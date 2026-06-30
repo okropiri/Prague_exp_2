@@ -10,12 +10,13 @@
 \usepackage{fontspec}
 \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
 
+\ifLuaTeX
 \setmainfont{Urbanist}[
   Path=fonts/Urbanist/,
-  UprightFont=Urbanist[wght].ttf,
-  ItalicFont=Urbanist-Italic[wght].ttf,
-  BoldFont=Urbanist[wght].ttf,
-  BoldItalicFont=Urbanist-Italic[wght].ttf,
+  UprightFont=Urbanist-VF.ttf,
+  ItalicFont=Urbanist-Italic-VF.ttf,
+  BoldFont=Urbanist-VF.ttf,
+  BoldItalicFont=Urbanist-Italic-VF.ttf,
   UprightFeatures={RawFeature={axis={wght=400}}},
   ItalicFeatures={RawFeature={axis={wght=400}}},
   BoldFeatures={RawFeature={axis={wght=700}}},
@@ -24,17 +25,40 @@
 
 \setsansfont{Urbanist}[
   Path=fonts/Urbanist/,
-  UprightFont=Urbanist[wght].ttf,
-  ItalicFont=Urbanist-Italic[wght].ttf,
-  BoldFont=Urbanist[wght].ttf,
-  BoldItalicFont=Urbanist-Italic[wght].ttf,
+  UprightFont=Urbanist-VF.ttf,
+  ItalicFont=Urbanist-Italic-VF.ttf,
+  BoldFont=Urbanist-VF.ttf,
+  BoldItalicFont=Urbanist-Italic-VF.ttf,
   UprightFeatures={RawFeature={axis={wght=400}}},
   ItalicFeatures={RawFeature={axis={wght=400}}},
   BoldFeatures={RawFeature={axis={wght=700}}},
   BoldItalicFeatures={RawFeature={axis={wght=700}}}
 ]
+\else
+\setmainfont{Urbanist}[
+  Path=fonts/Urbanist/,
+  UprightFont=Urbanist-VF.ttf,
+  ItalicFont=Urbanist-Italic-VF.ttf,
+  BoldFont=Urbanist-VF.ttf,
+  BoldItalicFont=Urbanist-Italic-VF.ttf
+]
 
-\setmonofont{Latin Modern Mono}[Scale=MatchLowercase]
+\setsansfont{Urbanist}[
+  Path=fonts/Urbanist/,
+  UprightFont=Urbanist-VF.ttf,
+  ItalicFont=Urbanist-Italic-VF.ttf,
+  BoldFont=Urbanist-VF.ttf,
+  BoldItalicFont=Urbanist-Italic-VF.ttf
+]
+\fi
+
+\IfFontExistsTF{Latin Modern Mono}{%
+  \setmonofont{Latin Modern Mono}[Scale=MatchLowercase]%
+}{%
+  \IfFontExistsTF{Menlo}{%
+    \setmonofont{Menlo}[Scale=MatchLowercase]%
+  }{}%
+}
 \fi
 
 \definecolor{NCALPrimary}{HTML}{071C33}
