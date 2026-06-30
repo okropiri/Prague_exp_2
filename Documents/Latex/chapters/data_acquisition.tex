@@ -236,3 +236,75 @@ Several conventions were adopted specifically for long remote campaigns.
 \end{itemize}
 
 In its current form, the DOGMA chain should be regarded as the robust production baseline for the commissioning data set. It already incorporates solutions to the most consequential analysis-side problems encountered so far: pulse-level cleaning, explicit \texttt{ch0} auditing, consistent time-versus-ToT products, dedicated RF diagnostics, and segment-aware handling of within-run RF phase resets. At the time of writing, the full remote rerun with this patched version is in progress and therefore serves as the definitive end-to-end validation of the present design.
+
+\subsection{Background treatment and gamma--neutron timing reference}
+
+The folded RF phase-versus-ToT plots are useful for developing gamma--neutron separation strategies, but they should not be interpreted as direct particle-identification maps without a background model. The radiation field seen by NCAL is mixed. It can contain prompt gammas from source-station materials, secondary capture gammas in hydrogenous material, room and shielding backgrounds, scattered neutrons, continuum neutrons from the beryllium target, random coincidences, electronic pickup, and residual artifacts from the timing-reference chain. For this reason, a compact region in phase--ToT space should be called gamma-like or neutron-like only after the non-beam and off-region contributions have been characterized.
+
+The working strategy is therefore hierarchical. First, beam-off, no-target, blocked-aperture, or sideband regions should be used where available to estimate components that are not correlated with the prompt beam timing. Second, cleanly separated regions of the position scan can be used to define empirical gamma-like and neutron-like templates. Third, regions where the two populations overlap should be treated statistically rather than by hard event labels. In an overlapped phase--ToT region, the observed density should be represented schematically as
+\begin{equation}
+N(\phi,\mathrm{ToT}) = A_{\gamma}G(\phi,\mathrm{ToT}) + A_{n}N_{n}(\phi,\mathrm{ToT}) + B(\phi,\mathrm{ToT}),
+\end{equation}
+where \(G\) is the prompt-gamma-like template, \(N_{n}\) is the neutron-like template, and \(B\) is the residual background model. Under such conditions, individual hits cannot be assigned uniquely to gamma or neutron populations using phase and ToT alone. They should instead receive probabilistic weights or be used only in fitted yield estimates with an explicit overlap uncertainty.
+
+An analytical time-of-flight reference is still needed to show why the position scan is expected to help. For a detector-face distance \(d\), the prompt-gamma time is
+\begin{equation}
+t_{\gamma}(d) = \frac{d}{c},
+\end{equation}
+while a neutron with kinetic energy \(E_{n}\) has
+\begin{equation}
+\beta_{n}(E_{n}) = \sqrt{1 - \left(1 + \frac{E_{n}}{m_{n}c^{2}}\right)^{-2}},
+\qquad
+t_{n}(d,E_{n}) = \frac{d}{\beta_{n}c}.
+\end{equation}
+The reference separation is therefore
+\begin{equation}
+\Delta t(d,E_{n}) = t_{n}(d,E_{n}) - t_{\gamma}(d).
+\end{equation}
+For the present campaign, \SI{30}{MeV} is used as the main reference energy because the reviewed \(p+\mathrm{Be}\) literature places the prominent high-energy forward-neutron structure near \SIrange{30}{32}{MeV}, with the thick-target spectrum extending up to about \SI{33}{MeV}. This should be understood as a reference curve for fast neutrons, not as a complete source-spectrum model.
+
+Figure~\ref{fig:gamma-neutron-tof-reference-positions} shows the resulting prompt-gamma and fast-neutron time-of-flight curves for the position-scan distances. The \SI{30}{MeV} reference gives separations of about \SI{28.5}{ns}, \SI{34.6}{ns}, \SI{40.7}{ns}, \SI{50.9}{ns}, \SI{59.0}{ns}, and \SI{67.2}{ns} at \SIlist{2.8;3.4;4.0;5.0;5.8;6.6}{m}, respectively. Since slower continuum neutrons arrive later, this reference marks the early fast-neutron scale rather than the full neutron timing envelope.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/Gamma_Neutron_deltaTOF_30MeV_reference_positions.png}
+\caption{Analytical prompt-gamma and fast-neutron time-of-flight reference for the NCAL position scan. The central neutron curve uses \SI{30}{MeV}; the shaded band indicates the small change between \SI{30}{MeV} and \SI{33}{MeV}. The \SI{30}{MeV} choice is a representative fast-neutron reference within the high-energy part of the \SI{35}{MeV} proton-on-beryllium spectrum, not a monoenergetic source assumption.}
+\label{fig:gamma-neutron-tof-reference-positions}
+\end{figure}
+
+The qualitative motivation for this treatment is visible directly in the folded RF phase-versus-ToT products. Figure~\ref{fig:position-scan-phase-tot-panel} collects representative channel-2, three-period folded maps from the completed position-scan runs. The compact prompt-like island remains narrow in phase and ToT, while the broader neutron-dominated structure changes its relative timing as the detector distance is varied. The figure is included to show the observable space in which the later template or mixture analysis must operate; the different panels should not be read as an absolute yield comparison because the displayed density scales are plot-level renderings.
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/phase_tot_position_scan/pos_2p8m_ch02_rf_phase_3x_vs_tot.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/phase_tot_position_scan/pos_3p4m_ch02_rf_phase_3x_vs_tot.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/phase_tot_position_scan/pos_4p0m_ch02_rf_phase_3x_vs_tot.png}
+\end{minipage}
+
+\vspace{0.5cm}
+
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/phase_tot_position_scan/pos_5p0m_ch02_rf_phase_3x_vs_tot.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/phase_tot_position_scan/pos_5p8m_ch02_rf_phase_3x_vs_tot.png}
+\end{minipage}\hfill
+\begin{minipage}{0.32\linewidth}
+\centering
+\includegraphics[width=\linewidth]{figures/phase_tot_position_scan/pos_6p6m_ch02_rf_phase_3x_vs_tot.png}
+\end{minipage}
+\caption{Representative channel-2 folded RF phase-versus-ToT maps across the position scan, displayed with a three-period RF phase axis. The panels motivate the later gamma--neutron separation strategy: at some positions the compact prompt-like island is visibly separated from the broader neutron-dominated distribution, while in overlap regions the event content must be treated as a statistical mixture rather than by unique hit-by-hit labels. The \SI{4.0}{m} panel uses the completed \texttt{NCAL\_20us\_Pos\_4m\_0001} run.}
+\label{fig:position-scan-phase-tot-panel}
+\end{figure}
+\end{landscape}
