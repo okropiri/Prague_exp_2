@@ -28,6 +28,7 @@ conda activate conda_env
 - `step04_write_cleaned_all_channel_rf_period_outputs.py`: writes step-04 ch0-ref RF timing, folded 1x profiles, folded 3x profiles, and folded phase-vs-ToT products.
 - `step04_write_rf_period_scan_outputs.py`: writes the dedicated RF-period-scan diagnostics in the old-style merit/sigma/residual format from the step-04 scan text outputs.
 - `step04_run_cleaned_all_channel_rf_period.py`: step-04 runner.
+- `step05_estimate_gamma_neutron_background.py`: first-pass channel-2 phase-vs-ToT sideband estimator for prompt-like ROI, broad neutron-candidate band, and local background control regions.
 
 ## Utility Files Kept Nearby
 
