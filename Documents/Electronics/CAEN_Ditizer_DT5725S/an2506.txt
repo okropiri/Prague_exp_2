@@ -1,0 +1,337 @@
+CAEN
+Tools for Discovery
+
+n
+
+Application Note AN2506
+Digital Gamma Neutron discrimination with Liquid Scintillators
+
+Viareggio
+19 November 2012
+
+Introduction
+In recent years CAEN has developed a complete family of digitizers that consists of several models differing in sampling frequency,
+resolution, form factor and other features. Besides the use of the digitizers as waveform recorders (oscilloscope mode), CAEN
+offers the possibility to upload special versions of the FPGA firmware that implement algorithms for the Digital Pulse Processing
+(DPP); when the digitizer runs in DPP mode, it becomes a new instrument that represents a complete digital replacement of most
+traditional modules such as Multi Channel Analyzers, QDCs, TDCs, Discriminators and many others. In this application note, we
+describe the capability of the series x720 (12 bit, 250MSps) to perform neutron-gamma discrimination based upon the digital pulse
+shape analysis. The development of this FPGA firmware was based upon liquid scintillating detectors of type BC501-A.
+All detector and neutron/gamma source based tests were performed at the Triangle Universities Nuclear Laboratory (TUNL) on the
+campus of the Duke University in collaboration with Mohammad Ahmed.
+
+Neutron-Gamma discrimination with liquid scintillators
+Liquid scintillating detectors are widely used to achieve neutron-gamma discrimination due to their effective Pulse Shape
+Discrimination (PSD) properties [1].
+The light emission of liquid scintillating detectors comprises of a fast decay component, as well as a substantial slow decay
+component. These components arise from de-excitations of different atomic states in the scintillator. The relative population of
+these states depends on the energy loss (dE/dx) of the particle. In organic liquid scintillators, these components strongly depend on
+the energy loss.
+The gamma rays interact in the scintillator mostly via atomic Compton scattering or pair production mechanisms. The neutrons are
+detected by scattering them with the protons. These two different processes for gamma-rays and neutrons give rise to significant
+difference in the slow decay component of the light emission. This difference becomes the basis of pulse shape discrimination in
+the liquid scintillating detectors [2].
+
+Set-up description
+The detector is a 5 inch diameter, 2 inch thick liquid scintillator of type
+BC501-A. The scintillator is coupled to a Hamamatsu R1250 photomultiplier tube (PMT). The base is also a Hamamatsu model HTV
+H6527. The detector is biased to -1430V.
+The signals from the PMTs are connected to the digitizer inputs via
+120 feet low-loss RG8 cables.
+The detector is biased to -1430V. The signals from the PMTs are
+connected to the digitizer inputs via 120 feet low-loss RG8 cables.
+The digitizer is a 4 channel, 12 bit, 250 MS/s DT5720 (Desktop
+version). The analog bandwidth is about 120 MHz and the input
+dynamic range is 2 Vpp; the DC offset can be adjusted by means of an
+internal DAC in the range -2/+2 V.
+
+Fig. 1: The detector used for these measures is a 5”x2” BC501-A
+liquid scintillator coupled to an Hamamatsu R1250 PMT
+
+
+
+
+
+The digitizer runs the preliminary version of the DPP-PSD firmware for
+the digital charge integration and neutron-gamma discrimination. This
+principle of operation of the DPP-PSD firmware can be summarized by
+the following operations that are executed in real time inside the
+FPGA
+
+The baseline of the signal is calculated by a programmable length mean filter and subtracted from the input signal; the
+result is compared with the trigger threshold and, if exceeded, a trigger is issued; it is also possible to use the threshold
+only to get armed, then wait for the pulse peak and issue the trigger at that time.
+With the trigger, the baseline is frozen, two gates of programmable width are opened and the charge integration starts;
+the signal fed to the integrator is delayed of a programmable number of samples in order to let the gates to start before
+the trigger.
+The trigger also initiates the event building: this can include the waveforms (i.e. row samples) of the input, baseline,
+trigger, gate and other signals, the time stamp of the trigger and the charges calculated within the two gates (short and
+long).
+
+1
+
+CAEN
+Tools for Discovery
+
+
+
+n
+
+Application Note AN2506
+Digital Gamma Neutron discrimination with Liquid Scintillators
+
+At the end of the long gate, the baseline calculation restarts
+and the system gets ready for a new event; if the waveform
+mode is enabled, the recording continues until the
+requested number of samples have been saved into the
+memory.
+
+With the DPP-PSD firmware, each channel has the ability to detect the
+input pulses and to self trigger independently by the other channels.
+Common triggering is still possible using the external or software
+trigger.
+Fig. 2: Digitizer Mod. DT5720 (4 channel, 12 bit, 250MS/s) used
+for this test
+
+Calibration
+
+The energy calibration of the liquid scintillating detector was performed using the 662 keV gamma-ray from a 137Cs source. The
+Compton scattered gamma rays produce a “Compton Edge”. Due to multiple scattering effects, the hard Compton edge is smeared
+towards higher energies to produce the spectrum as shown in Fig. 1.2 in which the peak is clearly recognizable.
+Compton edge can be determined [3] using:
+Nc = channel number of the Compton edge
+
+Nc  NP  1.177
+
+NP = channel number of the edge peak centroid
+
+ = standard deviation of the edge peak
+
+The spot half-way from the maximum is taken as the “1-Cs-Edge” and the thresholds are set with respect to this Cs-Edge. For
+example, in the Fig 1.2 the 1-Cs-Edge is about 3750 ADC channels, a 1/8 Cs threshold would be at 468 ADC channels.
+
+Fig. 3: Cs-137 Spectrum with the Compton edge at 447 keV
+used for the calibration
+
+Neutron - Gamma Measurements
+We used an Americium-Beryllium (AmBe) source placed at about 1 meter away from the detector (measured rate = 2 kcounts/s) as
+a source of neutrons and gamma rays. The DPP-PSD parameters used for the acquisition are reported in Tab. 1. It is worth noticing
+that the value of the trigger threshold is not equal to the energy threshold, although they are somehow related. In fact, the trigger
+threshold is actually the voltage (in ADC counts) that a pulse must exceed in order to be triggered. Instead, the energy is
+represented by the charge accumulated within the long gate.
+TRIGGER THRESHOLD
+
+100
+
+1 ADC count = 0.5mV
+
+SHORT GATE WIDTH
+
+100 ns
+
+= 25 samples
+
+LONG GATE WIDTH
+
+320 ns
+
+= 80 samples
+
+GATE ANTICIPATION
+
+40 ns
+
+This is the delay applied to the input signal before entering the accumulator;
+it defines how long the gates start be
+
+BASELINE THRESHOLD
+
+3
+
+This threshold is used to exclude noise spikes from the baseline calculation
+
+NUM SAMP BL
+
+16
+
+Number of samples for the calculation of the baseline (mean filter)
+
+SENSITIVITY
+
+40fC/LSB
+
+This parameter defines the sensitivity of the charge integrator and it determines
+the full scale range of the charge (which is expressed as a 16 bit number)
+
+Tab. 1: DPP-PSD parameters
+
+2
+
+CAEN
+Tools for Discovery
+
+n
+
+Application Note AN2506
+Digital Gamma Neutron discrimination with Liquid Scintillators
+
+In Fig. 4 the average waveforms of neutron and gamma particles are shown. These waveforms are realized averaging off-line 50
+events per particle characterized by the same area. It is possible to notice the higher fraction of slow component for neutrons than
+gammas. The short and the long gate used in the acquisition are also shown.
+
+Fig. 4: Average waveforms of neutron and
+gamma pulses. In the right corner, a zoom
+showing the different fraction of slow
+component for gammas and neutrons is
+drawn.on
+
+The PSD (pulse shape discrimination) is a number that is calculated (off line)
+according to the following formula:
+
+PSD 
+
+QL  QS
+QL
+
+QL = charges calculated within long gate
+QS = charges calculated within short gate
+
+During the acquisition, the list of the events (Time Stamp + QS + QL) is read from the DT5720 and saved to disk (one file per
+channel). At the end of the acquisition, the files are post processed in order to calculate the energy histograms, the PSD number
+and to make the relevant plots. We are here considering a run of 200000 events.
+Fig. 2.2 is a 2D plot of the counts as function of the pulse Energy (X-axis) and PSD (Y-axis); the two lobes of the neutrons and
+gammas are well separated and they don’t present any bending, thus making easy the n-g discrimination.
+
+Fig. 5: 2D plot of Energy versus PSD
+(AmBe source @ 2 kcounts/s)
+
+To quantify the separation of the lobes, it is possible to make an energy cut, take only the points of the 2D plot above that energy
+and project them along the Y-axis. The resulting plot has the PSD on the X axis and the counts on the Y axis. The energy cut is
+applied off-line.
+In Fig. 6 such a plot is shown for five different energy cuts, that is 1/8, 1/4, 1/2, 1 and 2 times the 137Cs- Compton edge. Note that
+1/8 is about the lower limit given by the trigger threshold, hence this is not an actual cut. This plot helps in finding the PSD value
+optimizing the n-g separation.
+
+3
+
+CAEN
+Tools for Discovery
+
+n
+
+Application Note AN2506
+Digital Gamma Neutron discrimination with Liquid Scintillators
+
+In order to quantify the effectiveness of the neutron-gamma discrimination, the Figure of Merit, FOM, is usually used [4]; FOM is
+defined as:
+
+FOM 
+
+Peak
+FWHMn  FWHM
+
+Peak = separation between the neutron and gamma peaks
+FWHMn = full width at half maximum of the neutron peaks
+FWHM = full width at half maximum of the gamma peaks
+
+In Fig. 6 the FOM value for each energy cut is also shown.
+
+Fig. 6: Energy cuts with the relevant projection of Fig. 5 along the PSD axis (AmBe source @ 2 kcounts/s)
+
+In the final version of the DPP-PSD firmware, it will be possible to set a PSD threshold and discard all the events above it (essentially
+most of the gammas), since in many applications only the neutrons have to be acquired. This feature is particularly important in the
+cases where the counting rate of the gammas is much higher than that one of the neutrons.
+Two other data acquisitions were performed increasing the count rate at 10 kcounts/s and 37 kcounts/s. In
+plots of these acquisitions are shown.
+
+and
+
+the 2D
+
+4
+
+CAEN
+Tools for Discovery
+
+n
+
+Application Note AN2506
+Digital Gamma Neutron discrimination with Liquid Scintillators
+
+Fig. 7: 2D plot of Energy versus PSD
+(AmBe source @ 10 kcounts/s)
+
+Fig. 8: 2D plot of Energy versus PSD
+(AmBe source @ 37 kcounts/s)
+
+Comparing the measures at 2, 10 and 37 kcounts/s we notice that, despite of a smearing of the two lobes, the neutron-gamma
+separation is still effective.
+In Fig. 9 the projections of the 2D plots referring to the different counting rates are shown having set the energy cut to 1/4 Cs. The
+projections are normalized to their area in order to compare the three distributions of PSD.
+
+Fig. 9: Energy cut set at 1/4 Cs with the
+relevant projection of the PSD axis
+(AmBe source @ 2 kcounts/s, 10
+kcounts/s, 37 kcounts/s). The histograms
+are normalized to their area.)
+
+Considering Fig. 9, increasing the counting rate leads to two different effects in the PSD distribution: the centroids of the gamma
+and neutron peaks are shifted to higher values of PSD and the ratio between the gamma peak and the neutron one decreases.
+The first effect is due to baseline shift caused by the tail of pulses preceding the event going to be analyzed by the DPP-PSD; vice
+versa, the second effect is due to pulses following the analyzed one that fall into the long gate (even partially). In this way, QL, and
+therefore the PSD value, increases causing a wrong identification of a large fraction of gammas as neutrons.
+
+5
+
+CAEN
+Tools for Discovery
+
+n
+
+Application Note AN2506
+Digital Gamma Neutron discrimination with Liquid Scintillators
+
+It is possible to modify the FPGA algorithms in order to cope with both effects: the baseline can be made more stable and precise
+by adding a programmable hold-off time that prevents a new trigger to open the integration gate too close to the previous pulse,
+thus leaving enough time for the baseline restoring. As for the multiple pulses within the gate, it is possible to implement a pile-up
+rejector that discards the events for which the signal presents multiple peaks. These features are currently under study.
+
+References
+[1]
+
+P. J. Sellin, G. Jaffar and S. D. Jastaniah, “Performance of digital algorithms for n/γ pulse shape discrimination using a liquid scintillation
+detector”, 2003 IEEE Nuclear Science Symposium and Medical Imaging Conference Record.
+
+[2]
+
+W.R. Leo, “Techniques for Nuclear and Particle Physics Experiments: A How-to Approach”, 2nd Revised Edition. Springer-Verlag.
+
+[3]
+
+G.C. Chikkura, N. Umakantha, “A new method of determining the Compton edge in liquid scintillators”, Nuclear Instruments and Methods,
+Volume 107, Issue 1, 15 February 1973, Pages 201-202.
+
+[4]
+
+R. Aryaeinejad, J. K. Hartwell, D. F. Spencer,“Comparison between digital and analog pulse shape discrimination techniques for neutron and
+gamma ray separation”, 2005 IEEE Nuclear Science Symposium and Medical Imaging Conference Record.
+
+Application Note AN2506 - Digital Gamma Neutron discrimination with Liquid Scintillators rev.3 – 09 September 2016
+00117-10-DGT20-ANXX
+Copyright © CAEN SpA. All rights reserved. Information in this publication supersedes all earlier versions. Specifications subject to change without notice.
+
+CAEN
+Tools for Discovery
+
+n
+
+CAEN SpA
+Via Vetraia 11
+55049 – Viareggio Italy
+Tel +39.0584.388.398
+Fax +39.0584.388.959
+info@caen.it www.caen.it
+
+www.caen.it6
+
+

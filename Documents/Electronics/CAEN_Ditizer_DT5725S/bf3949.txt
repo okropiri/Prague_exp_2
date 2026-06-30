@@ -1,0 +1,696 @@
+CAEN
+
+Modular Pulse Processing Electronics
+
+Tools for Discovery
+
+725 - 730 Digitizer Families
+16/8 Channel 14-bit 250-500 MS/s Digitizer
+
+The perfect mix of sampling rate,
+resolution and channel density for
+the maximum flexibility
+Today with the NEW DAW and
+ZLEplus DPPs!
+Features
+
+Applications
+
+• Sampling rate:
+- 500 MS/s (730 family)
+- 250 MS/s (725 family)
+
+• Dark Matter and Astroparticle Physics
+
+• Resolution: 14-bit
+
+• Analog input on MCX coax. connectors
+• VME64/VME64X (16/8 ch.), NIM (8 ch.) and Desktop (8 ch.)
+modules
+• 0.5 or 2 Vpp input dynamic range with programmable DC
+offset adjustment
+• Algorithms for Digital Pulse Processing and effective zerosuppression
+• VME64/VME64X, USB and Optical Link communication
+interfaces
+• Multi-board synchronization features
+• 16 programmable LVDS I/Os
+• Daisy chain capability
+• Demo software tools, DPP Control Software, CAEN
+Compass and MC2 Analyzer Software, C and LabVIEW
+libraries
+
+26
+
+• Nuclear and Particle Physics
+• Fast Neutron Spectroscopy
+• Fusion Plasma Diagnostic
+• Environmental Monitoring
+• Homeland Security
+
+Overview
+725 and 730 are two families of CAEN Waveform Digitizer able
+to perform basic waveform recording and run online advanced
+algorithms for digital pulse processing: charge integration and pulse
+shape discrimination with constant fraction timing (DPP-PSD), pulse
+height analysis (DPP-PHA), zero-length encoding (DPP-ZLEplus),
+and dynamic acquisition window (DPP-DAW). The wide selection of
+DPP algorithms supported by the two families makes the 730 and
+725 a “must-have” for any kind of nuclear physics application.
+Data is read by a Flash ADC, 14-bit resolution and 500 MS/s (x730)
+or 250 MS/s (x725) sampling rate, which is well suited for mid-fast
+signals as the ones coming from liquid or inorganic scintillators
+coupled to PMTs or Silicon Photomultipliers, but also for high
+precision detectors as Silicon or HPGe coupled with charged
+sensitive preamplifiers. In this case the sampling rate can be
+
+USB
+
+reduced using the decimation feature. The acquisition can be
+channel independent and it is possible to make coincidence/anticoincidence logic among different channels and external veto/
+gating. Multiple boards can be synchronized to build up complex
+systems. The data stream is written in a circular memory buffer
+with independent read/write access, which reduces the deadtime of the acquisition process. In case of DPP mode, data can
+be saved in time-stamped list mode to support higher input rates
+by improving the throughput performances. Piled-up events can
+be rejected or saved for offline analysis.
+
+An USB 2.0 link is provided in NIM and Desktop
+form factors for an easy data readout.
+
+Digital I/O
+Digital I/Os are provided in VME boards
+that can be used for individual trigger
+propagation to external trigger logic. This
+feature makes VME form factor ideal to scale
+up the acquisition channels where a global
+trigger generation is mandatory.
+
+Optical Link
+An Optical link is provided in any form factor
+for high performance data readout through
+CAEN proprietary daisy-chainable CONET
+communication protocol.
+
+730 and 725 families come in three form factors: VME (16 or 8
+input channels), NIM (8 input channels) and Desktop (8 input
+channels). The communication to and from the board is provided
+through the following interfaces: USB (DT and NIM form factors),
+VMEbus (VME form factor), and Optical Link (all form factors).
+
+Model Compare
+Model
+
+No. Of Channels
+
+Resolution (bits) Max Sampling Rate (MS/s)
+
+Bandwidth (MHz)
+
+Board Memory Samples/ch Package
+
+DT5725
+
+8
+
+14
+
+250
+
+125
+
+640 k - 5.12 M
+
+Desktop
+
+DT5730
+
+8
+
+14
+
+500
+
+250
+
+640 k - 5.12 M
+
+Desktop
+
+N6725
+
+8
+
+14
+
+250
+
+125
+
+640 k - 5.12 M
+
+1U - NIM
+
+N6730
+
+8
+
+14
+
+500
+
+250
+
+640 k - 5.12 M
+
+1U - NIM
+
+V1725
+
+8 / 16
+
+14
+
+250
+
+125
+
+640 k - 5.12 M
+
+6U - VME64
+
+V1730
+
+8 / 16
+
+14
+
+500
+
+250
+
+640 k - 5.12 M
+
+6U - VME64
+
+VX1725
+
+8 / 16
+
+14
+
+250
+
+125
+
+640 k - 5.12 M
+
+6U - VME64X
+
+VX1730
+
+8 / 16
+
+14
+
+500
+
+250
+
+640 k - 5.12 M
+
+6U - VME64X
+
+Firmware / Software
+x730 - x725 digitizers are provided with FPGAs that can run Digital Pulse Processing firmware for Physics
+Applications.
+
+DPP-PHA - Pulse Height Analysis
+Free downloadable DPP-PHA Trial version
+
+725 and 730 digitizers running DPP-PHA firmware
+become multichannel data acquisition systems
+for nuclear physics or other applications requiring
+radiation detection. The digitizers accept signals
+directly from Charge Sensitive Preamplifiers or photomultiplier
+and implement a digital replacement of Shaping Amplifier and
+Peak Sensing ADC (Multi-Channel Analyzer).
+
+Available software:
+MC2Analyzer
+
+Software with basic analysis tools and complete
+acquisition / control capabilities for CAEN Digital
+MCAs and Digitizers running Pulse Height
+Analysis. It allows to manage multiple boards, to set the
+relevant DPP-PHA parameters, to collect the spectra and
+perform mathematical analysis, like energy calibration, peak
+search, background subtraction, peak fitting, etc..
+
+Some typical applications:
+• Gamma ray spectroscopy with Germanium and Silicon Detectors
+• Readout of PMTs with slow scintillators (for instance NaI)
+• Applications that require a moderate timing resolution to make
+coincidences
+
+CoMPASS
+
+Multiparametric DAQ Software for Physics
+Applications
+
+27
+
+DPP-PSD - Pulse Shape Discrimination
+Free downloadable DPP-PSD Trial version
+
+725 and 730 digitizers running DPP-PSD firmware
+become multichannel data acquisition systems
+for nuclear physics or other applications requiring
+radiation detection. The digitizers accept signals
+directly from the detector and implement a digital replacement
+of Dual Gate QDC, Discriminator and Gate Generator.
+Some typical applications:
+• Readout of PMTs coupled to organic liquid scintillators (e.g.
+BC501-A)
+• Applications that require a moderate timing resolution to perform
+coincidences
+• Gamma-Neutron discrimination (dual gate integration)
+
+Available software:
+CoMPASS
+
+CAEN Multi-PArameter Spectroscopy Software
+(CoMPASS) is the new software from CAEN able
+to implement a Multi-parametric DAQ for Physics
+Applications, where the detectors can be connected
+directly to the digitizers inputs and the software acquires
+energy, timing, and PSD spectra.
+It features a User-friendly GUI when different CAEN
+digitizer models with DPP firmwares are detected. The
+software harmonizes the data in a unique format both
+for synchronous and asynchronous acquisitions of
+disomogeneous CAEN boards. The resulting data can be
+plotted and saved thanks to the CERN Root interface.
+
+DPP-ZLEplus - Zero Length Encoding
+Free downloadable DPP-ZLEplus Trial version
+
+The Zero Length Encoding (DPP-ZLEplus) allows
+the user to transfer the digitized waveforms in
+compressed mode, performing an enhanced Zero
+Suppression algorithm on the input signals.
+The DPP-ZLEplus identifies and saves those samples where
+the distance from the baseline is larger than a programmable
+threshold, while discarding samples not fulfilling this
+requirement. The acquisition window, triggered by a global
+trigger, is completely scanned, but only the relevant data
+is saved. The event data size can be therefore quite small
+compared with the data produced by the ADCs in the same
+window.
+
+Available software:
+
+ZLE +
+
+DPP-ZLEplus
+
+DPP-ZLEplus Control Software is an open source
+CAEN software which can configure the setup, start/stop
+the acquisition and manage the data readout: the
+waveforms elaborated by the ZLEplus algorithm are plotted
+using Gnuplot or saved to output text files. The user can make
+an entire acquisition through this software, as well customize
+the readout program thanks to the C source files and the
+provided VS project.
+
+Some typical applications:
+• Readout of a large number of detectors following a global trigger
+• Application requiring an effective data reduction Gamma-Neutron
+discrimination (dual gate integration)
+
+DPP-DAW - Dynamic Acquisition Window
+COMING SOON
+
+The DPP-DAW firmware allows the user to
+acquire data from each channel independently
+and to adapt the acquisition window to the real
+pulse duration (over-threshold). Samples are
+identified when their distance from the baseline is larger than
+a programmable threshold. After the minimum record length is
+reached, the DPP-DAW firmware acquires the input samples
+until they return below the threshold level for a programmable
+number of samples. The acquisition can be vetoed/gated with
+an external signal on TRG-IN front panel connector.
+The DPP-DAW firmware has many advantages, like the
+possibility to acquire each channel independently and the
+possibility to adjust the record length to each event individually.
+This ensure an optimization of the data transfer, since only the
+“relevant” samples are transmitted, while channels with no data
+are not transferred at all.
+
+28
+
+Available software:
+
+DAW
+
+DPP-DAW
+
+DPP-DAW Control Software is an open source
+
+CAEN software which can configure the setup, start/
+
+stop the acquisition and manage the data readout:
+the waveforms elaborated by the DAW algorithm are plotted
+using Gnuplot or saved to output text files. The user can make
+an entire acquisition through this software, as well customize
+the readout program thanks to the C source files and the
+provided VS project.
+Some typical applications:
+• Neutrino experiment
+• Large number of detectors
+• Drift chambers, TPC, Cherenkov detectors
+• Application requiring an effective data reduction
+
+Waveform Recording Firmware
+
+Ordering Option
+
+Free downloadable
+
+The default firmware for Waveform Recording
+takes advantage of the flash ADC technology of
+the digitizer to convert and retrieve the analog
+input into digital waveform samples, preserving the
+information required by the experimental activities
+and the applications of nuclear techniques.
+Each channel of the digitizer is able to implement a digital
+discriminator that generates a trigger when a certain condition
+is met; in the basic implementation, this is just a programmable
+threshold which is continuously compared to the digitized input.
+The waveform digitizer therefore provides time information
+and digitized signal waveforms through fast communication
+interfaces, allowing the user to operate post-processing data
+analysis.
+
+Code
+
+Description
+
+WDT5725SXAAA
+
+DT5725S - 8 Ch. 14 bit 250 MS/s Digitizer: 640kS/ch, CE30, SE Desktop
+
+Form Factor
+
+WDT5725SBXAA
+
+DT5725SB - 8 Ch. 14 bit 250 MS/s Digitizer: 5.12MS/ch, CE30, SE
+
+Desktop
+
+WN672S5XAAAA
+
+N6725S - 8 Ch. 14 bit 500 MS/s Digitizer: 640kS/ch, CE30, SE
+
+NIM
+
+WN6725SBXAAA
+
+N6725SB - 8 Ch. 14 bit 500 MS/s Digitizer: 5.12MS/ch, CE30, SE
+
+NIM
+
+WV1725SXAAAA
+
+V1725S - 16 Ch. 14 bit 250 MS/s Digitizer: 640kS/ch, CE30, SE
+
+6U-VME64
+
+WV1725SBXAAA
+
+V1725SB - 16 Ch. 14 bit 250 MS/s Digitizer: 5.12MS/ch, CE30, SE 6U-VME64
+
+WV1725SCXAAA
+
+V1725SC - 8 Ch. 14 bit 250 MS/s Digitizer: 640kS/ch, CE30, SE 6U-VME64
+
+WV1725SDXAAA
+
+V1725SD - 8 Ch. 14 bit 250 MS/s Digitizer: 5.12MS/ch, CE30, SE
+
+WVX1725SXAAA
+
+VX1725S - 16 Ch. 14 bit 250 MS/s Digitizer: 640kS/ch, CE30, SE
+
+6U-VME64X
+
+WVX1725SBXAA
+
+VX1725SB - 16 Ch. 14 bit 250 MS/s Digitizer: 5.12MSch, CE30, SE
+
+6U-VME64X
+
+WVX1725SCXAA
+
+VX1725SC - 8 Ch. 14 bit 250 MS/s Digitizer: 640kS/c, CE30, SE 6U-VME64X
+
+WVX1725SDXAA
+
+VX1725SD - 8 Ch. 14 bit 250 MS/s Digitizer: 5.12MS/ch, CE30, SE
+
+WFWDPPTFAA25
+
+DPP-PHA - Digital Pulse Processing for Pulse Height Analysis (16 ch 6U-VME64
+x725)
+VME64X
+
+WFWDPPTFAD25
+
+DPP-PHA - Digital Pulse Processing for Pulse Height Analysis for (8ch x 725)
+
+6U-VME64
+
+6U-VME64X
+
+ALL
+
+WFWDPPNGAA25 DPP-PSD - Digital Pulse Processing for Pulse Shape Discrimination (16 ch 6U-VME64
+
+x725)
+
+VME64X
+
+WFWDPPNGAD25 DPP-PSD - Digital Pulse Processing for Pulse Shape Discrimination (8ch x725) ALL
+WFWDPPTWAA25 DPP-DAW - Digital Pulse Processing with Dynamic Acquisition Windows 6U-VME64
+
+(16ch x725)
+
+Available software:
+
+VME64X
+
+WFWDPPTWAD25 DPP-DAW - Digital Pulse Processing with Dynamic Acquisition Windows ALL
+
+(8ch x725)
+
+CAEN WaveDump
+
+WaveDump is a basic console application, with no
+graphics, supporting digitizers running Waveform
+Recording Firmware. It allows the user to program a single
+board (according to a text configuration file containing a list
+of parameters and instructions), to start/stop the acquisition,
+read the data, display the readout and trigger rate, apply
+some post-processing (e.g. FFT and amplitude histogram),
+save data to a file and also plot the waveforms using Gnuplot.
+Starting with this demo is strongly recommended to all those
+users willing to write the software on their own. Source files
+and the VS project are included for developers.
+
+CAENScope
+
+CAENScope is a user friendly software interface
+to specifically control CAEN digitizer running
+Waveform Recoding Firmware. The software
+interface presents different sections to easily manage
+the digitizer configuration and plot the waveforms. Once
+connected, the program retrieves the digitizer information.
+Different parameters can be set for the channels, the
+trigger and the trace visualization (up to 12 traces can be
+simultaneously plotted). Signals are recordable to files in two
+different formats: Binary (SQLite db) and Text (XML).
+
+WFWDPPZLAA25
+
+DPP-ZLEplus - Digital Pulse Processing Zero Length Encoding for (16ch x725) 6U-VME64
+VME64X
+
+WFWDPPZLAD25
+
+DPP-ZLEplus - Digital Pulse Processing Zero Length Encoding for (8ch x725) ALL
+
+WFWDPPS2501A
+
+DPP-SUP - Super Licence for 16ch x 725 Digital Pulse Processing
+
+6U-VME64
+VME64X
+
+WFWDPPS2501D
+
+DPP-SUP - Super Licence for 8ch x 725 Digital Pulse Processing
+
+ALL
+
+Code
+
+Description
+
+Form Factor
+
+WDT5730SXAAA
+
++;S*OIP[4:Z+PNP[PaLY!R:JO*,:, +LZR[VW
+
+WDT5730SBXAA
+
++;S)*OIP[4:Z+PNP[PaLY!4:JO*,:, +LZR[VW
+
+WN6730SXAAAA
+
+5S*OIP[4:Z+PNP[PaLY!R:JO*,:,
+
+504
+
+WN6730SBXAAA
+
+5S)*OIP[4:Z+PNP[PaLY!4:JO*,:,
+
+504
+
+WV1730SXAAAA
+
+=S*OIP[4:Z+PNP[PaLY!R:JO*,:,
+
+<=4,
+
+WV1730SBXAAA
+
+=S)*OIP[4:Z+PNP[PaLY!4:JO*,:,
+
+<=4,
+
+WV1730SCXAAA
+
+=S**OIP[4:Z+PNP[PaLY!R:JO*,:, <=4,
+
+WV1730SDXAAA
+
+=S+*OIP[4:Z+PNP[PaLY!4:JO*,:,
+
+<=4,
+
+WVX1730SXAAA
+
+=?S*OIP[4:Z+PNP[PaLY!R:JO*,:,
+
+<=4,?
+
+WVX1730SBXAA
+
+=?S)*OIP[4:Z+PNP[PaLY!4:JO*,:, <=4,?
+
+WVX1730SCXAA
+
+=?S**OIP[4:Z+PNP[PaLY!R:JO*,:,
+
+WVX1730SDXAA
+
+=?S+*OIP[4:Z+PNP[PaLY!4:JO*,:, <=4,?
+
+<=4,?
+
+WFWDPPTFAA30 +777/(+PNP[HS7\SZL7YVJLZZPUNMVY7\SZL/LPNO[(UHS`ZPZJO  < = 4 ,  
+
+_
+
+=4,?
+
+WFWDPPNGAA30 +777:++PNP[HS7\SZL7YVJLZZPUNMVY7\SZL:OHWL+PZJYPTPUH[PVUJO  < = 4 ,  
+
+_
+
+=4,?
+
+WFWDPPTFAD30 +777/(+PNP[HS7\SZL7YVJLZZPUNMVY7\SZL/LPNO[(UHS`ZPZMVYJO_
+
+ALL
+
+WFWDPPNGAD30 +777:++PNP[HS7\SZL7YVJLZZPUNMVY7\SZL:OHWL+PZJYPTPUH[PVUJO_ ALL
+WFWDPPDWAA30 +77+(>  +PNP[HS 7\SZL 7YVJLZZPUN ^P[O +`UHTPJ (JX\PZP[PVU >PUKV^Z <=4,
+
+JO_
+
+=4,?
+
+WFWDPPDWAD30 +77+(>  +PNP[HS 7\SZL 7YVJLZZPUN ^P[O +`UHTPJ (JX\PZP[PVU >PUKV^Z ALL
+
+JO_
+
+All CAEN Control Software are available for free
+download on the web site.
+
+CAEN
+
+Tools for Discovery
+Copyright © CAEN SpA - 2019
+All rights reserved. Information in this publication
+supersedes all earlier versions. Specifications subject
+to change without notice.
+BF3949-rev6
+Printed in November 2019
+
+CAEN SpA
+
+Via Vetraia 11, 55049 - Viareggio • Italy
+Phone +39.0584.388.398 • Fax +39.0584.388.959
+info@caen.it
+www.caen.it
+
+CAEN GmbH
+
+WFWDPPZLAA30
+
++77A3,WS\Z+PNP[HS7\SZL7YVJLZZPUNALYV3LUN[O,UJVKPUNMVYJO_ <=4,
+=4,?
+
+WFWDPPZLAD30
+
++77A3,WS\Z+PNP[HS7\SZL7YVJLZZPUNALYV3LUN[O,UJVKPUNMVYJO_ ALL
+
+WFWDPPS3001A
+
++77:<7:\WLY3PJLUJLMVYJO_+PNP[HS7\SZL7YVJLZZPUN
+
+<=4,
+=4,?
+
+WFWDPPS3001D
+
++77:<7:\WLY3PJLUJLMVYJO_+PNP[HS7\SZL7YVJLZZPUN
+
+ALL
+
+Klingenstraße 108, 42651 - Solingen • Germany
+Phone +49.212.2544077 • Fax +49.212.2544079
+info@caen-de.com
+www.caen-de.com
+
+CAEN Technologies, Inc.
+
+1140 Bay Street - Suite 2C, Staten Island, NY 10305 • USA
+Phone +1.718.981.0401 • Fax +1.718.556.9185
+info@caentechnologies.com
+www.caentechnologies.com
+
+

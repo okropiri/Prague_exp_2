@@ -1,0 +1,17 @@
+input_file=/data6/Data/NCAL_Test_Prescaler1024_TrigWindow_0x83e803e8_20us_Pos_3.4m_20260425_0000.dld.dat
+event_stride=1
+trigger_reset_threshold_seconds=1.000000
+parsed_headers=27013584
+parsed_rows=697922772
+finalized_events=13504506
+processed_events=13504506
+duplicate_restart_detected=true
+duplicate_restart_previous_trigger_seconds=4820.507853
+duplicate_restart_new_trigger_seconds=-574.051516
+duplicate_restart_headers_skipped=27013584
+elapsed_seconds=189.362597
+
+custom_Ncal1_entries=13504506.000000
+custom_ProfNcal1_entries=11462997.000000
+custom_ProfLstilbene_entries=12034321.000000
+custom_ProfSstilbene_entries=46463.000000

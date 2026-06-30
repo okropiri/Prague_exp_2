@@ -1,0 +1,12 @@
+Backup record created: 2026-06-05
+Source machine: dachi-Latitude-7450
+
+Backed up to IKP (padiwa):
+- Local source (deleted): /home/dachi/Documents/NCAL_FSD/Prague_Cyclotron_Exp_2/Dogma_Analysis/Results
+  Remote backup: /data6/Laptop_Backups/NCAL_FSD/Prague_Cyclotron_Exp_2/Dogma_Analysis_Results
+
+- Local source (deleted): /home/dachi/Documents/NCAL_FSD/Prague_Cyclotron_Exp_2/Data
+  Remote backup: /data6/Laptop_Backups/NCAL_FSD/Prague_Cyclotron_Exp_2/Data
+
+Google Drive target path (to upload manually later):
+- Google Drive/My Drive/Backups/NCAL_FSD/Prague_Cyclotron_Exp_2/

@@ -1,0 +1,192 @@
+\chapter{Experimental Detector Systems}
+
+This chapter summarizes the detector systems currently used in the experiment and the parts of their readout chains that matter for operation and data interpretation. The present hardware inventory includes a primary gamma-spectroscopy detector, consisting of an ORTEC 905-4 NaI(Tl) detector head coupled to an ORTEC Model 276 photomultiplier base with integrated preamplifier, two auxiliary thin scintillation counters instrumented with compact Hamamatsu PMT hardware, and one compact stilbene-based parallel monitor detector provided by the beamline team at \NCALInstitute. The discussion is organized by detector system rather than by vendor component alone, because in practical operation the experimentally relevant object is the full detector-plus-readout chain.
+
+\section{Detector inventory and intended role}
+
+Table~\ref{tab:detector-summary} summarizes the detector systems presently identified for the campaign in a compact form suitable for later comparison of detector medium, sensor chain, biasing, signal compatibility, and experimental role. Where a parameter has not yet been verified directly in the available documentation or campaign notes, it is marked explicitly as not yet verified rather than inferred.
+
+\begin{landscape}
+\begin{table}[p]
+\centering
+\caption{Summary of detector systems presently identified for the campaign.}
+\label{tab:detector-summary}
+\small
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{3.1cm}>{\centering\arraybackslash}p{0.9cm}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{2.2cm}Y}
+\toprule
+Detector & \shortstack[c]{Detector\\medium} & \shortstack[c]{Sensor /\\Readout} & \multicolumn{1}{c}{Qty} & \shortstack[c]{HV\\range} & \shortstack[c]{Signal\\range} & \shortstack[c]{Signal\\polarity} & Role \\
+\midrule
+ORTEC 905-4 chain & 3-inch $\times$ 3-inch NaI(Tl) crystal & 3-inch PMT + ORTEC 276 base/preamplifier & 1 & Positive HV up to \SI{2000}{V} at the base & Branch dependent; preamp and anode outputs serve different purposes & Positive preamp output; negative anode output & Gamma spectroscopy; calibration; threshold studies; commissioning support \\
+Thin plastic scintillation counters & Thin plastic detectors; dimensions N/A & Hamamatsu E1761-04 socket assembly for 10 mm PMTs & 2 & Negative HV up to \SI{1500}{V} & Setup-specific pulse amplitude not yet verified in archived notes & Negative & Charged-particle or prompt-timing support; coincidence studies; auxiliary trigger work \\
+SCIONIX stilbene monitor & 5 $\times$ 5 $\times$ 15 mm crystalline stilbene & Hamamatsu R12421 PMT, direct raw-anode readout & 1 & Negative HV in assembled probe; PMT $|V_{\mathrm{AK}}|$ up to \SI{1250}{V} & Several-hundred-ns negative anode pulses; typically few-hundred-mV into \SI{50}{\ohm}, possibly approaching about \SI{1}{V} in current working notes & Negative & Parallel neutron monitor and relative beam-flux reference \\
+\bottomrule
+\end{tabularx}
+\par\smallskip
+\begin{minipage}{\linewidth}
+\footnotesize
+\textit{Sources:} Gamma-detector entry compiled from the ORTEC 905-series detector documentation and the ORTEC Model 276 manual \citep{ORTEC905SeriesManual,ORTEC276Manual}. Thin-plastic-detector readout and high-voltage limits from the Hamamatsu E1761-04 documentation \citep{HamamatsuE176104Page}. Stilbene-monitor PMT and high-voltage limits from the Hamamatsu R12421 datasheet \citep{HamamatsuR12421Manual}; assembly identification and setup-specific signal working values from current campaign notes.
+\end{minipage}
+\end{table}
+\end{landscape}
+
+\section{Primary gamma-spectroscopy detector chain}
+
+The primary detector chain for the auxiliary gamma-ray measurements and calibration studies is a conventional scintillation assembly composed of an ORTEC 905-4 NaI(Tl) detector head and an ORTEC Model 276 photomultiplier base with integrated preamplifier. In the local hardware inventory, the detector head is additionally identified as an Alpha Spectra, Inc. model 12I12/3. These two components should be treated as a single measurement chain: the NaI(Tl) crystal converts deposited gamma-ray energy into scintillation light, the photomultiplier tube (PMT) converts that light into charge, and the Model 276 base supplies both the dynode bias distribution and the first analog conditioning stage \citep{ORTEC905SeriesManual,ORTEC276Manual}.
+
+\subsection{ORTEC 905-4 NaI(Tl) detector head}
+
+The ORTEC 905 series is a family of NaI(Tl) scintillation detectors intended primarily for gamma-ray counting and spectroscopy \citep{ORTEC905SeriesManual}. For the present work, the relevant unit is the 905-4 configuration, which combines a 3-inch diameter by 3-inch long NaI(Tl) crystal with a 3-inch PMT. This geometry is a standard compromise between absolute efficiency, moderate intrinsic energy resolution, and mechanical simplicity. Because iodine has a relatively high atomic number, NaI(Tl) retains a comparatively large full-energy absorption probability for laboratory gamma sources, which is one reason why this detector class remains a practical choice for commissioning, calibration, and source-based verification.
+
+The 905-series datasheet emphasizes the standard physical advantages and limitations of NaI(Tl) detectors \citep{ORTEC905SeriesManual}. Their light output is sufficiently large for routine spectroscopy, and the manufacturer quotes a typical resolution of about 7\% at $^{137}$Cs for a 3-inch by 3-inch crystal, with somewhat worse values for larger detectors. At the same time, NaI(Tl) is not a particularly fast scintillator: the light decay constant is about \SI{0.23}{\micro\second}, and with a typical charge-sensitive front end this corresponds to an output-voltage rise time of about \SI{0.5}{\micro\second}. Consequently, the detector is well suited to efficiency-oriented gamma counting and moderate-resolution energy measurements, but it is not the natural choice when the best possible sub-nanosecond timing performance is required.
+
+For the present report, two practical remarks from the manufacturer documentation are especially relevant. First, the 905-series detector heads are supplied to ORTEC by specialized detector manufacturers, so minor parameter differences between nominally identical detector heads are possible \citep{ORTEC905SeriesManual}. Second, the datasheet quotes representative total counting efficiencies for a $1$-$\mu$Ci $^{137}$Cs source positioned at a distance of \SI{10}{cm}; these values are useful as order-of-magnitude expectations during laboratory checkout, but they should not be mistaken for a substitute for an experiment-specific efficiency calibration.
+
+\begin{table}[htbp]
+\centering
+\caption{Manufacturer information most relevant to the ORTEC 905-4 detector used in the present setup.}
+\label{tab:ortec9054-specs}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.2cm}YY}
+\toprule
+Parameter & Value & Comment \\
+\midrule
+Detector family & ORTEC 905 series NaI(Tl) scintillation detector & Modular scintillation-detector family for gamma-ray measurements \citep{ORTEC905SeriesManual}. \\
+Nominal detector size & 3-inch diameter $\times$ 3-inch length crystal & ORTEC model 905-4; the local assembly is identified as Alpha Spectra model 12I12/3. \\
+Photomultiplier size & 3-inch PMT & Integral part of the detector head supplied with the 905-4 configuration \citep{ORTEC905SeriesManual}. \\
+Typical energy resolution & About 7\% at $^{137}$Cs for a 3-inch by 3-inch crystal & Representative manufacturer value for routine gamma spectroscopy. \\
+Light decay constant & About \SI{0.23}{\micro\second} & Sets a lower bound on the detector pulse width and therefore influences timing performance. \\
+Typical voltage-pulse rise time & About \SI{0.5}{\micro\second} with a typical charge-sensitive preamplifier & Useful for estimating shaping or record-length requirements in downstream electronics. \\
+Typical total counting efficiency & 2.00\% at \SI{0.5}{MeV} and 1.30\% at \SI{2.0}{MeV} for a $1$-$\mu$Ci $^{137}$Cs source at \SI{10}{cm} & Quoted specifically for the 905-4 geometry; intended as a comparative detector figure rather than an in-beam calibration. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{ORTEC Model 276 photomultiplier base with integrated preamplifier}
+
+The ORTEC Model 276 is not merely a passive PMT socket. It is a combined PMT base and analog front-end designed for essentially all 10-stage photomultipliers that fit the standard 14-pin socket geometry \citep{ORTEC276Manual}. The instrument contains a resistor-divider bleeder chain for dynode biasing, a focus adjustment for optimizing the photocathode-to-first-dynode field, an ac-coupled anode output intended mainly for timing applications, and a self-contained low-noise integrating preamplifier coupled to the last dynode for spectroscopy-oriented energy readout \citep{ORTEC276Manual}. In practical terms, the device therefore separates the detector signal into two complementary observables: a fast negative anode pulse for timing work and a slower positive preamplifier pulse for energy analysis.
+
+The manufacturer specifications show why the Model 276 is suitable for routine scintillation spectroscopy. The PMT divider has a total resistance of \SI{1.49}{\mega\ohm} and draws about \SI{1.33}{mA} at the maximum applied voltage of \SI{2000}{V}. The integrated preamplifier has a nominal conversion gain of \SI{5}{\micro\volt\per\electronvolt} for a reference configuration consisting of a 2-inch by 2-inch NaI(Tl) crystal and a PMT gain of $10^{6}$; the same manual quotes a rise time below \SI{100}{ns} for a fast test pulse, a fall-time constant of \SI{50}{\micro\second}, and an output noise below \SI{50}{\micro\volt} rms \citep{ORTEC276Manual}. These numbers should be interpreted as front-end performance parameters rather than as immutable detector properties, because the actual pulse amplitude still depends on the detector head, the PMT installed, and the chosen high-voltage operating point.
+
+The Model 276 manual also provides the key operational constraints relevant to the present work. The PMT base expects a positive high-voltage supply with a maximum value of \SI{2000}{V}, the detector--PMT assembly must be made fully light-tight, and the single-turn focus potentiometer must be adjusted under irradiation so that the pulse amplitude is maximized and then mechanically locked \citep{ORTEC276Manual}. The manual further notes that the photomultiplier gain changes by approximately a factor of two for each \SI{100}{V} change in high voltage, so the actual gain setting is highly sensitive to the chosen bias voltage.
+
+\begin{table}[htbp]
+\centering
+\caption{Selected specifications of the ORTEC Model 276 relevant to detector operation and DAQ coupling.}
+\label{tab:ortec276-specs}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.2cm}YY}
+\toprule
+Parameter & Value & Comment \\
+\midrule
+PMT compatibility & Standard 14-pin, 10-stage photomultipliers & Designed to provide near-optimum voltage distribution for this PMT class \citep{ORTEC276Manual}. \\
+Maximum high voltage & Positive \SI{2000}{V} & The supply polarity is positive, with the cathode at ground potential. \\
+Divider resistance & \SI{1.49}{\mega\ohm} total bleeder resistance & Corresponds to a bleeder current of about \SI{1.33}{mA} at \SI{2000}{V}. \\
+Focus adjustment & External single-turn locking potentiometer & Used to optimize the photocathode-to-first-dynode field under operating conditions. \\
+Preamplifier output & Positive, dc-coupled energy-analysis signal & Intended primarily for spectroscopy-oriented acquisition. \\
+Anode output & Negative, ac-coupled pulse & Intended primarily for timing and coincidence work. \\
+Nominal preamplifier conversion gain & \SI{5}{\micro\volt\per\electronvolt} in the reference 2-inch by 2-inch NaI(Tl) configuration & Reference value only; the actual output depends on detector, PMT, and high voltage. \\
+Preamplifier rise time & $<\SI{100}{ns}$ for a fast test pulse & Indicates that the base itself does not dominate the slower NaI(Tl) scintillation time scale. \\
+Preamplifier fall-time constant & \SI{50}{\micro\second} & Relevant for shaping and pile-up considerations at higher count rates. \\
+Output noise & $<\SI{50}{\micro\volt}$ rms & Useful lower bound when evaluating baseline quality. \\
+Power requirements & $+\SI{24}{V}$ at \SI{16}{mA} and $-\SI{24}{V}$ at \SI{16}{mA} & Compatible with ORTEC main amplifiers or the ORTEC 114 preamplifier power supply \citep{ORTEC276Manual}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Operational settings relevant to the ORTEC NaI(Tl) chain}
+
+For the present NCAL-related laboratory work, the most important result of the manufacturer documentation is that there is no single universal bias setting that can be adopted blindly. The recommended procedure is instead operational: the detector must first be made light-tight, a positive high-voltage supply is then connected, and the high voltage is increased slowly while the preamplifier output is observed in the presence of a radiation source \citep{ORTEC276Manual}. If a large amount of unipolar ``grass'' appears on the oscilloscope trace, the manual recommends checking explicitly for a light leak by covering the PMT region with an opaque cloth. Only after the detector has been verified to be optically sealed should the operating voltage be optimized.
+
+The focus control is the second essential setting. According to the Model 276 manual, the correct procedure is to set the high voltage near the desired operating level, observe radiation-induced pulses, adjust the focus for maximum pulse amplitude, and then lock the potentiometer mechanically \citep{ORTEC276Manual}. This is a physically meaningful adjustment rather than a cosmetic one, because it optimizes electron collection from the photocathode to the first dynode and therefore influences both gain stability and pulse-height response.
+
+For routine acquisition, the manufacturer explicitly advises using the minimum practical high voltage when high count rates are expected, because count-rate tolerance is directly connected to the PMT gain and the gain changes by roughly a factor of two per \SI{100}{V} \citep{ORTEC276Manual}. In the context of a digitizer-based DAQ chain, this has two immediate consequences. First, the applied bias voltage should be documented together with each accepted configuration, because modest voltage changes can shift the effective gain substantially. Second, the digitizer settings must match the signal branch that is actually digitized: the preamplifier output is the natural branch for energy analysis and has positive polarity, whereas the anode output is the natural branch for timing studies and has negative polarity. A threshold or polarity configuration validated on one branch should therefore not be transferred to the other without re-optimization.
+
+The manual also offers a simple functional calibration check that is useful during bench setup: a \SI{1}{V} test pulse injected into the TEST input should yield a \SI{1}{V} pulse at the preamplifier output \citep{ORTEC276Manual}. This provides a straightforward verification that the base, preamplifier power, and downstream readout chain are behaving consistently before radioactive-source measurements are attempted.
+
+Taken together, the ORTEC 905-4 and the ORTEC 276 form a robust, conventional scintillation-detector chain for laboratory gamma spectroscopy and detector commissioning. The detector head offers the expected efficiency advantages of a 3-inch by 3-inch NaI(Tl) crystal, while the base and preamplifier provide the biasing, gain control, and signal extraction needed to couple the assembly to either classical NIM electronics or a modern waveform digitizer. For the present campaign, these characteristics make the system well suited to calibration runs, threshold studies, and first-response checks of the broader NCAL readout infrastructure.
+
+\section{Auxiliary thin plastic detectors}
+
+The setup also includes two thin plastic detectors used as auxiliary counters. The presently available hardware identification for their optical readout is the Hamamatsu E1761-04 D-type socket assembly, which Hamamatsu specifies for 10~mm diameter head-on photomultiplier tubes \citep{HamamatsuE176104Page}. This places the readout in the class of compact PMT assemblies rather than large-area spectroscopy bases. In practical detector terms, that geometry is well matched to lightweight auxiliary detectors, where compactness and prompt signal pickup are more important than the absolute full-energy efficiency expected from a much larger NaI(Tl) head.
+
+The manufacturer specification most relevant to detector operation is electrical rather than mechanical. Hamamatsu lists the E1761-04 with negative high-voltage polarity, a maximum supply voltage of \SI{1500}{V}, and the same \SI{1500}{V} maximum rating between the case and connector pins \citep{HamamatsuE176104Page}. The integrated voltage-divider chain has a total resistance of \SI{3.63}{\mega\ohm}, corresponding to a maximum divider current of \SI{0.41}{mA} at the rated voltage. The product page further quotes a maximum leakage current of $1.0\times10^{-10}$~A at the signal output and a maximum linear dc output current of \SI{20}{\micro A} at \SI{1500}{V} \citep{HamamatsuE176104Page}. Current setup notes additionally identify the readout polarity used for these detectors as negative. Taken together, these are the main verified limits and operating characteristics that matter when the counters are connected to external high voltage, discriminators, or digitizer inputs.
+
+At present, the local notes establish the detector bodies as thin plastic detectors mounted with Hamamatsu E1761-04 assemblies. The exact scintillator trade name, active area, and thickness are not yet verified from manufacturer documentation available in the workspace. Rather than introducing unsupported dimensions or assigning a plastic formulation that is not documented locally, Table~\ref{tab:hamamatsu-e1761-04-specs} records the verified detector-type and readout specifications and leaves the remaining body parameters to be added later, once the counters are measured directly or their original labels are recovered.
+
+\begin{table}[htbp]
+\centering
+\caption{Verified readout specifications for each of the two auxiliary thin scintillation counters equipped with Hamamatsu E1761-04 hardware.}
+\label{tab:hamamatsu-e1761-04-specs}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.2cm}YY}
+\toprule
+Parameter & Value & Comment \\
+\midrule
+Number of counters in setup & 2 & Pair of auxiliary thin scintillation counters planned for the present campaign. \\
+Detector-body type & Thin plastic detector & Established in current setup notes; exact plastic grade and dimensions remain unverified. \\
+Readout assembly & Hamamatsu E1761-04 D-type socket assembly & Manufacturer-designated PMT socket assembly used on the counters \citep{HamamatsuE176104Page}. \\
+Applicable PMT & 10~mm head-on type & Hamamatsu specification for the E1761-04 assembly. \\
+Readout signal polarity & Negative & Current setup notes identify negative signal polarity for these counters. \\
+Supply voltage polarity & Negative & The assembly is intended for negative high-voltage operation. \\
+Maximum supply voltage & \SI{1500}{V} & Manufacturer maximum rating for operation. \\
+Maximum insulation voltage (case to pins) & \SI{1500}{V} & Important when integrating the assembly into grounded mechanical supports. \\
+Total voltage-divider resistance & \SI{3.63}{\mega\ohm} & Sets the divider current and power dissipation at the chosen operating voltage. \\
+Maximum voltage-divider current & \SI{0.41}{mA} & Quoted at rated voltage by Hamamatsu. \\
+Maximum leakage current in signal output & $1.0\times10^{-10}$~A & Upper bound from the product specification. \\
+Maximum linear dc output current & \SI{20}{\micro A} at \SI{1500}{V} & Useful when estimating acceptable load conditions. \\
+Exact plastic grade / dimensions presently verified & Not yet identified & Active area, thickness, and scintillator trade name should be added after direct inspection of the two counters. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Facility-provided parallel stilbene monitor}
+
+In addition to the detector systems brought by the NCAL group, the beamline team at \NCALInstitute indicated that one compact stilbene-based monitor detector would be operated in parallel with the NCAL measurements as an online flux reference. In the available campaign coordination notes, this detector is identified as a SCIONIX model \texttt{V5B15/0.5-E1-STILB-X-NEG}, consisting of a 5 $\times$ 5 $\times$ 15 mm stilbene crystal optically coupled to a Hamamatsu \texttt{R12421} photomultiplier tube. A dedicated public datasheet for this exact assembled probe is not presently archived in the workspace. The description below therefore separates three layers of information that should not be conflated: assembly-level identification from campaign notes, material-level properties of crystalline stilbene from vendor documentation, and tube-level characteristics of the Hamamatsu photomultiplier from its manufacturer datasheet.
+
+As a detector medium, stilbene belongs to the class of hydrogen-rich organic scintillators used for fast-neutron detection. Scionix summarizes the basic detection logic by noting that fast neutrons are detected in organic scintillators mainly through recoil protons, and that neutron--gamma separation is possible by pulse-shape discrimination when neutron and gamma interactions lead to different scintillation decay behavior \citep{ScionixNeutronScintillatorNote}. The Inrad application note describes crystalline stilbene as particularly suitable for fast-neutron identification in the presence of gamma background and lists a density of \SI{1.15}{\gram\per\centi\meter\cubed}, a maximum emission wavelength of about \SI{380}{nm}, a prompt decay time of about \SI{4.3}{ns}, and a rise time of about \SI{0.1}{ns} \citep{InradStilbeneNote}. These are material-level quantities rather than guaranteed performance numbers for the specific SCIONIX assembly used here, but they explain why stilbene is a scientifically reasonable choice for a compact reference detector in a mixed neutron--gamma field.
+
+The same stilbene note describes neutron--gamma separation in terms of different prompt and delayed fluorescence fractions and presents vendor data with a pulse-shape-discrimination figure of merit of 4.7 near \SI{500}{keVee}, with separation demonstrated down to \SI{22}{keVee} and reported gamma misclassification rates of $10^{-6}$ \citep{InradStilbeneNote}. For the present report, however, those figures should be treated only as indicative literature-level performance for high-quality stilbene and an optimized PSD chain. They should not be promoted to established performance of the particular 5 $\times$ 5 $\times$ 15 mm control detector unless the assembled probe is characterized directly under the same acquisition conditions used in the campaign.
+
+At the photosensor level, Hamamatsu specifies the R12421 as a compact 13 mm diameter photomultiplier tube with a 10 mm effective area, a bialkali photocathode, 10 dynode stages, a spectral response from 300 to 650 nm, and a peak response near \SI{420}{nm} \citep{HamamatsuR12421Manual}. The same datasheet gives a typical gain of $2.0\times10^{6}$ at \SI{1000}{V}, an anode pulse rise time of about \SI{1.2}{ns}, and a maximum anode-to-cathode voltage magnitude of \SI{1250}{V} \citep{HamamatsuR12421Manual}. This spectral response is technically compatible with stilbene emission in the blue-violet region, so the R12421 is a consistent readout choice for a compact stilbene monitor operated without an intermediate wavelength-shifting stage.
+
+For the present campaign, current working notes indicate direct raw-anode readout with negative polarity and negative high-voltage operation of the assembled detector. The working pulses are described as several hundred nanoseconds wide and typically in the few-hundred-mV range into \SI{50}{\ohm}, with amplitudes potentially approaching about \SI{1}{V} at operating bias. Because the factory sheet for the exact SCIONIX assembly is not yet available locally, these signal-level statements should be interpreted as setup-specific working values rather than universal device specifications.
+
+The most defensible experimental role of this detector in the present setup is therefore that of a relative neutron monitor and beam-reference channel. The crystal is intentionally compact, and the Scionix detector note explicitly remarks that efficient fast-neutron detection requires a significant absorption volume \citep{ScionixNeutronScintillatorNote}. Accordingly, the probe is well suited to tracking relative beam conditions and providing a compact PSD-capable reference detector in parallel with the main NCAL measurement, but it should not be treated in this report as an absolutely calibrated neutron-efficiency instrument unless a separate dedicated calibration is performed.
+
+\begin{table}[htbp]
+\centering
+\caption{Selected characteristics of the facility-provided stilbene monitor.}
+\label{tab:scionix-stilbene-specs}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.02}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.8cm}YY}
+\toprule
+Parameter & Value & Comment \\
+\midrule
+Assembly identifier & SCIONIX \texttt{V5B15/0.5-E1-STILB-X-NEG} & Control-detector identification from campaign notes. \\
+Scintillator material & Crystalline stilbene & PSD-capable organic fast-neutron scintillator \citep{InradStilbeneNote,ScionixNeutronScintillatorNote}. \\
+Nominal crystal size & 5 $\times$ 5 $\times$ 15 mm & Size recorded for the assembled probe in campaign notes. \\
+Stilbene density & \SI{1.15}{\gram\per\centi\meter\cubed} & Inrad material value \citep{InradStilbeneNote}. \\
+Maximum emission wavelength & \SI{380}{nm} & Inrad material value \citep{InradStilbeneNote}. \\
+Prompt decay time & About \SI{4.3}{ns} & Inrad material value relevant to fast timing \citep{InradStilbeneNote}. \\
+Photosensor & Hamamatsu \texttt{R12421} PMT & Small PMT documented by Hamamatsu \citep{HamamatsuR12421Manual}. \\
+PMT effective area & 10 mm & Hamamatsu datasheet value \citep{HamamatsuR12421Manual}. \\
+PMT spectral response & 300 to 650 nm, peak near \SI{420}{nm} & Compatible with stilbene blue-violet emission \citep{HamamatsuR12421Manual}. \\
+Typical PMT gain & $2.0\times10^{6}$ at \SI{1000}{V} & Hamamatsu datasheet value \citep{HamamatsuR12421Manual}. \\
+Anode pulse rise time & About \SI{1.2}{ns} & Hamamatsu datasheet value \citep{HamamatsuR12421Manual}. \\
+PMT voltage limit & $|V_{\mathrm{AK}}| \leq \SI{1250}{V}$ & Tube-level maximum rating \citep{HamamatsuR12421Manual}. \\
+Campaign readout branch & Raw anode output & Setup-specific operating choice. \\
+Observed / expected signal form & Negative pulses, several hundred ns wide, typically few hundred mV into \SI{50}{\ohm}, possibly approaching \SI{1}{V} & Setup-specific working values, not factory-guaranteed specifications. \\
+Intended role in this campaign & Relative neutron monitor and beam-flux reference & Compact parallel reference channel for the NCAL run. \\
+\bottomrule
+\end{tabularx}
+\end{table}

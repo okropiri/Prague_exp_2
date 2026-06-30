@@ -1,0 +1,59 @@
+# OS and editor sidecars
+.DS_Store
+._*
+.Trash-*
+
+# Local mounts and machine-specific volumes
+data6/
+
+# Conda/virtual environments and local package state
+.conda/
+*/.conda/
+.venv/
+venv/
+conda_env/
+
+# Python cache/build outputs
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# C/C++ build outputs
+*.o
+*.so
+*.dylib
+*.exe
+
+# LaTeX generated files
+Documents/Latex/*.aux
+Documents/Latex/*.bbl
+Documents/Latex/*.blg
+Documents/Latex/*.fdb_latexmk
+Documents/Latex/*.fls
+Documents/Latex/*.log
+Documents/Latex/*.out
+Documents/Latex/*.pdf
+Documents/Latex/*.synctex.gz
+Documents/Latex/*.toc
+Documents/Latex/chapters/*.aux
+
+# Raw/test DOGMA exports stay local or on padiwa/data6.
+*.dld.dat
+Dogma_Analysis/Dogma_test_Data/
+
+# Large third-party/reference libraries are mirrored locally but not synchronized
+# through GitHub by default.
+Documents/Articles_Papers/*.pdf
+Documents/Context_Related_Documents/*.pdf
+Documents/Detectors/**/*.pdf
+Documents/Electronics/**/*.pdf
+Documents/Electronics/**/*.tgz
+Documents/Electronics/**/bin/
+Documents/Presentations/*.pdf
+Documents/red_notebook.pdf
+
+# Heavy/generated analysis products should live on padiwa/data6 by default.
+Dogma_Analysis/Results/**/cleaned/
+Dogma_Analysis/Results/Archive/

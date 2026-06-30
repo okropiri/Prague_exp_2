@@ -1,0 +1,4041 @@
+CAEN
+
+Electronic Instrumentation
+
+Rev. 10 - February 3rd, 2025
+
+DT5730/DT5725
+8-Channel 14-bit 500/250 MS/s Digitizer
+
+User Manual
+UM3148
+1
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+Register your device
+Register your device to your MyCAEN+ account and get access to our customer services, such
+as notification for new firmware or software upgrade, tracking service procedures or open a ticket
+for assistance. MyCAEN+ accounts have a dedicated support service for their registered
+products. A set of basic information can be shared with the operator, speeding up the
+troubleshooting process and improving the efficiency of the support interactions.
+MyCAEN+ dashboard is designed to offer you a direct access to all our after sales
+services.
+Registration
+is
+totally
+free,
+to
+create
+an
+account
+go
+to
+https://www.caen.it/become-mycaenplus-user and fill the registration form with your data.
+
+https://www.caen.it/become-mycaenplus-user/
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+2
+
+CAEN
+
+Electronic Instrumentation
+
+Purpose of this Manual
+This document contains the full hardware description of the DT5730 and DT5725 digitizers and
+the principle of operating as Waveform Recording Digitizer (based on the hereafter called
+”waveform recording firmware”).
+The reference firmware revision is: 4.29_0.9 for DT5730/DT5725 and 4.29_0.4 for
+DT5730S/DT5725S.
+
+For higher releases compatibility, check in the firmware revision history files.
+For any reference to registers in this document, please refer to document [RD2] on
+the digitizer web page.
+For any reference to DPP firmware in this document, please refer to
+[RD9][RD11][RD12] present on the firmware web page.
+
+Change Document Record
+Date
+
+Revisi
+on
+
+Changes
+
+Feb 14th, 2014
+Dec 15th, 2014
+
+00
+01
+
+Jun 10th, 2016
+
+02
+
+Sep 24th, 2019
+
+03
+
+May 6th, 2020
+
+04
+
+Sep 2nd, 2020
+
+05
+
+May 4th, 2021
+
+06
+
+Sep 20th, 2021
+
+07
+
+Mar 31st, 2023
+
+08
+
+July 2nd, 2024
+
+09
+
+Feb 3rd, 2025
+
+10
+
+Initial release
+Added new Chap. 7 on cooling management and Chap. 8 on temperature protection. Updated Sec.
+Trigger Management. General revision.
+Fully reviewed for the new DT5725 digitizer (250 MS/s). Updated Chap. 1, 3, 5, 9, 14, Sec. Clock
+Distribution, PLL Mode, Trigger Clock, Channel Calibration, Custom-sized Events, Event
+Structure,
+Trigger Distribution, DPP-PSD Control Software. Added Sec. Changing the ADC
+Frequency, CaenScope, MC2 Analyzer.
+Global review. Added support to the new 730S/725S modules. Added Sections: DC Offset
+Individual Setting, TRG-IN as Gate, Multi-board Synchronization, Test Pattern Generator,
+CoMPASS, DPP-ZLEplus and DPP-DAW Control Software, Troubleshooting.
+Updated Tab. 1.1, Chap. 8, Sec. Acquisition Run/Stop, CaenScope. Added Sec. Channel SelfTrigger Rate Meter (725S and 730S only).
+Updated Sec.
+DPP-ZLEplus and DPP-DAW Control Software, and power consumption
+specifications in Chap. 3, 5.
+Updated digitizer pictures and Sec. Troubleshooting. Reviewed Sec. External Trigger. Added more
+information on the time stamp reset via the GPI connector in Sec. Timer Reset.
+Updated Tab. 1.1, Tab. 3.1, Chap 5, Sec. Acquisition Triggering: Samples and Events, Sec. Optical
+Link and USB Access, Chap. 11, Sec CaenScope, Sec. Event Structure, Sec. Trigger Clock.
+Removed section about MC2 Analyzer dismissed software from Chap. 12.
+Updated Purpose of this Manual. Added Manufacturer Contacts, Limitation of Responsibility,
+Disclaimer, Made in Italy. Updated Chap. 3, Chap. 4. Added Chap. 5. Upgraded Chap Technical
+Support. Removed Sec. Mc2Analyzer.
+Removed all CAEN Upgrader references due to software obsolescence and replaced with CAEN
+Toolbox.
+Reviewed Cover and End pages. Replaced references to CAENUpgrader with CAENToolbox.
+Replaced references to CAENScope with WaveDump 2. Removed all MC2 Analyzer references to
+software obsolescence. Added Safety Notices, Sec. 12.4, Chap. 15, Chap. 16, Chap. 17. Updated
+Chap. 1, Tab. 1.1, Tab. 3.1, Chap. 4, Chap. 5, Chap. 7, Sec. 9.2, Sec. 10.3, Sec. 10.5.5, Sec. 10.6.3,
+Sec. 10.7, Sec. 10.8, Sec. 10.11, Sec. 11.1. Sec. 11.2, Chap. 12, Chap. 13, Sec. 14.1.2.
+
+Symbols, Abbreviated Terms, and Notations
+ADC
+AMC
+DAQ
+DAC
+DC
+LVDS
+ROC
+GUI
+DPP
+ETTT
+OS
+PLL
+PSD
+TTT
+USB
+
+3
+
+Analog-to-Digital Converter
+ADC & Memory Controller
+Data Acquisition
+Digital-to-Analog Converter
+Direct Current
+Low-Voltage Differential Signal
+ReadOut Controller
+Graphical User Interface
+Digital Pulse Processing
+Extended Trigger Time Tag
+Operating System
+Phase-Locked Loop
+Pulse Shape Discrimination
+Trigger Time Tag
+Universal Serial Bus
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+Reference Documents
+[RD1]
+[RD2]
+[RD3]
+[RD4]
+[RD5]
+[RD6]
+[RD7]
+[RD8]
+[RD9]
+[RD10]
+[RD11]
+[RD12]
+[RD13]
+[RD14]
+[RD15]
+[RD16]
+[RD17]
+
+UM11111 – CAENToolbox User Manual
+UM5118 – 725-730 Raw Waveform Registers Description
+GD2783 – First Installation Guide to Desktop Digitizers & MCA
+UM1934 - CAENComm User & Reference Manual
+UM1935 - CAENDigitizer User & Reference Manual
+UM2091 - CAEN WaveDump User Manual
+GD2483 - WaveDump QuickStart Guide
+UM7934 – CAEN WaveDump 2 User Manual
+UM5960 - CoMPASS User Manual
+UM3185 – CAENDPP User Manual
+UM5954 – DPP-DAW User Manual
+UM6064 – DPP-ZLEPlus User Manual
+GD2728 – How to make Coincidences with CAEN Digitizers
+GD9764 – CAEN FELib Library User Guide
+AN2472 - CONET1 to CONET2 migration
+DS7799 – A4818 USB-3.0 to Optical Link Adapter Datasheet
+UM10551 – A5818 Technical Information Manual
+
+https://www.caen.it/support-services/documentation-area/
+
+Manufacturer Contacts
+CAEN S.p.A.
+Via Vetraia, 11 55049 Viareggio (LU) - ITALY
+Tel. +39.0584.388.398 Fax +39.0584.388.959
+www.caen.it | info@caen.it
+© CAEN SpA – 2025
+
+Limitation of Responsibility
+If the warnings contained in this manual are not followed, CAEN will not be responsible for damage caused by improper use of the
+device. The manufacturer declines all responsibility for damage resulting from failure to comply with the instructions for use of the
+product. The equipment must be used as described in the user manual, with particular regard to the intended use, using only
+accessories as specified by the manufacturer. No modification or repair can be performed.
+
+Disclaimer
+No part of this manual may be reproduced in any form or by any means, electronic, mechanical, recording, or otherwise, without the
+prior written permission of CAEN spa.
+The information contained herein has been carefully checked and is believed to be accurate; however, no responsibility is assumed for
+inaccuracies. CAEN spa reserves the right to modify its products specifications without giving any notice; for up to date information
+please visit www.caen.it.
+
+Made in Italy
+We remark that all our boards have been designed and assembled in Italy. In a challenging environment where a competitive edge is
+often obtained at the cost of lower wages and declining working conditions, we proudly acknowledge that all those who participated
+in the production and distribution process of our devices were reasonably paid and worked in a safe environment (this is true for the
+boards marked "MADE IN ITALY", while we cannot guarantee for third-party manufactures).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+4
+
+CAEN
+
+Electronic Instrumentation
+
+Index
+Purpose of this Manual ....................................................................................................................... 3
+Change Document Record ................................................................................................................ 3
+Symbols, Abbreviated Terms, and Notations .................................................................................. 3
+Reference Documents ........................................................................................................................ 4
+Manufacturer Contacts ....................................................................................................................... 4
+Limitation of Responsibility................................................................................................................. 4
+Disclaimer ............................................................................................................................................. 4
+Made in Italy ......................................................................................................................................... 4
+
+Index ........................................................................................................................................ 5
+List of Figures......................................................................................................................... 6
+List of Tables .......................................................................................................................... 7
+Safety Notices......................................................................................................................... 8
+1
+Introduction ................................................................................................................... 10
+2
+Block Diagram .............................................................................................................. 12
+3
+Technical Specifications ............................................................................................. 13
+4
+Packaging and Compliancy ........................................................................................ 15
+5
+PID (Product Identifier) ................................................................................................ 17
+6
+Power Requirements ................................................................................................... 18
+7
+Cooling Management ................................................................................................... 20
+7.1
+
+8
+9
+
+Cleaning Air Vents ................................................................................................................ 20
+
+Temperature Protection .............................................................................................. 21
+Panels Description ....................................................................................................... 22
+9.1
+9.2
+
+Front Panel ............................................................................................................................ 23
+Rear Panel ............................................................................................................................. 26
+
+10 Functional Description ................................................................................................ 27
+10.1
+
+Analog Input Stage ............................................................................................................... 27
+
+10.1.1
+
+10.2
+10.3
+10.4
+10.5
+
+10.5.1
+10.5.2
+10.5.3
+10.5.4
+
+Channel Calibration .................................................................................................................. 30
+Acquisition Run/Stop ............................................................................................................... 34
+Acquisition Triggering: Samples and Events .................................................................... 34
+Multi-Event Memory Organization ........................................................................................ 35
+
+10.5.4.1
+
+Custom-sized Events ...................................................................................................................................36
+
+10.5.5
+
+Event Structure .......................................................................................................................... 37
+
+10.5.5.1
+10.5.5.2
+10.5.5.3
+
+Header ...........................................................................................................................................................37
+Data ................................................................................................................................................................38
+Event Format Example ................................................................................................................................38
+
+10.5.6
+10.5.7
+
+Acquisition Synchronization .................................................................................................. 40
+Channel Self-Trigger Rate Meter (725S and 730S only) .................................................. 40
+
+10.6
+
+Trigger Management ............................................................................................................ 41
+
+10.6.1
+10.6.2
+10.6.3
+10.6.4
+10.6.5
+10.6.6
+
+Software Trigger ........................................................................................................................ 41
+External Trigger ......................................................................................................................... 41
+Self-Trigger ................................................................................................................................. 42
+Trigger Coincidence Level...................................................................................................... 44
+TRG-IN as Gate .......................................................................................................................... 47
+Trigger Distribution .................................................................................................................. 47
+
+10.6.6.1
+
+Example .........................................................................................................................................................48
+
+10.7
+5
+
+DC Offset Individual Setting ................................................................................................... 27
+
+Clock Distribution .................................................................................................................. 28
+PLL Mode ............................................................................................................................... 29
+Trigger Clock ......................................................................................................................... 29
+Acquisition Modes ................................................................................................................. 30
+
+Multi-board Synchronization Overview .............................................................................. 48
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+10.8
+10.9
+
+Electronic Instrumentation
+Test Pattern Generator ........................................................................................................ 49
+Reset, Clear, and Default Configuration............................................................................ 49
+
+10.9.1
+10.9.2
+10.9.3
+
+Global Reset ............................................................................................................................... 49
+Memory Reset ............................................................................................................................ 49
+Timer Reset ................................................................................................................................ 49
+
+Data Transfer Capabilities and Events Readout .......................................................... 50
+
+10.10
+10.10.1
+10.10.2
+
+Block Transfers ......................................................................................................................... 50
+Single Data Transfer................................................................................................................. 50
+
+Optical Link and USB Access ......................................................................................... 51
+
+10.11
+
+11 Drivers & Libraries ....................................................................................................... 52
+11.1
+11.2
+
+Drivers .................................................................................................................................... 52
+Libraries .................................................................................................................................. 52
+
+11.2.1
+
+LabVIEW Support ...................................................................................................................... 54
+
+12 Software Tools .............................................................................................................. 55
+12.1
+12.2
+12.3
+12.4
+12.5
+12.6
+
+CAEN Toolbox ....................................................................................................................... 55
+CAENComm Demo............................................................................................................... 56
+CAEN WAVEDump............................................................................................................... 57
+CAEN WaveDump 2 ............................................................................................................. 58
+CoMPASS .............................................................................................................................. 59
+DPP-ZLEplus and DPP-DAW Control Software .............................................................. 60
+
+13 HW Installation.............................................................................................................. 61
+13.1
+
+Power-on Status.................................................................................................................... 61
+
+14 Firmware and Upgrades .............................................................................................. 63
+14.1
+
+Firmware Upgrade ................................................................................................................ 63
+
+14.1.1
+14.1.2
+
+Firmware Files Description .................................................................................................... 64
+Troubleshooting ........................................................................................................................ 64
+
+15 Instructions for Cleaning ............................................................................................ 66
+15.1
+15.2
+15.3
+
+Cleaning the Touchscreen................................................................................................... 66
+Cleaning the air vents........................................................................................................... 66
+General cleaning safety precautions ................................................................................. 66
+
+16 Device Decommissioning ........................................................................................... 67
+17 Disposal ......................................................................................................................... 68
+18 Technical Support ........................................................................................................ 69
+
+List of Figures
+Fig. 2.1: Block Diagram ......................................................................................................................................................................12
+Fig. 5.1: PID location on the Desktop device (the number and digitizer model in the pictures are purely indicative) ..........17
+Fig. 6.1: AC/DC power supply provided with the module ..............................................................................................................19
+Fig. 9.1: Front panel view ..................................................................................................................................................................22
+Fig. 9.2: Rear panel view ...................................................................................................................................................................22
+Fig. 10.1: Analog Input Diagram .......................................................................................................................................................27
+Fig. 10.2: Clock Distribution Diagram ..............................................................................................................................................28
+Fig. 10.3: Typical channel before the calibration (A and B) and after the calibration (C) .........................................................30
+Fig. 10.4: Automatic calibration at WaveDump first run ................................................................................................................32
+Fig. 10.5: Temperature monitoring with manual calibration in WaveDump software ................................................................32
+Fig. 10.6: Channel calibration in CoMPASS software ...................................................................................................................33
+Fig. 10.7: Trigger overlap...................................................................................................................................................................35
+Fig. 10.8: TTT description ..................................................................................................................................................................38
+Fig. 10.9: ETTT description ...............................................................................................................................................................38
+Fig. 10.10: Event format example.....................................................................................................................................................39
+Fig. 10.11: Block Diagram of the trigger management ..................................................................................................................41
+Fig. 10.12: Self Trigger and Trigger Request logic for Ch0 and Ch1 couple; a single trigger request signal is generated. 42
+Fig. 10.13: Channel over/under threshold signal............................................................................................................................42
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+6
+
+CAEN
+
+Electronic Instrumentation
+
+Fig. 10.14: Channel pulse signal ......................................................................................................................................................43
+Fig. 10.15: Trigger request management at mezzanine level with Majority level = 0 ...............................................................44
+Fig. 10.16: Trigger request management at motherboard level with Majority level = 0 ............................................................45
+Fig. 10.17: Trigger request relationship with Majority level = 1 and T TVAW ≠ 0...........................................................................45
+Fig. 10.18: Trigger request relationship with Majority level = 1 and T TVAW = 0 ..........................................................................46
+Fig. 10.19: Trigger configuration on GPO front panel output connector .....................................................................................47
+Fig. 11.1: Drivers and software layers based on CAENComm and CAENDigitizer libraries. ..................................................54
+Fig. 11.2: Drivers and software layers based on CAEN_FELib and CAEN_Dig1 libraries. .....................................................54
+Fig. 12.1: CAEN Toolbox Graphical User Interface .......................................................................................................................55
+Fig. 12.2: CAENComm Demo Java™ and LabVIEW™ graphical interface ...............................................................................56
+Fig. 12.3: CAEN WaveDump ............................................................................................................................................................57
+Fig. 12.4: CAEN WaveDump2 ..........................................................................................................................................................58
+Fig. 12.5: CoMPASS software tool ...................................................................................................................................................59
+Fig. 13.1: Front panel LEDs status at power-on .............................................................................................................................62
+Fig. 14.1: Reboot USB device in CAEN Toolbox ...........................................................................................................................65
+
+List of Tables
+Tab. 1.1: Table of models and related items ...................................................................................................................................11
+Tab. 3.1: Specifications table ............................................................................................................................................................14
+Tab. 4.1: Delivered kit content ..........................................................................................................................................................15
+Tab. 6.1: Power requirements table for DT5730x models ............................................................................................................18
+Tab. 6.2: Power requirements table for DT5725x models ............................................................................................................18
+Tab. 10.1: Buffer Organization ..........................................................................................................................................................36
+Tab. 10.2: Reserved/Trg Options configuration table ....................................................................................................................37
+
+7
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+Safety Notices
+N.B. Read carefully the “Precautions for Handling, Storage and Installation” document provided with the product
+before starting any operation.
+
+The following HAZARD SYMBOLS may be reported on the unit:
+
+Caution, refer to the product
+manual
+
+Caution, risk of electrical shock
+
+Protective conductor terminal
+
+Earth (Ground) Terminal
+
+Alternating Current
+
+Three-Phase Alternating Current
+
+The following symbol may be reported in the present manual:
+
+General warning statement
+
+The symbol could be followed by the following terms:
+• DANGER: Indicates a hazardous situation that, if not avoided, will result in serious injury or death.
+• WARNING: Indicates a hazardous situation that, if not avoided, could result in death or serious injury.
+• CAUTION: Indicates a situation or condition that, if not avoided, could cause physical injury, or damage the
+product and/or its environment.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+8
+
+CAEN
+
+Electronic Instrumentation
+
+GENERAL NOTICES:
+CAUTION: Avoid potential hazards.
+
+USE THE PRODUCT ONLY AS SPECIFIED.
+ONLY QUALIFIED
+PROCEDURES
+
+PERSONNEL
+
+SHOULD
+
+PERFORM
+
+SERVICE
+
+CAUTION: Avoid Electric Overload.
+
+TO AVOID ELECTRIC SHOCK OR FIRE HAZARD, DO NOT POWER A
+LOAD OUTSIDE OF ITS SPECIFIED RANGE
+
+CAUTION: Avoid Electric Shock.
+
+TO AVOID INJURY OR LOSS OF LIFE, DO NOT CONNECT OR
+DISCONNECT CABLES WHILE THEY ARE CONNECTED TO A VOLTAGE
+SOURCE
+CAUTION: Do Not Operate without Covers.
+
+TO AVOID ELECTRIC SHOCK OR FIRE HAZARD, DO NOT OPERATE THIS
+PRODUCT WITH COVERS OR PANELS REMOVED
+CAUTION: Do Not Operate in Wet/Damp Conditions.
+
+TO AVOID ELECTRIC SHOCK, DO NOT OPERATE THIS PRODUCT IN WET
+OR DAMP CONDITIONS
+
+CAUTION: Do Not Operate in an Explosive Atmosphere.
+
+TO AVOID INJURY OR FIRE HAZARD, DO NOT OPERATE THIS
+PRODUCT IN AN EXPLOSIVE ATMOSPHERE
+
+THIS DEVICE SHOULD BE INSTALLED AND USED BY A SKILLED
+TECHNICIAN ONLY OR UNDER HIS SUPERVISION
+
+DO NOT OPERATE WITH SUSPECTED FAILURES.
+IF YOU SUSPECT THIS PRODUCT TO BE DAMAGED, PLEASE CONTACT
+THE TECHNICAL SUPPORT
+
+9
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+1 Introduction
+The DT5730 is a Desktop module housing an 8-channel 14-bit 500 MS/s FLASH ADC Waveform Digitizer with software
+selectable 2 Vpp or 0.5 Vpp input dynamic range on single-ended MCX coaxial connectors. The DC offset is adjustable in
+the ±1 V (@ 2 Vpp) or ±0.25 (@ 0.5 Vpp) range via a 16-bit DAC on each channel (see Sec. 10.1).
+Operationally, the mod. DT5725 differs from the DT5730 for working at 250 MS/s sampling frequency.
+The ADC resolution and the sampling frequency make these digitizers well suited for mid-fast signal detection systems
+(e.g. liquid or inorganic scintillators coupled to PMTs or Silicon Photomultipliers).
+Each channel has an SRAM Multi-Event Buffer divisible into 1 ÷ 1024 buffers of programmable size. Two sizes of the
+channel digital memory are available by ordering option (see Tab. 1.1).
+DT5730 and DT5725 digitizers are provided with FPGAs that can run special DPP firmware for Physics Applications (see
+Chap. 14).
+A common acquisition trigger signal can be fed externally via the front panel TRG-IN input connector or via software.
+Alternatively, each channel can generate a self-trigger when the input signal goes under/over a programmable
+threshold. For each couple of adjacent channels, the relevant self-triggers are then processed to provide a single trigger
+request. In the DPP firmware, the trigger requests can be used at the channel level for the event acquisition
+(independent triggering), while in the waveform recording firmware they can be processed by the board to generate a
+common trigger causing all the channels to acquire an event simultaneously. The trigger from one board can be
+propagated to the other boards through the front panel GPO output connector.
+During the acquisition, the data stream is continuously written in a circular memory buffer. When the trigger occurs,
+the digitizer writes further samples for the post-trigger and freezes the buffer that can be read by one of the provided
+readout links. The acquisition can continue without any dead time in a new buffer.
+DT5730 and DT5725 feature front panel CLK-IN connector as well as an internal PLL for clock synthesis from
+internal/external references. Multi-board synchronization is supported, so all DT5730 or all DT5725 can be
+synchronized to a common clock source and ensuring Trigger time stamps alignment. The fan-in of an external clock
+signal to each CLK-IN is required. Once synchronized, all data will be aligned and coherent across the multi-board
+system.
+Each module houses USB 2.0 and Optical Link interfaces. USB 2.0 allows data transfers up to 30 MB/s. The Optical Link
+(CAEN proprietary CONET protocol) supports a transfer rate of 80 MB/s and offers Daisy chain capability. Therefore, it
+is possible to connect up to 8 ADC modules to a single Optical Link Controller by using the A4818 adapter and up to 32
+using an A5818 (4-link version). Optical Link and USB accesses are internally arbitrated. The A4818 adapter from USB3.0 to Optical Link is also supported.
+In addition to the waveform recording firmware, CAEN provides for this digitizer four types of Digital Pulse Processing
+firmware (DPP):
+•
+
+Pulse Shape Discrimination (DPP-PSD) combines the functions of a digital QDC (charge integration) and
+discriminator of different shapes for particle identification.
+
+•
+
+Pulse Height Analysis (DPP-PHA) is the digital solution equivalent to Shaping Amplifier and Peak Sensing ADC for
+nuclear physics or other applications requiring radiation detectors.
+
+•
+
+Zero-Length Encoding (DPP-ZLEplus) for zero suppression and data reduction.
+
+•
+
+Dynamic Acquisition Windows (DPP-DAW) automatically adjusts the acquisition window length to match the
+actual input pulse duration.
+
+All these DPP firmware make the digitizer an enhanced system for Physics Applications.
+To interface the digitizers, CAEN provides the drivers for the supported communication links, a set of C libraries,
+LabVIEW VIs and example codes, configuration tools for firmware management (e.g. upgrade, board information, etc.)
+and direct register access, readout software for the waveform recording firmware (WaveDump, WaveDump 2) and the
+DPP firmware (CoMPASS, DPP-ZLE and DPP-DAW Control Software).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+10
+
+CAEN
+
+Board Models
+DT5730
+DT5730B
+DT5730S
+DT5730SB
+DT5725
+DT5725B
+DT5725S
+DT5725SB
+
+Description
+8 ch. 14bit 500 MS/s Digitizer:640kS/ch,CE30,SE
+8 ch. 14bit 500 MS/s Digitizer:5.12MS/ch,CE30,SE
+8 Ch. 14 bit 500 MS/s Digitizer:640kS/ch,Arria V GX,SE
+8 Ch. 14 bit 500 MS/s Digitizer:5.12MS/ch,Arria V GX,SE
+8 ch. 14bit 250 MS/s Digitizer:640kS/ch,CE30,SE
+8 ch. 14bit 250 MS/s Digitizer:5.12MS/ch,CE30,SE
+8 ch. 14bit 250 MS/s Digitizer:640kS/ch,Arria V GX,SE
+8 ch. 14bit 250 MS/s Digitizer:5.12MS /ch,Arria V GX,SE
+
+DPP Firmware
+DPP-PSD 8ch 730
+DPP-PSD 8ch 725
+DPP-PHA 8ch 730
+DPP-PHA 8ch 725
+DPP-ZLE 8ch 730
+DPP-ZLE 8ch 725
+DPP-DAW 8ch 730
+DPP-DAW 8ch 725
+
+Description
+DPP-PSD - Digital Pulse Processing for Pulse Shape Discrimination (8ch x730)
+DPP-PSD - Digital Pulse Processing for Pulse Shape Discrimination (8ch x725)
+DPP-PHA - Digital Pulse Processing for Pulse Height Analysis (8ch x730)
+DPP-PHA - Digital Pulse Processing for Pulse Height Analysis (8ch x725)
+DPP-ZLE – Digital Pulse Processing with Zero Length Encoding (8ch x730)
+DPP-ZLE – Digital Pulse Processing with Zero Length Encoding (8ch x725)
+DPP-DAW – Digital Pulse Processing with Dynamic Acquisition Window (8ch x730)
+DPP-DAW – Digital Pulse Processing with Dynamic Acquisition Window (8ch x725)
+
+Related Products
+A2818
+A3818A
+A3818B
+A3818C
+A4818
+A5818
+
+Accessories
+
+Electronic Instrumentation
+
+Description
+A2818 – PCI Optical Link (Obsolete)
+A3818A – PCIe 1 Optical Link (Obsolete)
+A3818B – PCIe 2 Optical Link (Obsolete)
+A3818C – PCIe 4 Optical Link (Obsolete)
+A4818 – USB-3.0 to Optical Link
+A5818 – PCIe 4 Optical Link, Gen. 3
+
+Description
+
+DT4700
+Clock Generator and Fan Out Unit
+A317
+Cable assembly for Clock distribution 3-pin AMPMODU IV female terminations – 18 / 25 cm
+A318
+Adapter for Clock signal FISCHER S101A004 male to 3-pin AMPMODU IV female - 10 cm
+A319B
+A319B - Clock Cable for Digitizer Series 1.0 to 2.0 interconnection (L=20cm)
+A654
+Cable assembly LEMO 00 male to MCX male - 1 m
+A654 KIT4
+4 Cable assembly LEMO 00 male to MCX male - 1 m
+A654 KIT8
+8 Cable assembly LEMO 00 male to MCX male - 1 m
+A659
+Cable assembly BNC male to MCX male - 1 m
+A659 KIT4
+4 MCX to BNC Cable Adapter
+A659 KIT8
+8 MCX to BNC Cable Adapter
+AI2740
+Optical Fibre 40 m simplex
+AI2730
+Optical Fibre 30 m simplex
+AI2720
+Optical Fibre 20 m simplex
+AI2705
+Optical Fibre 5 m simplex
+AI2703
+Optical Fibre 30 cm simplex
+AY2730
+Optical Fibre 30 m duplex
+AY2720
+Optical Fibre 20 m duplex
+AY2705
+Optical Fibre 5 m duplex
+Tab. 1.1: Table of models and related items
+
+11
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+2 Block Diagram
+FRONT PANEL
+
+x8 channels
+G1 or G4
+
+INPUTS
+
+ADC
+
+PGA
+
+DAC
+
+AMC [FPGA]
+ADC &
+MEMORY
+CONTROLLER
+
+CLK IN
+
+MUX
+
+OSC
+
+CLOCK
+MANAGER
+(AD9520)
+
+LOCAL BUS
+
+BUFFERS
+
+TRG IN
+
+GPI
+GPO
+
+OPTICAL LINK
+
+ROC [FPGA]
+- Readout Controller
+- Optical link Interface
+- USB interface
+- Global Trigger Logic
+- I/O Control Logic
+
+USB
+
+Fig. 2.1: Block Diagram
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+12
+
+CAEN
+
+Electronic Instrumentation
+
+3 Technical Specifications
+Number of Channels
+8 channels
+Single-ended
+ANALOG INPUT
+
+DIGITAL
+CONVERSION
+SYSTEM
+PERFORMANCES
+FPGA
+
+TRIGGER
+
+ACQUISITION
+MEMORY
+ADC CLOCK
+GENERATION
+
+DIGITAL I/O
+
+DC Offset
+Bandwidth
+Programmable 16-bit DAC for 250 MHz (DT5730)
+DC offset adjustment on each 125 MHz (DT5725)
+channel in the FSR
+Resolution
+Sampling Rate
+14 bits
+500 MS/s (DT5730)
+250 MS/s (DT5725)
+Simultaneous on each channel
+DT5730S-DT5725S Baseline RMS Noise (open inputs)
+@ 2 Vpp: 2.6 LSB = 312 uV
+@ 0.5 Vpp: 3.4 LSB = 102 uV
+DT5730/DT5725
+DT5730S/DT5725S
+Altera Cyclone EP4CE30
+Intel/Altera Arria V GX
+(one FPGA serves 4 channels)
+(one FPGA serves 4 channels)
+Trigger Source
+Trigger Time Stamp DT5730
+- Self-trigger: channel over/under threshold for
+Waveform Recording: 31-bit counter, 16 ns resolution, 17
+either Common or Individual (DPP only) trigger
+s range; 48-bit extension by firmware
+generation
+DPP-PSD: 47-bit counter, 2 ns resolution, 78 h range; 10- External-trigger: Common by TRG-IN connector bit and about 2 ps fine time stamp with digital CFD
+- Software-trigger: Common by software
+DPP-PHA: 47-bit counter, 2 ns resolution, 78 h range
+command
+DPP-DAW: 48-bit counter, 2 ns resolution, 156 h range
+DPP-ZLEplus: 48-bit counter, 16 ns resolution, 625 h
+Trigger Propagation
+range
+GPO programmable digital output
+Trigger Time Stamp DT5725
+Waveform Recording: 31-bit counter, 16 ns resolution, 17
+s range; 48-bit extension by firmware
+DPP-PSD: 47-bit counter, 4 ns resolution, 156 h range; 10bit and about 4 ps fine time stamp with digital CFD
+DPP-PHA: 47-bit counter, 4 ns resolution, 156 h range
+DPP-DAW: 48-bit counter, 4 ns resolution, 312 h range
+DPP-ZLEplus: 48-bit counter, 16 ns resolution, 1250 h
+range
+640 kS/ch or 5.12 MS/s Multi-event Buffer divisible into 1 ÷ 1024 buffers.
+Independent read and write access; programmable event size and pre/post-trigger
+Clock source: internal/external
+On-board programmable PLL provides generation of the main board clocks from an internal (50 MHz local
+Oscillator) or external (front panel CLK-IN connector) reference
+CLK-IN (AMP Modu II)
+GPO (LEMO)
+AC coupled input clock
+General-purpose digital output (e.g. Trigger)
+Differential LVDS, ECL, PECL, LVPECL, CML (singleNIM/TTL
+ended NIM/TTL available by A318 adapter)
+Rt = 50 Ω
+Accuracy<100ppm requested
+Zdiff = 100 Ω
+
+Clock Propagation
+One‐to‐many: From an external clock source
+SYNCHRONIZATION (DT4700) to CLK‐IN connector
+Clock Cable delay compensation
+
+FIRMWARE
+
+13
+
+Connector
+MCX
+
+Full Scale Range (FSR)
+0.5 Vpp / 2 Vpp (default)
+SW selectable
+
+TRG-IN (LEMO)
+External trigger digital input
+Signal Width > 8 ns
+NIM/TTL
+
+COMMUNICATION
+INTERFACE
+
+Impedance (Zin)
+50 Ω
+
+USB
+USB 2.0 compliant
+Transfer rate: up to 30 MB/s
+Waveform Recording Firmware
+Free firmware for waveform recording
+
+GPI (LEMO)
+General-purpose digital input (e.g. SYNC/START)
+Signal Width > 8 ns
+NIM/TTL
+Zin = 50 Ω
+Acquisition Synchronization
+Sync Start/Stop by digital I/O (TRG-IN/GPI, GPO)
+Trigger Time Stamp Alignment
+By GPI input connector
+Optical Link
+CONET: CAEN proprietary protocol
+Up to 80 MB/s transfer rate
+Daisy chain capability
+DPP Firmware
+Upgrades
+Pay firmware for Digital Pulse Supported via
+Processing: DPP-PSD, DPPUSB/Optical Link
+PHA, DPP-ZLEplus, DPP-DAW
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+SOFTWARE
+MECHANICAL
+
+ENVIRONMENTAL
+
+Readout SW
+Libraries and Tools
+CAEN software for users and developers:
+General-purpose C libraries with readout demos
+WaveDump, WaveDump2 (Windows®, Linux®)
+(Windows®, Linux®, LabVIEW™) and configuration tools.
+Form Factor
+Weight
+Dimensions
+Desktop
+670 g
+154x50x164 mm3 (WxHxD)
+Environment:
+Indoor use
+Operating Temperature:
+0°C to +40°C
+Storage Temperature:
+10°C to +60°C
+Operating Humidity:
+10% to 90% RH non condensing
+Storage Humidity:
+5% to 90% RH non condensing
+Altitude:
+< 2000m
+Pollution Degree:
+2
+Overvoltage Category:
+II
+EMC Environment:
+Commercial and light industrial
+IP Degree:
+IPX0 Enclosure, not for wet location
+
+EMC
+CE 2014/30/EU Electromagnetic compatibility
+Directive
+FW
+DT5730
+Wav. Rev.
+2.8 A
+DT5730x
+DPP-PHA
+POWER
+REQUIREMENTS
+DPP-PSD
+(TYP. @+12 VDC)
+DPP-DAW
+DPP-ZLE
+FW
+DT5725
+Wav. Rev.
+2.0 A
+DT5725x
+DPP-PHA
+POWER
+REQUIREMENTS
+DPP-PSD
+(TYP. @+12 VDC)
+DPP-DAW
+DPP-ZLE
+Tab. 3.1: Specifications table.
+
+Safety
+
+REGULATORY
+COMPLIANCE
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CE 2014/35/EU Low Voltage Directive
+DT5730B
+3.0 A
+
+DT5730S
+2.9 A
+2.9 A
+2.9 A
+2.9 A
+2.3 A
+DT5725S
+2.1 A
+
+N.A.
+DT5725B
+N.A.
+
+DT5730SB
+3.5 A
+3.4 A
+3.2 A
+3.4 A
+3.2 A
+DT5725SB
+2.8 A
+
+N.A.
+
+14
+
+CAEN
+
+Electronic Instrumentation
+
+4 Packaging and Compliancy
+The DT5730 and DT5725 are desktop modules housed in an alloy box (weight: 670 g) with the following dimensions:
+154 W x 50 H x 164 L mm³ (connectors not included)
+154 W x 50 H x 171 L mm³ (including connectors).
+The device is inspected by CAEN before the shipment, and it is guaranteed to leave the factory free of mechanical or
+electrical defects.
+The content of the delivered package standardly consists of the part list shown in the table below (Tab. 4.1).
+Part
+
+Description
+
+Qt
+
+DT5725 or DT5725
+
+Digitizer device
+
+x1
+
+Power supply cable and
+adapter
+
+Standard C13 Power Supply chord L=2MT and AC-DC
+12V-45W Adapter
+
+x1
+
+USB cable
+
+USB A to B HI-SPEED cable L=2MT
+
+x1
+
+Documentation
+
+UM3148 – DT5730/DT5725 User Manual
+
+x1
+
+Tab. 4.1: Delivered kit content
+
+CAUTION: to manage the product, consult the operating instructions provided.
+When receiving the unit, the user is strictly recommended to:
+
+15
+
+•
+
+Inspect containers for damage during shipment. Report any damage to the freight carrier for possible
+insurance claims.
+
+•
+
+Check that all the components received match those listed on the enclosed packing list as in Tab. 4.1. (CAEN
+cannot accept responsibility for missing items unless we are notified promptly of any discrepancies.)
+
+•
+
+Open shipping containers; be careful not to damage contents.
+
+•
+
+Inspect contents and report any damage. The inspection should confirm that there is no exterior damage to
+the unit such as broken knobs or connectors and that the front panel and display face are not scratched or
+cracked. Keep all packing material until the inspection has been completed.
+
+•
+
+If damage is detected, file a claim with the carrier immediately and notify CAEN service.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+•
+
+If equipment must be returned for any reason, carefully repack equipment in the original shipping container
+with original packing materials if possible. Please, contact CAEN service (Chap. 18).
+
+If equipment is to be installed later, place equipment in the original shipping container and store it in a safe place until
+ready to install.
+
+DO NOT SUBJECT THE ITEM TO UNDUE SHOCK OF VIBRATIONS
+
+DO NOT BUMP, DROP OR SLIDE SHIPPING CONTAINERS
+
+DO NOT LEAVE ITEMS OR SHIPPING CONTAINERS UNSUPERVISED IN
+AREAS WHERE UNTRAINED PERSONNEL MAY MISHANDLE THE ITEMS
+
+USE ONLY ACCESSORIES WHICH MEET THE MANUFACTURER'S
+SPECIFICATIONS
+
+Official documentation, firmware updates, software tools, and accessories are available on the CAEN website
+www.caen.it at the Digitizer web page. MyCAEN+ account needed for download (see Chap. 18).
+
+For a correct and safe use the module, refer to Chap. 6 and Chap. 7.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+16
+
+CAEN
+
+Electronic Instrumentation
+
+5 PID (Product Identifier)
+PID is the CAEN product identifier, an incremental number greater than 10000 that is unique for each product 1. The PID
+is on a label affixed to the product (Fig. 5.1) and it is even stored in an on‐board non‐ volatile memory readable at bit
+[7:0] of registers 0xF080 or 0xF084 [RD2]. The PID information is also available through CAENToolbox Software (for
+more details refer to [RD1]).
+
+
+
+Note: The serial number is still valid to identify older boards, where the PID label is not present.
+
+Fig. 5.1: PID location on the Desktop device (the number and digitizer model in the pictures are purely indicative)
+
+1
+
+The PID substitutes the serial number previously identifying the boards.
+
+17
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+6 Power Requirements
+The modules are powered by the external AC-DC 12V-60W stabilized power supply unit included in the delivered kit.
+The tables below resume the typical power consumptions at the nominal power supply voltage.
+
+Typical Power Consumptions @+12 VDC
+FW
+
+D5730
+
+DT5730B
+
+DT5730S
+
+DT5730SB
+
+Waveform Recording
+
+2.8 A
+
+3.0 A
+
+2.9 A
+
+3.5 A
+
+2.9 A
+
+3.4 A
+
+2.9 A
+
+3.2 A
+
+DPP-DAW
+
+2.9 A
+
+3.4 A
+
+DPP-ZLE
+
+2.3 A
+
+3.2 A
+
+DPP-PHA
+DPP-PSD
+N.A.*
+
+Tab. 6.1: Power requirements table for DT5730x models
+
+*Not measured values can be assumed to respect the same proportions as the relevant "S" model ones
+
+Typical Power Consumptions @+12 VDC
+FW
+
+D5725
+
+DT5725B
+
+DT5725S
+
+DT5725SB
+
+Waveform Recording
+
+2.0 A
+
+N.A.
+
+2.1 A
+
+2.8 A
+
+DPP-PHA
+DPP-PSD
+N.A.
+DPP-DAW
+DPP-ZLE
+Tab. 6.2: Power requirements table for DT5725x models
+
+
+
+Note.: The declared values are measured in standard operating conditions. In general, they could be subject to slight
+changes due to the firmware type, the firmware version, and the operating mode.
+
+
+
+Note.: The reported power requirements may be different depending on the motherboard revision numbers, which
+could be read at 0xF04C register. Please, contact CAEN for old power consumption specifications.
+
+
+
+Note.: Using a different power supply source, like a battery or linear type, it is recommended the source to provide
++12 V and, at least the typical current + 20%; the power jack is a 2.1 mm type, a suitable cable is the RS 656-3816 type
+(or similar).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+18
+
+CAEN
+
+Electronic Instrumentation
+
+Fig. 6.1: AC/DC power supply provided with the module
+
+19
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+7 Cooling Management
+The DT5730 and DT5725 Digitizers can operate in the temperature range 0° ÷ +40°.
+It is equipped with air flow fans installed onboard, which take care of the proper cooling of the board.
+Starting from revision 4 of the motherboard (readable at 0xF04C address of the configuration ROM), DT5730 and
+DT5725 feature an automatic fan speed control to guarantee an appropriate cooling in consequence of internal
+temperature variations.
+The automatic control is managed by the ROC FPGA firmware from revision 4.4 on.
+
+CAEN HEARTLY RECOMMENDS MONITORING THE TEMPERATURE OF THE ADC CHIPS DURING THE BOARD
+OPERATION BY CAEN SOFTWARE (E.G. CoMPASS, WAVEDUMP) OR READING AT REGISTER ADDRESS 0x1nA8.
+
+The user can manually set the fan speed through the bit[3] at register address 0x8168 [RD2]:
+Hardware revision ≥ 4 and ROC FPGA firmware revision ≥ 4.4:
+•
+
+Bit[3] = 0 (default) sets the automatic fan speed control;
+
+•
+
+Bit[3] = 1 sets HIGH the fan speed.
+
+Hardware revision < 4 and ROC FPGA firmware revision < 4.4:
+•
+
+Bit[3] = 0 (default) sets LOW the fan speed;
+
+•
+
+Bit[3] = 1 sets HIGH the fan speed.
+
+WARNING: It is recommended not to run ROC FPGA firmware revision < 4.4 on DT5730 or DT5725 with hardware
+revision ≥ 4 as the fans will work always at the maximum speed to prevent hardware damages, but with a high
+noisiness on the other hand.
+
+EXTERNAL FANS MUST BE USED WHEN THE BOARD IS INSTALLED IN A
+SETUP WITH POOR AIR FLOW
+The User must take care to provide a proper cooling to the board with external fan if the board is used in an enclosure
+or if the board is installed in a setup with poor air flow.
+Excessive temperature will, in first instance, reduce the performance and the quality of the measurements and can also
+damage the board.
+If the board is stored in cold environment, please check for water condensation before power on.
+The board has not been tested for radiation hardness. High energy particles can be source of errors and can damage
+the FPGA. If used in strong proton or neutron beams, arrange proper shielding, or remote the sensors with a custom
+cable.
+
+7.1 Cleaning Air Vents
+CAEN recommends to occasionally clean the air vents on all vented sides of the board or crate, if present. Lint, dust,
+and other foreign matter can block the vents and limit the airflow. Be sure to power off the board and disconnect it
+from the power by physically detach the power chord before cleaning the air vents and follow the general cleaning
+safety precautions.
+
+IT IS UNDER THE RESPONSIBILITY OF THE CUSTOMER A NON-COMPLIANT
+USE OF THE PRODUCT
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+20
+
+CAEN
+
+Electronic Instrumentation
+
+8 Temperature Protection
+TEMPERATURE PROTECTION IS NOT AVAILABLE FOR WAVEFORM RECORDING FIRMWARE
+RELEASES < 4.5_0.3 (REFER TO CHAP. 14)
+
+To preserve hardware damages, the digitizer implements an automatic turning off of the board channels in event of
+internal over-temperature. Internal temperature can be monitored through register address 0x1nA8.
+The over-temperature limit is fixed at 85°C for DT5730S/DT5725S digitizers and 70°C for the DT5730/DT5725 ones. As
+soon as the internal temperature exceeds this limit, the board enters the temperature protection condition and the
+firmware automatically performs the following actions:
+• turns off all the channel ADCs;
+• stops the acquisition, if running (data possibly stored at that moment can be read out in any case).
+This status does not change as long as the internal temperature remains over 75°C for DT5730S/DT5725S digitizers and
+62°C for the DT5730/DT5725 ones. As soon as the temperature decreases under this limit, the user can turn on the
+channel ADCs again and restart the acquisition, if necessary.
+The temperature protection can be controlled through register addresses 0x8104 and 0x81C0 [RD2].
+
+21
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+9 Panels Description
+
+Fig. 9.1: Front panel view
+
+Fig. 9.2: Rear panel view
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+22
+
+CAEN
+
+Electronic Instrumentation
+
+9.1 Front Panel
+
+ANALOG INPUT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Input connectors from CH0 to CH7 receive
+the input analog signals.
+
+Series: MCX connectors.
+
+ELECTRICAL SPECS
+Input dynamics:
+•
+
+2 Vpp (default);
+
+•
+
+0.5 Vpp SW selectable.
+
+Type: CS 85MCX-50-0-16 (jack/female).
+Manufacturer: SUHNER.
+Suggested plug/male: MCX-50-2-16.
+Suggested cable: RG174 type.
+
+Input impedance (Zin): 50 Ω.
+
+CLOCK INPUT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Input connector for the external clock.
+
+Series: AMPMODU connectors.
+
+ELECTRICAL SPECS
+
+Type: 3-102203-4 (3-pin).
+
+Signal type:
+
+Manufacturer: AMP Inc.
+
+differential LVDS, ECL, PECL, LVPECL, CML.
+Single-ended to differential A318 cable
+adapter available (see Tab. 1.1).
+
+PINOUT
+
+Coupling: AC.
+Zdiff: 100 Ω.
+Accuracy < 100 ppm.
+
+CLK IN LED (GREEN): indicates the external clock is enabled.
+
+23
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+GENERAL PURPOSE OUTPUT
+
+FUNCTION
+General-purpose programmable
+output connector to propagate:
+
+MECHANICAL SPECS
+digital
+
+• the internal trigger sources;
+• the channel probes (i.e. signals from the
+mezzanines);
+• GPI signal
+according to register addresses 0x8110 and
+0x811C, or
+
+Series: 101 A 004 connectors.
+Type: DLP 101 A 004-28.
+Manufacturer: FISCHER.
+Alternatively:
+Type: EPL 00 250 NTN.
+Manufacturer: LEMO.
+
+• the motherboard probes (i.e. signals
+from the motherboard), like the Run
+signal, ClkOut signal, ClockPhase signal,
+PLL_Unlock signal, or Busy signal
+according to register address 0x811C.
+ELECTRICAL SPECS
+Signal level: NIM or TTL software selectable.
+Requires 50 Ω termination.
+
+TRIGGER INPUT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Digital input connector for the external
+trigger.
+
+Series: 101 A 004 connectors.
+
+ELECTRICAL SPECS
+Signal level: NIM or TTL software selectable.
+Input impedance (Zin): 50 Ω.
+
+Type: DLP 101 A 004-28.
+Manufacturer: FISCHER.
+Alternatively:
+Type: EPL 00 250 NTN.
+Manufacturer: LEMO.
+
+GENERAL PURPOSE INPUT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+General-purpose programmable input
+connector. Can be used to reset the
+time stamp (Sec. Timer Reset) or to
+start/stop the acquisition.
+
+Series: 101 A 004 connectors.
+
+ELECTRICAL SPECS
+
+Alternatively:
+
+Signal level: NIM or TTL software selectable.
+
+Type: EPL 00 250 NTN.
+
+Input impedance (Zin): 50 Ω.
+
+Manufacturer: LEMO.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+Type: DLP 101 A 004-28.
+Manufacturer: FISCHER.
+
+24
+
+CAEN
+
+Electronic Instrumentation
+
+OPTICAL LINK PORT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Optical LINK connector for data readout and
+flow control. Daisy chainable. Compliant to
+Multimode 62.5/125 μm cable featuring LC
+connectors on both sides.
+
+Series: SFF Transceivers.
+Type: FTLF8519F-2KNL (LC
+connectors).
+Manufacturer: FINISAR.
+
+ELECTRICAL SPECS
+
+PINOUT
+
+Transfer rate: up to 80 MB/s.
+
+LINK LEDs (GREEN/YELLOW): right LED (GREEN) indicates the network presence, while the left LED (YELLOW) signals
+the data transfer activity.
+
+USB PORT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+USB connector for data readout and flow
+control.
+
+Series: USB connectors.
+Type: 787780-2 (B-Type).
+
+ELECTRICAL SPECS
+
+Manufacturer: AMP Inc.
+
+Standard: compliant to USB 2.0 and USB 1.0.
+Transfer rate: up to 30 MB/s.
+USB LINK LED (GREEN): indicates the USB communication is active.
+
+DIAGNOSTIC LEDs
+
+DTACK (GREEN): indicates there is a read/write access to the board;
+TTL (GREEN): indicates the TTL standard is set for GPO, TRG IN, GPI;
+NIM (GREEN): indicates the NIM standard is set for GPO, TRG IN, GPI;
+PLL LOCK (GREEN): indicates the PLL is locked to the reference clock;
+PLL BYPS (GREEN): indicates the PLL drives directly the ADCs. PLL circuit is
+switched off and PLL LOCK LED is turned off;
+RUN (GREEN): indicates the acquisition is running (data taking). See Sec.
+10.5.2 Acquisition Run/Stop;
+TRG (GREEN): indicates the trigger is accepted;
+DRDY (GREEN): indicates the event/data is present in the Output Buffer.;
+BUSY (RED): indicates all the buffers are full for at least one channel.
+
+25
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+9.2 Rear Panel
+SPARE LINK
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Auxiliary connector reserved for
+CAEN usage.
+
+Series: Header connectors.
+
+ELECTRICAL SPECS
+
+Type: 7610-5002-5+5.
+Manufacturer: 3M.
+
+n.a.
+
+DC INPUT
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Input connector for the desktop
+Digitizer main power supply from
+the external AC/DC adapter.
+
+Series: CC power supply connectors
+
+ELECTRICAL SPECS
+Input voltage: +12V DC (typ.).
+
+Type: RAPC722X (DC power jack).
+Manufacturer: Switchcraft Inc.
+PINOUT
+
+C
+ON/OFF SWITCH
+
+FUNCTION
+
+MECHANICAL SPECS
+
+Switch for module power supply
+ON/OFF:
+
+Series: A1 switches.
+
+O → power supply OFF.
+
+Type: A11331122000 (Single pole two
+way)
+
+I → power supply ON.
+
+Manufacturer: Molveno.
+
+ELECTRICAL SPECS
+n.a.
+
+IDENTIFICATION LABELS
+
+FUNCTION
+Reports:
+−
+
+Model name
+
+−
+
+CE conformity marking
+
+−
+
+PID barcode
+
+−
+
+PID number
+
+Note: For older boards, a 4-digit Serial Number (S/N) is reported on a blue label on the
+DT board’s rear panel.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+26
+
+CAEN
+
+Electronic Instrumentation
+
+10 Functional Description
+10.1 Analog Input Stage
+The internal Programmable Gain Amplifier (Fig. 10.1) provides a dual input range of 2 Vpp (default) or 0.5 Vpp on the
+single-ended MCX coaxial connectors. To preserve the full dynamic range according to the polarity of the input signal
+(bipolar, positive unipolar, negative unipolar), it is possible to add a DC offset through a 16-bit DAC, which is up to ±1 V
+@ 2 Vpp and ±0.25 V @ 0.5 Vpp. The input bandwidth ranges from DC to 250 MHz (@3dB) for DT5730, to 125 MHz
+(@3dB) for DT5725 (with 2nd order linear phase anti-aliasing low-pass filter).
+The input range is software selectable by directly writing at register address 0x1n28.
+Input Dynamic Range: 2 Vpp
++2.00
+
+Positive Unipolar
+DAC = FSR
+
++1.00
+0
+-1.00
+
+G1 or G4
+
+-2.00
+
+MCX
+
+Input
+50ohm
+
+PGA
+
++
+OpAmp
+-
+
+Bipolar
+DAC = FSR/2
+
+ADC 14 bit
+
+FPGA
+
+Vref
+DC Offset
+
+DAC
+
+Negative Unipolar
+DAC = 0
+
+16 bit
+Input Dynamic Range: 0.5 Vpp
+-0.50
+
+Positive Unipolar
+DAC = FSR
+
++0.25
+0
+-0.25
+-0.50
+
+Negative Unipolar
+DAC = 0
+Bipolar
+DAC = FSR/2
+
+Fig. 10.1: Analog Input Diagram
+
+10.1.1 DC Offset Individual Setting
+Setting the DC offset for channel n can be done either by directly writing at register addresses 0x1n98 (or 0x8098 for
+common setting), or by library function (CAENDigitizerLib -> SetChannelDCOffset), or in the readout software
+[RD6][RD8][RD9][RD11][RD12].
+
+27
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.2 Clock Distribution
+AD9520
+
+MUX
+
+CLK IN
+
+REF-CLK
+
+REFIN
+
+MEZZANINE
+
+Phase
+Detector
+
+Rdiv
+Ndiv
+
+SCLK
+
+VCXO
+
+DATA
+
+FANOUT
+MUX
+
+CLK1
+
+INTCLK
+
+ADC
+
+SAMP-CLK0
+
+Sdiv
+
+.
+.
+
+SAMP-CLK1
+
+Sdiv
+
+SCLK
+DATA
+
+50MHz
+
+CTRL
+
+Ldiv
+
+Ldel
+
+Odiv
+
+Odel
+
+CH0
+.
+.
+.
+CH7
+
+ADC
+
+SYNCB
+
+OSC
+
+.
+.
+.
+
+DFF
+Acquisition
+& Memory
+Control
+Logic
+
+TRG-CLK
+
+SyncB
+
+RAMCLK
+DATA
+
+SYNC
+SRAM
+
+TRIGGER
+
+TRG IN
+
+Trigger & Sync
+Logic
+
+LOCAL-TRGs
+SYNC
+
+Local Bus
+Interface
+
+4
+FIFO
+
+Local Bus
+Interface
+
+LOCAL BUS
+
+FPGA (ROC)
+
+FPGA (AMC)
+
+OSC-CLK
+
+Fig. 10.2: Clock Distribution Diagram
+
+The clock distribution of the module takes place on two domains: OSC-CLK and REF-CLK.
+OSC-CLK is a fixed 50-MHz clock coming from a local oscillator that handles USB, Optical Link, and Local Bus, which
+takes care of the communication between motherboard and mezzanines (see red traces in Fig. 10.2).
+REF-CLK handles ADC sampling, trigger logic, and acquisition logic (samples storage into RAM, buffer freezing on
+trigger) through a clock chain. REF-CLK can be either an external (via the front panel CLK-IN connector) or an internal
+(via the 50-MHz local oscillator) source. In the latter mode, OSC-CLK and REF-CLK will be synchronous (the operation
+mode remains the same).
+REF-CLK clock source selection can be done writing bit[6] of 0x8100 register:
+• INT mode (default) means REF-CLK is the 50 MHz of the local oscillator (REF-CLK = OSC-CLK);
+• EXT mode means REF-CLK source is the external frequency fed on the CLK-IN connector.
+CLK-IN signal must be differential (LVDS, ECL, PECL, LVPECL, CML) with a jitter lower than 100 ppm (see Chap. 3). CAEN
+provides the A318 cable to adapt single-ended signals coming from an external clock unit into the differential CLK-IN
+connector (see Tab. 1.1).
+The DT5725 and DT5730 boards mount a phase-locked-loop (PLL) and clock distribution device, AD9520. It receives the
+REF-CLK and generates the sampling clock for ADCs and the mezzanine FPGA (SAMP-CLK0 and SAMPCLK1), as well as
+the trigger logic synchronization clock (TRG-CLK) and the output clock (CLK-OUT).
+The AD9520 configuration can be changed and stored in non-volatile memory. Changing the AD9520 configuration is
+primarily intended to be used for external PLL reference clock frequency change (see Sec. PLL Mode). The digitizer
+locks to an external 50 MHz reference clock in the default AD9520 configuration.
+Refer to the AD9520 datasheet for more details:
+http://www.analog.com/static/imported-files/data_sheets/AD9520-3.pdf
+(in case the active link above does not work, copy and paste it on the internet browser)
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+28
+
+CAEN
+
+Electronic Instrumentation
+
+10.3 PLL Mode
+The Phase Detector within the AD9520 device allows to couple REF-CLK with a VCXO (500 MHz frequency) to provide
+the nominal ADCs frequency (500 MHz for DT5730 and 250 MHz for DT5725).
+As introduced in Sec. Clock Distribution, the source of the REF-CLK signal can be external on the CLK-IN front panel
+connector or internal from the 50 MHz local oscillator (see Fig. 10.2).
+The following options are allowed:
+1.
+
+50 MHz internal clock source – it is the standard operating mode, where the AD9520 dividers do not require to
+be reprogrammed (the digitizer works in the AD9520 default configuration). The clock source selection bit
+(bit[6] of 0x8100) is in default INT mode. REF-CLK = OSC-CLK.
+
+2.
+
+50 MHz external clock source – in this case, the clock source is taken from an external device; the AD9520
+dividers do not need to be reprogrammed as the external frequency is the same as the default one. The clock
+source selection bit (bit[6] of 0x8100) must be set in EXT mode. CLK-IN = REF-CLK = OSC-CLK.
+
+3.
+
+External clock source different from 50 MHz – the clock signal is externally provided as in point 2, but the
+AD9520 dividers must be reprogrammed to lock the VCXO to the new REF-CLK and provide the nominal
+sampling frequency. The clock source selection bit (bit[6] of 0x8100) must be set in EXT mode. CLK-IN = REFCLK ̸= OSC-CLK.
+
+If the digitizer is locked, the PLL-LOCK front panel LED must be on.
+
+
+
+Note: the user can configure the clock parameters, generate the PLL programming file and load it on the board by
+using the CAEN Toolbox software (see Chap. 12).
+
+10.4 Trigger Clock
+The TRG-CLK logic works at 125 MHz (i.e. 1/4 of the SAMP-CLK for DT5730, 1/2 for the DT5725).
+
+29
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.5 Acquisition Modes
+10.5.1 Channel Calibration
+THE DT725S/DT730S DIGITIZER VERSIONS DO NOT NEED CALIBRATION!
+The module performs a self-calibration of the ADCs at its power-on. Anyway, to achieve the best performance, the
+calibration procedure is recommended to be executed by the user, on command, after the ADCs have stabilized their
+operating temperature. The calibration will not need to be repeated at each run unless the operating temperature
+changes significantly, or clock settings are modified (e.g. switching from internal to the external clock).
+
+A
+
+B
+
+C
+
+Fig. 10.3: Typical channel before the calibration (A and B) and after the calibration (C)
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+30
+
+CAEN
+
+Electronic Instrumentation
+
+The diagram below synthesizes the flow for a proper calibration:
+POWER-ON
+
+BOARD
+CONFIGURATION
+
+TEMPERATURE
+STABILIZATION
+LOOP
+
+CALIBRATE
+
+START RUN
+Temperature or Clock
+variation
+
+Acquisition sessions
+(n cycles)
+STOP RUN
+
+−
+
+At the low level, the ADCs temperature can be read at the register address 0x1nA8, while the calibration must be
+performed through register address 0x809C.
+The following steps are required:
+• Write whatever value at register address 0x809C; the self-calibration process will start simultaneously on
+each channel of the board and the "Calibrating bit" flag of register address 0x1n88 will be set to 0.
+• Poll the "Calibrating bit" flag until it returns to 1.
+
+
+
+Note: It is normally not required to calibrate after a board reset but, if a Reset command is intentionally issued to the
+digitizer (write access at register address 0xEF24) to be directly followed by a calibration procedure, it is recommended
+to wait for the board to reach stable conditions (100 ms, indicatively) before to start the calibration.
+
+
+
+Note: At power-on, a Sync command is also issued by the firmware to the ADCs to synchronize all of them to the
+board’s clock. In the standard operating, this command is not required to be repeated by the user. If a Sync command
+is intentionally issued (write access at register address 0x813C), the user must consider that a new calibration
+procedure is needed for a correct board operating.
+
+−
+
+At the library level, developers can refer to the routines of the CAENDigitizer library (see Chap. 11): ReadTemperature
+function for temperature readings, Set/GetChannelDCOffset function for DC Offset management, Reset function to reset
+the board, and the Calibrate function which executes the channel calibration steps above described.
+
+
+
+IMPORTANT NOTE: Starting from CAENDigitizer release 2.6.1, the Reset function has been modified so that it no
+longer includes the channel calibration routine implemented in the code. This calibration must be performed on
+command by the dedicated Calibrate function [RD5].
+
+31
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+−
+
+Electronic Instrumentation
+
+At the software level, CAEN manages the on-command channel calibration in the available readout software (see the
+relevant software documentation).
+➢ WaveDump
+1.Launch WaveDump: the software performs an automatic ADC calibration and displays a message when it is
+completed (see Fig. 10.4).
+
+Fig. 10.4: Automatic calibration at WaveDump first run
+
+This allows the user to start an acquisition being sure that the digitizer has been calibrated at least once.
+NOTE THAT: If the SKIP_STARTUP_CALIBRATION parameter is set to YES in the WaveDump configuration file, the
+automatic start-up calibration is not performed, and no message is displayed.
+2.At any time, once the acquisition is stopped (“s” command by keyboard), the channel temperature can be read
+out for monitoring (“m” command).
+3.In case of significant variations, a manual channel calibration can be forced (“c” command) as in Fig. 10.5.
+
+Fig. 10.5: Temperature monitoring with manual calibration in WaveDump software
+
+4.The acquisition can then start again (“s” command).
+See the WaveDump User Manual for a complete software description [RD6].
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+32
+
+CAEN
+
+Electronic Instrumentation
+
+➢ CoMPASS
+1.Launch CoMPASS software.
+2.Connect to the digitizer.
+3.Before starting the acquisition, go to the “Input” tab and enable the “Calib. ADC” checkcell.
+4.Start the acquisition: the calibration of the channel ADCs is performed at every start acquisition.
+
+Fig. 10.6: Channel calibration in CoMPASS software
+
+33
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.5.2 Acquisition Run/Stop
+The acquisition can be started and stopped in different ways, according to bit[1:0] setting at register address 0x8100
+and bit[2] of the same register:
+-
+
+SW CONTROLLED (bit[1:0] = 00): Start and Stop take place by software command. Bit[2] = 0 means
+stopped, while bit[2] = 1 means running.
+
+-
+
+GPI CONTROLLED (bit[1:0] = 01): acquisition is armed by setting bit[2] = 1, then two options are selectable
+through bit [11]:
+•
+START/STOP ON LEVEL - If bit[11] = 0, then acquisition starts when the GPI signal is high and
+stops when it is low; if bit[2] = 0 (disarmed), the acquisition is always off.
+•
+START ON EDGE - If bit[11] = 1, then acquisition starts on the rising edge of the GPI signal and
+must be stopped by software command (bit[2] = 0).
+
+
+-
+
+Note: the START ON EDGE option is implemented from ROC FPGA fw revision 4.22 on.
+FIRST TRIGGER CONTROLLED (bit[1:0] = 10): bit[2] = 1 arms the acquisition and the Start is issued on the
+first trigger pulse (rising edge) on the TRG-IN connector. This pulse is not used as a trigger; actual triggers
+start from the second pulse on TRG-IN. The Stop acquisition must be SW controlled (resetting bit[2]).
+
+10.5.3 Acquisition Triggering: Samples and Events
+In the waveform recording firmware, the arrival of the trigger signal during the acquisition provokes:
+-
+
+-
+
+The storage of the Trigger Time Tag (TTT), that is the time reference related to the start of the run. It is a
+31-bit counter plus an overflow bit (see Sec. 10.5.5.1). The value of the counter is updated at the same
+frequency as the Trigger Logic Unit (see Fig. 10.2), that is 125 MHz (8 ns) or every 4 ADC clock cycles of the
+DT5730 and 2 of the DT5725. As the acquired data are written into the board internal memory in 4sample bunches, the TTT counter value is read at half the Trigger Logic frequency (i.e. 62.5 MHz), fixing
+the Trigger Time Tag resolution at 16 ns for both DT5730 and DT5725 (i.e. the LSB of the TTT is always
+“0”).
+The increment the EVENT COUNTER.
+The filling of the active buffer with the pre/post-trigger samples, whose number is programmable via
+register address 0x8114 [RD2]; the acquisition window width (also referred to as record length) is
+determined via register addresses 0x800C and 0x8020; then, the buffer is frozen for readout purposes,
+while acquisition goes on in another buffer.
+
+An event is therefore composed of the trigger time tag, pre-, and post-trigger samples, and the event counter.
+Overlap between “acquisition windows” may occur (a new trigger occurs while the board is still storing the samples
+related to the previous trigger); this overlap can be either rejected or accepted (programmable via register address
+0x8000).
+If the board is programmed to accept the overlapped triggers, as the “overlapping” trigger arrives, the currently active
+buffer is filled up, then the samples storage continues in the subsequent one. In this case, not all events will have the
+same size (see Fig. 10.7 below).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+34
+
+CAEN
+EVENT n
+
+EVENT n+1
+
+Electronic Instrumentation
+EVENT n+2
+
+Recorded
+Not Recorded
+TRIGGER
+PRE
+POST
+ACQUISITION WINDOW
+
+Overlapping Triggers
+Fig. 10.7: Trigger overlap
+
+A trigger can be refused for the following cases:
+-
+
+-
+
+The acquisition is not active.
+Memory is FULL and therefore there are no available buffers.
+The required number of samples for building the pre-trigger of the event is not reached yet; typically, this
+happens when the trigger occurs too early either with respect to the RUN Acquisition command (see Sec.
+10.5.2) or with respect to a buffer emptying after a Memory FULL status (see Sec. 10.5.6).
+The trigger overlaps the previous one and the board is not enabled for accepting overlapped triggers.
+
+As a trigger is refused, the current buffer is not frozen, and the acquisition continues writing on it. The EVENT
+COUNTER can be programmed to be either incremented or not. If this function is enabled, the EVENT COUNTER value
+identifies the number of the triggers sent (but the event number sequence is lost); if the function is not enabled, the
+EVENT COUNTER value coincides with the sequence of buffers saved and read out.
+
+10.5.4 Multi-Event Memory Organization
+Each channel of the DT5730/DT5725 features an SRAM memory to store the acquired events. The memory size for the
+event storage is 640 kS/ch or 5.12 MS/s, according to the board version (see Tab. 1.1). The channel memory can be
+divided into a programmable number of buffers, Nb (Nb from 1 up to 1024), by the register address 0x800C [RD2], as
+described in Tab. 10.1.
+
+35
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+Register Value
+
+Buffer Number
+
+0x800C
+
+(Nb)
+
+0x0
+
+Size of one Buffer/channel(*)
+SRAM 1.25 MB (640 kS)/ch
+
+SRAM 10.24 MB (5.12 MS)/ch
+
+1
+
+1.25 MB – 20 B (640 kS – 10 S)
+
+10.24 MB – 20 B (5.12 MS – 10 S)
+
+0x1
+
+2
+
+640 kB – 20 B (320 kS – 10 S)
+
+5.12 MB – 20 B (2.56 MS – 10 S)
+
+0x2
+
+4
+
+320 kB – 20 B (160 kS – 10 S)
+
+2.56 MB -20 B (1.28 MS – 10 S)
+
+0x3
+
+8
+
+160 kB – 20 B (80 kS – 10 S)
+
+1.28 MB – 20 B (0.64 MS – 10 S)
+
+0x4
+
+16
+
+80 kB – 20 B (40 kS – 10 S)
+
+0.64 MB – 20 B (0.32 MS – 10 S)
+
+0x5
+
+32
+
+40 kB -20 B (20 kS – 10 S)
+
+0.32 MB – 20 B (0.16 MS – 10 S)
+
+0x6
+
+64
+
+20 kB – 20 B (10 kS – 10 S)
+
+0.16 MB – 20 B (0.08 MS – 10 S)
+
+0x7
+
+128
+
+10 kB – 20 B (5 kS – 10 S)
+
+0.08 MB – 20 B (0.04 MS – 10 S)
+
+0x8
+
+256
+
+5 kB – 20 B (2.5 kS – 10 S)
+
+0.04 MB – 20 B (0.02 MS – 10 S)
+
+0x9
+
+512
+
+2.5 kB – 20 B (1.25 kS – 10 S)
+
+0.02 MB – 20 B (0.01 MS – 10 S)
+
+0xA
+
+1024
+
+1.25 kB – 20 B (640 S – 10 S)
+
+0.01 MB – 20 B (5.12 kS – 10 S)
+
+Tab. 10.1: Buffer Organization
+
+Referring to the 640 kS memory size, then each buffer contains 640k/Nb samples (e.g. Nb = 1024 means 640 samples in
+each buffer).
+(*)IMPORTANT: For AMC FPGA firmware release < 0.2, the Size of one Buffer related to each Buffer Number must be
+
+intended as the number of the samples in Tab. 10.1 without decreasing by 10 samples (20 bytes).
+
+10.5.4.1 Custom-sized Events
+In case an event size less than the buffer size is needed, the user can set the N_LOC value at register address 0x8020
+[RD2], where N_LOC is the number of memory locations. The size of the event is so forced to be according to the
+formula:
+Nsample = 10 * N_LOC
+When N_LOC = 0, the custom size is disabled.
+
+
+
+Note: The value of N_LOC must be set so that the relevant number of samples does not exceed the buffer size and it
+must not be modified while the acquisition is running. Even using the custom size setting, the number of buffers and
+the buffer size are not affected by N_LOC, but they are still determined by Nb.
+The concepts of buffer organization and custom size directly affect the width of the acquisition window (i.e. number of
+the digitized waveform samples per event). The Record Length parameter defined in CAEN software (such as
+WaveDump and WaveDump 2 introduced in Chap. 12) and the Set/GetRecordLength function of the CAENDigitizer
+library (see Sec. 11.2) rely on these concepts [RD5].
+
+
+
+Note: In the case of DPP firmware, refer to the specific documentation [RD9][RD11][RD12].
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+36
+
+CAEN
+
+Electronic Instrumentation
+
+10.5.5 Event Structure
+The event can be read out via Optical Link or USB; data format is 32-bit long word (see Fig. 10.10).
+An event is structured as:
+•
+•
+
+Header (four 32-bit words)
+Data (variable size and format)
+
+10.5.5.1 Header
+The header consists of four words carrying the following information:
+•
+•
+
+•
+•
+
+
+
+EVENT SIZE (bit[27:0] of 1st header word) is the size of the event, that is the number of 32-bit long words to be
+read.
+BOARD FAIL FLAG (bit[26] of 2nd header word), implemented from ROC FPGA firmware revision 4.5 on (reserved
+otherwise), is set to “1” as a consequence of a hardware problem (e.g. PLL unlocking or over-temperature
+condition); the user can collect more information about the cause by reading at register address 0x8178 and
+contact CAEN Support Service if necessary (see Chap. 18).
+Bit[24] (2nd header word) identifies the event format; it is reserved and must be 0.
+TRG OPTIONS (bit[23:8] of 2nd header word);
+
+Note: Starting from revision 4.6 of the ROC FPGA firmware, these 16 bits can be programmed to provide trigger
+information according to the setting of the bits [22:21] at register address 0x811C (see Tab. 10.2).
+
+0x811C REGISTER
+
+FUNCTIONAL
+
+Reserved/TRG OPTIONS INFORMATION
+
+Bits[22:21]
+
+DESCRIPTION
+
+(bit[23:8] of 2nd header word)
+
+00
+(default)
+
+Reserved
+
+Must be 0
+Indicates the trigger source causing the
+event acquisition:
+Bit[23:19] = 0000
+
+01
+
+Event Trigger Source
+
+Bit[18] = Software Trigger
+Bit[17] = External Trigger
+Bit[16:12] = 00000
+Bit[11:8] = Channel Trigger requests (refer
+to Sec. 10.6.3)
+
+10
+
+Extended Trigger Time Tag
+(ETTT)
+
+A 48-bit Trigger Time Tag (ETTT)
+information is configured, where bit[23:8]
+contribute as the 16 most significant bits
+together with the 32-bit TTT field of the 4th
+header word
+Note: in the ETTT option, the overflow bit
+is not provided
+
+11
+
+Not used
+
+If configured, it acts the same as the “00”
+setting
+
+Tab. 10.2: Reserved/Trg Options configuration table
+
+•
+
+•
+
+37
+
+CHANNEL MASK (bit[7:0] of 2nd header word) is the mask of the channels participating in the event (e.g. CH0
+and CH6 participating → Channel Mask = 0100 0001). This information must be used by the software to
+acknowledge which channel the samples are coming from (the first event contains the samples from the
+channel with the lowest number).
+EVENT COUNTER (bit[23:0] of 3rd header word) is the trigger counter; it can count either accepted triggers only,
+or all triggers (according to bit[3] of register address 0x8100).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+•
+
+TRIGGER TIME TAG (bit[31:0] of 4th header word) is the Trigger Time Tag information (TTT), which is the trigger
+time reference (see Sec. 10.5.3). The word is composed of the value of the 31-bit counter of the Trigger Time
+Tag (bit[30:0]) plus the overflow bit (bit[31]) indicating that the timestamp counter has overflowed at least once
+(Fig. 10.8). If the ETTT option is enabled, then this field becomes the 32 less significant bits of the 48-bit
+Extended Trigger Time Tag information in addition to the 16 bits (MSB) of the TRG OPTIONS field (2nd event
+word). Note that, in the ETTT case, the overflow bit is no more provided (Fig. 10.9). The trigger time tag is reset
+either after each start of acquisition or via front panel signal on GPI connector and increments at the frequency
+of 125 MHz (8ns). The trigger time tag value is then read at half this frequency (62.5 MHz), so the Trigger Time
+Tag specifications result in 16 ns resolution and 17 s range (i.e. 8 ns*(231-1)), which can be extended to 625 h
+(i.e. 8 ns*(248-1)) by the Extended Trigger Time Tag option.
+TTT Counter
+
+True TTT
+
+Event’[m]
+
+2³¹
+
+2³² - 1
+Event[m]
+
+2³¹
+
+Time (s)
+34,359738360
+
+17,179869180
+
+17,179869180
+
+Fig. 10.8: TTT description
+
+ETTT Counter
+
+True ETTT
+
+Event’[m]
+
+2⁴⁸ - 1
+2⁴⁸ - 1
+
+Event[m]
+2⁴⁸
+
+Time (s)
+2251799,813685240
+
+2251799,813685240
+
+Fig. 10.9: ETTT description
+
+10.5.5.2 Data
+Data corresponds to the samples from the enabled channels. Data from masked channels are not read.
+
+10.5.5.3 Event Format Example
+The event format is shown in the following figure (case of 8 channels enabled).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+38
+
+CAEN
+
+Electronic Instrumentation
+
+31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
+EVENT SIZE
+RES. 0
+BFRES.
+
+SAMPLE [N-1] – CH[0]
+SAMPLE [1] – CH[1]
+
+0 0
+
+SAMPLE [N-1] – CH[1]
+
+0 0
+
+SAMPLE [N-2 ] – CH [1]
+
+0 0
+0 0
+
+SAMPLE [1] – CH[7]
+SAMPLE [3] – CH[7]
+
+0 0
+0 0
+
+SAMPLE [0] – CH[7]
+SAMPLE [2] – CH[7]
+
+0 0
+
+SAMPLE [N-1] – CH[7]
+
+0 0
+
+SAMPLE [N-2 ] – CH [7]
+
+SAMPLE
+
+SAMPLE [2] – CH[1]
+
+DATA CH7
+
+SAMPLE [N-2 ] – CH [0]
+SAMPLE [0] – CH[1]
+
+[3] – CH[1]
+
+0 0
+0 0
+0 0
+
+DATA CH1
+
+0 0
+0 0
+0 0
+
+DATA CH0
+
+PATTERN
+CHANNEL MASK [7:0]
+RESERVED
+/ TRG OPTIONS
+EVENT COUNTER
+RESERVED
+TRIGGER TIME TAG
+0 0
+0 0
+SAMPLE [1] – CH[0]
+SAMPLE [0] – CH[0]
+SAMPLE [3] – CH[0]
+SAMPLE [2] – CH[0]
+0 0
+0 0
+
+HEADER
+
+1 0 1 0
+BOARD -ID
+RESERVED
+
+Fig. 10.10: Event format example
+
+
+
+Note: Data transfer starts from Channel 0; once all the data from one Channel are transferred, data transfer from the
+subsequent Channel begins.
+
+
+
+Note: The firmware saves the waveforms in the memory of the digitizer with a granularity of n (i.e. in group of n
+samples). This way of writing the waveforms in memory allows for a potential ΔT between the instant when the trigger
+physically arrives and when it is sensed by the digitizer. The resulting effect is a jitter in the acquisition window
+between one event and the next. This jitter can be observed by graphing the waveforms of the enabled channels using
+an acquisition software. The channels may jitter together between one event and the next, but not among themselves.
+
+39
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.5.6 Acquisition Synchronization
+Each channel of the digitizer is provided with an SRAM memory that can be organized in a programmable number Nb of
+circular buffers (see sec. 10.5.4). When the trigger occurs, the FPGA writes further a programmable number of samples
+for the post-trigger and freezes the buffer, so that the stored data can be read via USB or Optical Link, while the
+acquisition can continue in a new buffer.
+When all buffers are filled, the board is considered FULL: no trigger is accepted and the acquisition stops (the samples
+coming from the ADC are not written into the memory, so they are lost). As soon as at least one buffer is read out, the
+board exits the FULL condition and acquisition restarts.
+IMPORTANT: When the acquisition restarts, no trigger is accepted until at least the entire buffer is written. This
+means that the dead time is extended for a certain time (depending on the size of the acquisition window) after the
+board exits the FULL condition.
+A way to eliminate this extra dead time is by setting bit[5] = 1 at register address 0x8100. The board is so programmed
+to enter the FULL condition when Nb-1 buffers are written: no trigger is then accepted, but samples writing continues
+in the last available buffer. As soon as one buffer is read out and becomes free, the boards exit the FULL condition and
+can immediately accept a new trigger. This way, the FULL reflects the BUSY condition of the board (i.e. inability to
+accept triggers).
+
+
+
+Note: when bit[5] = 1, the minimum number of circular buffers to be programmed is Nb = 2.
+In some cases, the BUSY propagation from the digitizer to other parts of the system has some latency and one or more
+triggers may occur while the digitizer is already FULL and unable to accept those triggers. This condition causes event
+loss and it is particularly unsuitable when multiple digitizers are running synchronously because the triggers accepted
+by one board and not by other boards cause event misalignment.
+In these cases, it is possible to program the BUSY signal to be asserted when the digitizer is close to the FULL condition,
+but it has still some free buffers (Almost FULL condition). In this mode, the digitizer remains able to accept some more
+triggers even after the BUSY assertion, and the system can tolerate a delay in the inhibit of the trigger generation.
+When the Almost FULL condition is enabled by setting the Almost FULL level to “X” (register address 0x816C), the BUSY
+signal is asserted as soon as X buffers are filled, although the board still goes FULL (and rejects triggers) when the
+number of filled buffers is Nb or Nb – 1, depending on the bit[5] at register address 0x8100 as described above.
+It is possible to provide the BUSY signal on the digitizer front panel GPO output by bit[20], bit[19:18], and bit[17:16] at
+register address 0x811C.
+
+10.5.7 Channel Self-Trigger Rate Meter (725S and 730S only)
+Each channel of the digitizer is equipped with a digital discriminator with a programmable threshold (see Sec. 10.6.3).
+The discriminator activity can be monitored through a special counter. The 32-bit value of this counter (register
+address 0x1nEC) indicates how many times per second the input pulse crossed the discriminator threshold on channel
+n.
+
+
+
+Note: the counter is available for 725S and 730S models only and implemented from ROC FPGA fw revision 4.22 on.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+40
+
+CAEN
+
+Electronic Instrumentation
+
+10.6 Trigger Management
+When operating the waveform recording firmware, all board channels share the same trigger (board common trigger),
+so they acquire an event simultaneously and in the same way (determined number of samples according to the buffer
+organization and custom size settings, as well as the position with respect to the trigger defined by the post-trigger).
+
+
+
+Note: For the trigger management in the DPP firmware operating, please refer to The DPP documentation
+[RD9][RD11][RD12].
+Mother Board
+
+Mezzanine
+x4
+Memory
+Buffers
+
+GPO
+(TRG OUT)
+
+TRG IN
+
+D
+
+Q
+
+COMMON TRIGGER
+
+4
+
+4
+
+Acquisition
+Logic
+
+x4
+
+ADC
+
+CH0
+
+ADC
+
+CH1
+
+SCLK
+
+Enable Mask
+
+4
+
+AND
+
+TRG_REQ [3:0]
+4
+
+OVTHR PULSE
+
+ONLY 0
+
+TRG_REQ [0] ONLY 1
+SW TRG
+
+SELF-TRIG. SET.
+
+OR
+
+SELF-TRIG. SET.
+OVTHR PULSE
+
+Local Bus
+Interface
+
+Fig. 10.11: Block Diagram of the trigger management
+
+The digitizer supports different sources for the generation of the board common trigger (configurable at register
+address 0x810C):
+•
+•
+•
+•
+•
+
+Software trigger
+External trigger
+Self-trigger
+Coincidences
+TRG-IN as Gate
+
+10.6.1 Software Trigger
+Software triggers are internally produced via a software command (write access at register address 0x8108) through
+USB or Optical Link.
+
+10.6.2 External Trigger
+A TTL or NIM external signal can be provided in the front panel TRG-IN connector (configurable at register address
+0x811C). When setting up a system of multiple digitizers (see Sec. 10.7), there could be a random jitter of 1 TRG-CLK hit
+(see Sec. 10.4) if the external signal is provided asynchronously with the internal clock of the boards (e.g. external
+trigger FAN-IN on TRG-IN). One board could then sense the trigger at clock_hit[N], while another board at
+clock_hit[N+1] and the same jitter is then present between the pulse acquired by one board and that acquired by the
+other board.
+
+41
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.6.3 Self-Trigger
+The digitizer is equipped with a digital discriminator for each channel. Each channel is so able to generate a self-trigger
+signal when the digitized input pulse crosses the configurable threshold of its discriminator (register address 0x1n80).
+The self-triggers of each couple of adjacent channels are then processed to output a single trigger request. The trigger
+requests are propagated to the central trigger logic where they are ORed to produce the board common trigger, which
+is finally distributed back to all channels causing the event acquisition (see Fig. 10.11). An example of self-trigger and
+trigger request logic for channel 0 and channel 1 couple is schematized in Fig. 10.12.
+
+Bit[1:0] of 0x1084
+
+PULSE
+CH0
+
+SELF_TRG [0]
+
+AND
+
+OVTHR
+ONLY 0
+TRG_REQ [0]
+
+Bit[2] of 0x1084
+ONLY 1
+PULSE
+CH1
+
+SELF_TRG [1]
+
+OR
+
+OVTHR
+
+Fig. 10.12: Self Trigger and Trigger Request logic for Ch0 and Ch1 couple; a single trigger request signal is generated.
+
+The FPGA, by register address 0x1n84, can be programmed for the self-trigger to be:
+▪
+
+an over/under-threshold signal (see Fig. 10.13). This signal can be programmed to be active (i.e. “1”) as long as
+the input pulse stays over the threshold or under the threshold (depending on the trigger polarity bit at register
+address 0x8000).
+
+THRESHOLD
+
+CH0 IN
+
+over-threshold signal [0]
+under-threshold signal [0]
+
+Fig. 10.13: Channel over/under threshold signal
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+42
+
+CAEN
+
+▪
+
+Electronic Instrumentation
+
+a pulse of configurable width (see Fig. 10.14); the width parameter can be set at register address 0x1n70.
+
+THRESHOLD
+
+CH0 IN
+WIDTH
+
+pulse [0]
+
+Fig. 10.14: Channel pulse signal
+
+The FPGA, by register address 0x1n84, can be programmed for the trigger request for a couple of adjacent channels to
+be the
+AND,
+ONLY CH(n),
+ONLY CH(n+1),
+OR
+of the relevant self-trigger signals (see Fig. 10.12).
+
+Default Conditions: by default, the FPGA is programmed so that the trigger request is the OR of two pulses of 4nswidth.
+
+
+
+Note: the above-described configurability of both the self-trigger logic and the trigger request logic are supported only
+by AMC FPGA firmware releases > 0.1.
+Previous revisions of the firmware do not implement the register address 0x1n84 as well as the 0x1n70; the self-trigger
+is intended only as the over/under threshold signal and a trigger request is intended only as the OR of the self-triggers
+couple.
+
+When operating in self-trigger mode, the firmware includes a feature that allows programming the number of pulse
+samples required to remain above or below the threshold (depending on signal polarity) to generate a self-trigger. This
+option can be adjusted in steps of 4 samples within a single trigger clock cycle, by writing at the channel register
+address 0x1n40. By default, the register value is set to "0," which disables this feature. In this case, a single sample
+crossing the threshold is enough to generate the trigger pulse.
+This new feature is particularly useful to avoid spurious triggers occurring with very noisy signals at low thresholds or
+signals with a very slow and noisy falling time. For more details refers to document Errore. L'origine riferimento non è
+stata trovata..
+
+
+
+43
+
+Note: This feature is supported for revision of Waveform Recording firmware >= 4.29_0.9 for DT5730/DT5725 and
+4.29_0.4 for DT5730S/DT5725S.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.6.4 Trigger Coincidence Level
+Operating with the waveform recording firmware, the acquisition trigger is common to the whole board. This common
+trigger allows the coincidence acquisition mode to be performed through the Majority operation.
+
+
+
+Note: From AMC FPGA firmware release > 0.1, it is possible to program the self-trigger logic as described in Sec. 10.6.3.
+Enabling the coincidences is possible by writing at register address 0x810C:
+-
+
+Bit[3:0] enable the trigger request signals to participate in the coincidence;
+Bit[23:20] set the coincidence window (TTVAW) linearly in steps of the Trigger clock;
+Bit[26:24] set the Majority level (i.e. Coincidence level).
+
+The coincidence takes place when:
+
+Number of enabled trigger requests > Majority level
+
+Supposing that bit[3:0] = 0xF (i.e. all the 4 trigger requests are enabled) and bit[26:24] = 01 (i.e. Majority level = 1), a
+common trigger is issued whenever at least two of the enabled trigger requests are in coincidence within the
+programmed TTVAW.
+The Majority level must be smaller than the number of trigger requests enabled via bit[3:0] mask. The default setting is
+bit[26:24] = 00 (i.e. Majority level = 0), which means the coincidence acquisition mode is disabled and the T TVAW is
+meaningless. In this case, the board common trigger is simple OR of the signals from the enabled channels pairs.
+
+
+
+Note: In the following pictures CH4 up to CH7 are considered disabled in order not to overload the plots.
+Fig. 10.15 and Fig. 10.16 show the trigger management when the coincidences are disabled
+
+CH0 THRESHOLD
+CH0 (enabled) IN
+
+Over-threshold signal [CH0]
+
+CH1 THRESHOLD
+
+CH1(enabled) IN
+Over-threshold signal [CH1]
+
+CH2 THRESHOLD
+
+MEZZANINE
+
+TRG_REQ [0]
+
+CH2 (enabled) IN
+Over-threshold signal [CH2]
+
+CH3 THRESHOLD
+
+CH3(enabled) IN
+Over-threshold signal [CH3]
+
+TRG_REQ [1]
+
+Fig. 10.15: Trigger request management at mezzanine level with Majority level = 0
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+44
+
+CAEN
+
+Electronic Instrumentation
+
+TRG_REQ [0]
+
+MOTHERBOARD
+
+TRG_REQ [1]
+
+ORed signal
+
+COMMON TRIGGER
+(Maj. Lev. = 0)
+
+Fig. 10.16: Trigger request management at motherboard level with Majority level = 0
+
+Fig. 10.17 and shows the trigger management in case the coincidences are enabled with Majority level = 1 and T TVAW is
+a value different from 0. To simplify the description, CH1 and CH3 channels are considered disabled, so that the
+relevant trigger requests are the over-threshold signals from CH0 and CH2.
+
+CH0 THRESHOLD
+
+TRG_REQ [0]
+
+MEZZANINE
+
+CH0(enabled) IN
+
+CH2 THRESHOLD
+
+CH2(enabled) IN
+TRG_REQ [1]
+
+TTVAW
+TRIGGER
+(Maj.lev = 1)
+
+MOTHERBOARD
+
+ORed signal
+
+Fig. 10.17: Trigger request relationship with Majority level = 1 and TTVAW ≠ 0
+
+
+
+45
+
+Note: with respect to the position where the common trigger is generated, the portion of the input signal stored
+depends on the programmed length of the acquisition window and the post-trigger setting.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+Fig. 10.18 shows the trigger management in case the coincidences are enabled with Majority level = 1 and T TVAW = 0
+(i.e. 1 clock cycle). To simplify the description, CH1 and CH3 channels are considered disabled, so that the relevant
+trigger requests are the over-threshold signals from CH0 and CH2.
+
+CH0 THRESHOLD
+
+CH0(enabled) IN
+
+MEZZANINE
+
+TRG_REQ [0]
+
+CH2 THRESHOLD
+
+CH2(enabled) IN
+TRG_REQ [1]
+
+TTVAW
+TRIGGER
+(Maj.lev = 1)
+
+MOTHERBOARD
+
+ORed signal
+
+Fig. 10.18: Trigger request relationship with Majority level = 1 and TTVAW = 0
+
+In this case, the common trigger is issued when at least two of the enabled trigger requests are instantaneously in
+coincidence (TTVAW does not apply).
+
+
+
+Note: CAEN provides a guide to coincidences including a practical example of making coincidences with the waveform
+recording firmware [RD13].
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+46
+
+CAEN
+
+Electronic Instrumentation
+
+10.6.5 TRG-IN as Gate
+It is possible to configure TRG-IN as a gate for trigger anti-veto function. The common acquisition trigger is then issued
+upon the AND between the external signal on TRG-IN and the other trigger sources but the software trigger (i.e. the
+software trigger cannot participate in the Trigger as Gate mode).
+This mode is enabled by setting bit[27] = 1 of register 0x810C and bit[10] = 1 of register 0x811C. The trigger sources
+participating in AND with TRG-IN are configurable through register 0x810C as well.
+
+10.6.6 Trigger Distribution
+As described in Sec. Trigger Management, the OR of all the enabled trigger sources, synchronized with the internal
+clock, becomes the common trigger of the board that is fed in parallel to all channels, consequently provoking the
+capture of an event. By default, only the Software Trigger and the External Trigger participate in the common
+acquisition trigger (refer to the red path on top of Fig. 10.19).
+A Trigger Out signal is also generated on the relevant front panel GPO connector (NIM or TTL) allowing the User for
+extending the trigger signal to other boards.
+Thanks to its configurability (see Fig. 10.19), GPO can propagate:
+-
+
+the OR of all the enabled trigger sources (only the Software Trigger is provided by default, as in the red
+path of Fig. 10.19);
+
+-
+
+the OR, AND, or MAJORITY exclusively of the channel trigger requests.
+0x810C
+Bits[3:0]
+
+3
+
+MASK 1
+COMMON ACQUISITON TRIGGER
+
+SW TRG
+
+TO THE CHANNELS
+
+EXT TRG
+OR
+
+0x810C
+Bits[31:30]
+
+MASK 2
+
+SW TRG
+EXT TRG
+SW TRG
+MASK 3
+
+EXT TRG
+
+3
+
+00
+TRG SOURCES
+
+TRG_REQ[3:0]
+
+01
+
+0x8110
+Bits[31:30]
+
+OR
+
+10
+PB PROBES
+
+OR
+
+11
+
+0x8110
+Bits[3:0]
+
+3
+
+GPO
+
+MB PROBES
+
+GPI
+
+00
+
+0x811C
+Bits[17:16]
+
+01
+
+MASK 4
+AND
+
+10
+
+0x8110
+Bits[9:8]
+
+MAJORITY
+
+0x8110
+Bits[12:10]
+
+Fig. 10.19: Trigger configuration on GPO front panel output connector
+
+The registers involved in the GPO programming are:
+
+47
+
+-
+
+0x8110;
+
+-
+
+0x811C.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.6.6.1 Example
+For instance, it could be required to start the acquisition on all the channels of a multi-board system as soon as one of
+the channels of a board (board “n”) crosses its threshold. Trigger Out signal is then fed to an external Fan-Out logic unit
+(e.g. CAEN DT5495 board); the obtained signal has then to be provided to the external trigger input TRG-IN of all the
+boards in the system (including the board which generated the Trigger Out signal). In this case, the programming steps
+to be performed are following described:
+1.
+
+2.
+
+Register 0x8110 on board “n”:
+-
+
+Enable the desired trigger request as Trigger Out signal on board “n” (by bit[3:0] mask);
+
+-
+
+Disable Software Trigger and External Trigger as Trigger Out signal on board “n” (bit[31:30] = 00);
+
+-
+
+Set Trigger Out signal as the OR of the enabled trigger requests on board “n” (bit[9:8] = 00).
+
+Register 0x811C on board “n”:
+-
+
+3.
+
+Configure the digitizer to propagates on GPO the internal trigger sources according to the 0x8110
+settings (i.e. the enabled trigger request, in the specific case) onboard “n” (bit[17:16] = 00).
+
+Register 0x810C on all the boards in the system (including board “n”):
+-
+
+Enable External Trigger to participate in the board’s common acquisition trigger, disable Software
+Trigger and the Trigger Requests from the channels (bit[31:30] = 01; bit[3:0] = 0000).
+
+10.7 Multi-board Synchronization Overview
+When multi-board systems are involved in an experiment, it is necessary to synchronize different boards. In this way,
+the user can acquire from N boards each one with Y channels, like if they were just one board with (N * Y) channels.
+While all the channels of the same board are simultaneously sampled at the same clock frequency by design, the main
+issue with a multi-board system is to guarantee the clock synchronization for the channels of all the boards. This is
+achieved by using an external clock unit, like CAEN DT4700, which generates the needed reference clock and can
+provide it in fan-out on the CLK-IN connector of up to ten digitizers.
+Other issues are the synchronization of the start of the run to let all the boards have the same zero for timestamps, the
+trigger synchronization to propagate and combine the triggers from all the boards to have the same common
+acquisition trigger, and the event data synchronization to keep event data aligned across boards (busy/veto
+management).
+Please, contact CAEN for details (see Chap. 18).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+48
+
+CAEN
+
+Electronic Instrumentation
+
+10.8 Test Pattern Generator
+The FPGA AMC can emulate the ADC and write into memory a triangular signal sweeping the entire ADC dynamics for
+test purposes. It can be enabled via register 0x8000.
+
+10.9 Reset, Clear, and Default Configuration
+10.9.1 Global Reset
+Global Reset is performed at Power-ON of the module or via software by writing at register address 0xEF24 (whatever
+32-bit value can be written). It allows clearing the data off the Output Buffer, the event counter and performs a global
+reset of the FPGAs restoring them to their default configuration. It initializes all counters to their initial state and clears
+all detected error conditions.
+
+10.9.2 Memory Reset
+The Memory Reset clears the data off the Output Buffer.
+The Memory Reset can be forwarded via write access at register address 0xEF28 [RD2] (whatever 32-bit value can be
+written).
+
+10.9.3 Timer Reset
+The timer reset initializes the time tag counters (Event Time Tag and Group Trigger Time Tag). The timer reset can be
+issued either via software by a software clear command at 0xEF28 register address, or via hardware by sending a pulse
+to the front panel GPI input. In case the GPI connector needs to be used to reset the trigger time stamps, no
+configurations or access to registers are necessary. The user only has to transmit a NIM or TTL signal to the input,
+depending on the software selected logic level for the GPI connector. The time stamps reset occurs at every leading
+edge of the logic signal sent to the GPI connector.
+
+49
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+10.10
+
+Data Transfer Capabilities and Events Readout
+The board features a Multi-Event digital memory per channel, configurable by the user to be divided into 1 up to 1024
+buffers, as detailed in Sec. 10.5.4. Once they are written in the memory, the events become available for readout via
+USB or Optical Link. During the memory readout, the board can store other events (independently from the readout)
+on the available free buffers.
+The events are read out sequentially and completely, starting from the header of the first available event, followed by
+the samples of the enabled channels (from 0 to 7) as reported in Fig. 10.10. Once an event is completed, the relevant
+memory buffer becomes free and ready to be written again (old data are lost). After the last word in an event, the first
+word (Header) of the subsequent event is readout. It is not possible to read out an event partially.
+The size of the event (EVENT SIZE) is configurable and depends on register addresses 0x8020 and 0x800C, as well as on
+the number of enabled channels.
+
+10.10.1
+
+Block Transfers
+The Block Transfer readout mode allows to read N complete events sequentially, where N is set at register address
+0xEF1C, or by using the SetMaxNumEventsBLT function of the CAENDigitizer library [RD5].
+When developing software, the readout process can be implemented on a different basis:
+• Using Interrupts: as soon as the programmed number of events is available for readout, the board sends an
+interrupt to the PC over the optical communication link (not supported by USB).
+• Using Polling (interrupts disabled): by performing periodic read accesses to a specific register of the board it is
+possible to know the number of events present in the board and perform a BLT read of the specific size to read
+them out.
+• Using Continuous Read (interrupts disabled): continuous data read of the maximum allowed size (e.g. total
+memory size) is performed by the software without polling the board. The actual size of the block read is
+determined by the board that terminates the BLT access at the end of the data, according to the configuration
+of register address 0xEF1C, or by the library function SetMaxNumEventsBLT above mentioned. If the board is
+empty, the BLT access is immediately terminated, and the “Read Block” function will return 0 bytes (it is the
+ReadData function in the CAENDigitizer Library [RD5]).
+Independently from the above methods, it is suggested to ask the board for the maximum of the events per block
+being set. Furthermore, the greater this maximum, the greater the readout efficiency, despite a larger memory
+allocation required on the host station side, which is not a real drawback considering nowadays personal computers.
+
+10.10.2
+
+Single Data Transfer
+This mode allows to read out one word at a time, starting from the header (4 words) of the first available event,
+followed by all the words until the end of the event, then the second event is transferred. The exact sequence of the
+transferred words is shown in Sec. 10.5.5.
+After the 1st word is transferred, it is suggested to check the EVENT SIZE information and then do as many cycles as
+necessary (EVENT SIZE -1) to read completely the event.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+50
+
+CAEN
+
+10.11
+
+Electronic Instrumentation
+
+Optical Link and USB Access
+The digitizer houses a USB2.0 compliant port, providing a transfer rate up to 30 MB/s, and an interface for optical link
+communication which uses optical fiber cables as physical transmission line, with a maximum transfer data rate of 80
+MB/s.
+CONET is the proprietary serial protocol designed by CAEN to enable optical link communication between digitizers
+(acting as CONET slaves) and the host PC. This communication needs CONET master such as the A5818 controllers, or
+the A4818 adapter.
+CONET2 is the latest protocol version, implemented at the firmware level on digitizers and controllers, that improves
+the data transfer rate efficiency by 50% compared to the earlier CONET1 version.
+
+
+
+Note: CONET1 and CONET2 protocol versions are incompatible; communication will fail in any optical chain containing
+both CONET1 and CONET2 boards.
+To update your system from CONET1 to CONET2, it is recommended to follow the instructions provided by CAEN in the
+dedicated Application Note [RD15].
+The optical link interface has Daisy-chain capability. Therefore, it is possible to connect up to eight digitizers to a single
+Optical Link Controller by using the A4818 adapter, while up to thirty-two digitizers with the A5818 PCIe card. Detailed
+information can be found at the relevant controller web page on CAEN website.
+The parameters for read/write accesses via Optical Link are the same used by VME cycles (Address Modifier, Base
+Address, data Width, etc…); wrong parameter settings cause Bus Error.
+Setting bit[3] at register address 0XEF00 enables the module to broadcast an interrupt request on the Optical Link; the
+enabled Optical Link Controllers propagate the interrupt on the PCI bus when a request from the Optical Link is sensed.
+Interrupts can also be managed at the CAENDigitizer library level [RD5].
+
+51
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+11 Drivers & Libraries
+11.1 Drivers
+In order to interface with the board, CAEN provides the drivers for the supported physical communication channels
+and compliant with Windows® and Linux® OS:
+•
+
+
+
+
+
+CONET Optical Link, managed by the A5818 PCIe cards. The driver installation package is available on CAEN
+website in the “Software/Firmware” tab at the A5818 page (login required).
+
+Note: For the installation of the Optical Link driver, refer to the User Manual of the specific card [RD17].
+•
+
+USB-2.0 Link. The driver installation packages are downloadable for free on the CAEN website (www.caen.it)
+in the “Software/Firmware” tab at the digitizer page (login required).
+
+•
+
+USB-3.0 Link, managed by the A4818 (USB3-to-CONET) Adapter [RD16]. The driver installation package is
+downloadable for free on the CAEN website at the A4818 page (login required).
+
+Note: CAEN provides a guide on the installation instructions for USB drivers in Microsoft Windows OS [RD3].
+
+11.2 Libraries
+CAEN libraries are a set of middleware software required by CAEN software tools for correct functioning. These
+libraries, including also demo and example programs, represent a powerful base for users who want to develop
+customized applications for the digitizer control (communication, configuration, readout, etc.):
+•
+
+CAENDPP (DPP-PHA firmware only) [RD10] is a high-level library of C functions designed to completely
+control exclusively CAEN digitizers running DPP-PHA firmware and Digital MCAs. The library manages all the
+relevant board settings, DPP parameters configuration, data acquisition storage. Configuration of
+synchronized start/stop acquisition is supported in multi-board hardware setup, as well as the single board
+can be configured for coincidences or anticoincidences among channels. Histograms are built at the library
+level and managed through specific library functions; other advanced histogram functionalities are provided
+(e.g. histogram recovery). Lists of data can be automatically saved to output files. HV management is also
+handled by the library if supported by the target board.
+
+•
+
+CAENDigitizer [RD5] is a library of C functions designed specifically for the Digitizer families and it supports
+both waveform recording and DPP firmware. The CAENDigitizer library is based on the CAENComm which, in
+turn, is based on CAENVMELib, as said above. For this reason, the CAENVMELib and CAENComm libraries
+must be already installed on the host PC before installing the CAENDigitizer.
+
+•
+
+CAENComm library [RD4] manages the communication at a low level (read and write access). The purpose of
+this library is to implement a common interface to the higher software layers, masking the details of the
+physical channel and its protocol, thus making the libraries and applications that rely on the CAENComm
+independent from the physical layer. The CAENComm requires the CAENVMELib library (access to the VME
+bus) even in the cases where the VME is not used.
+
+Installation packages are available for free download on CAEN web site (www.caen.it) at the relevant library product
+page (login required).
+
+As an alternative to the libraries mentioned above, a more recent set of libraries can be used:
+• CAEN_FE_lib [RD14] [RD14] is a library that can be used to control and acquire data from CAEN digitizers. This
+library is just an interface and does not include support to any digitizer family. In order to use a digitizer, you
+must install first the respective underlying CAEN_Digx library.
+• CAEN_DIG1_lib [RD14] is the high level library of functions designed specifically for CAEN V/VX17xx, DT57xx,
+N67xx first generation digitizers. The CAEN_FE_Lib library must be already installed on the host PC before
+installing the CAEN_Dig1.
+• CAEN_DIG2_lib [RD14] is the high level library of functions designed specifically for CAEN 27xx second
+generation digitizers. The CAEN_FE_Lib library must be already installed on the host PC before installing the
+CAEN_Dig2.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+52
+
+CAEN
+
+Electronic Instrumentation
+
+Installation packages are available for free download on CAEN web site ((www.caen.it) at CAEN_FELib page (login
+required.
+
+THE 725S/730S DIGITIZER VERSIONS ARE SUPPORTED FROM CAENDIGITIZER REL. 2.15.0 ON
+
+WINDOWS® and LINUX® compliant customized software. The user must install the required libraries apart.
+LINUX® compliant non-stand alone CAEN software. The user must install the required libraries apart to run the
+software.
+The CAENComm (and so the CAENDigitizer) library supports the following communication channels (see Fig. 11.1):
+PC → USB→ DT5730/DT5725 Digitizer
+PC → USB3 → A4818 → CONET → DT5730/DT5725 Digitizer
+PC → PCI (A2818) → CONET → DT5730/DT5725 Digitizer
+PC → PCIe (A3818/A5818) → CONET → DT5730/DT5725 Digitizer
+
+53
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+Fig. 11.1: Drivers and software layers based on CAENComm and CAENDigitizer libraries.
+
+Fig. 11.2: Drivers and software layers based on CAEN_FELib and CAEN_Dig1 libraries.
+
+11.2.1 LabVIEW Support
+CAEN also provides LabVIEW drivers for Windows OS only. The CAENVMELib and CAENComm C installation packages
+include LabVIEW VIs, while a dedicated CAENDigitizer LabVIEW library is available with VIs and demos for the
+waveform recording firmware and the different kinds of DPP firmware.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+54
+
+CAEN
+
+Electronic Instrumentation
+
+12 Software Tools
+CAEN provides software tools to interface the 730 and 725 digitizer families, which are available for free download on
+the CAEN website (www.caen.it) in the relevant software and firmware product pages (login required).
+
+12.1 CAEN Toolbox
+CAEN Toolbox is the comprehensive software suite designed for CAEN Front-End boards.
+With DT5730/DT5725, CAEN Toolbox simplifies various tasks into a few easy steps, including:
+•
+
+Uploading different FPGA firmware versions to the digitizer
+
+•
+
+Reading the firmware release of the digitizer
+
+•
+
+Managing firmware licenses, particularly for DPP firmware
+
+•
+
+Upgrading the internal PLL
+
+•
+
+Obtaining the Board Info file, useful for support
+
+•
+
+Managing the reboot of the FPGA firmware from either the Backup or the Standard FLASH page
+
+•
+
+Debugging your setup using the Manual Controller
+
+Fig. 12.1: CAEN Toolbox Graphical User Interface
+
+Related to V1725/VX1725 and V1730/VX1730, CAEN Toolbox is based on the CAENComm library (see Sec. 11.2). The
+software is compatible with both Windows® and Linux® platforms, operating as a standalone application on each
+available version. For installation instructions and a detailed description of tis features, refer to the CAEN Toolbox
+documentation [RD1]. Both documentation and software packages can be downloaded directly from the dedicated
+webpage on the CAEN website (login required).
+
+55
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+12.2 CAENComm Demo
+CAENComm Demo is a simple software developed in C/C++ source code and provided both with Java™ and LabVIEW™
+GUI interface. The demo mainly allows for a full board configuration at a low level by direct read/write access to the
+registers and may be used as a debug instrument.
+
+Fig. 12.2: CAENComm Demo Java™ and LabVIEW™ graphical interface
+
+CAENComm Demo is based on the CAENComm library (see Sec. 11.2) and it is included in the installation package of
+the library. Th software is available only for Windows® platform.
+The software installation package and the documentation [RD4] can be downloaded from the CAEN website (login
+required).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+56
+
+CAEN
+
+Electronic Instrumentation
+
+12.3 CAEN WAVEDump
+THIS SOFTWARE DOES NOT WORK WITH DPP FIRMWARE
+
+THE 725S/730S DIGITIZER VERSIONS ARE SUPPORTED FROM SOFTWARE REL. 3.10.0 ON
+WaveDump is a basic console application, with no graphics, supporting only CAEN digitizers running the waveform
+recording firmware. It allows the user to program a single board (according to a text configuration file containing a list
+of parameters and instructions), to start/stop the acquisition, read the data, display the readout and trigger rate, apply
+some post-processing (e.g. FFT and amplitude histogram), save data to a file and also plot the waveforms using Gnuplot
+(third-party graphing utility: www.gnuplot.info).
+WaveDump is a very helpful example of C code demonstrating the use of libraries and methods for an efficient readout
+and data analysis. Thanks to the included source files and the VS project, starting with this demo is strongly
+recommended to all those users willing to write the software on their own.
+
+Fig. 12.3: CAEN WaveDump
+
+CAEN WaveDump relies on the CAENDigitizer library (see Sec. 11.2) and it can run on Windows® and Linux® platforms.
+Windows® versions of WaveDump are stand-alone (all required libraries are present within the software package),
+while the Linux® versions need the required libraries to be previously installed by the user. Moreover Linux® users are
+required to install the third-party Gnuplot.
+The installation packages, the software User Manual [RD6] and a guide for getting started with it can be downloaded
+from CAEN website (login required).
+
+57
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+12.4 CAEN WaveDump 2
+WaveDump2 has been developed to support the Digitizer 2.0 new generation of CAEN digitizers, including the 2740,
+2745, 2730, and future series, running the waveform recording firmware (D-Wave).
+Starting from revision 2.0.0, support has been extended to pre-existing CAEN Digitizer 1.0 series: DT57xx, N67xx,
+V17xx, VX17xx.
+WaveDump2 is a C++ software developed upon Qt cross-platform application development framework. Through an
+advanced and user-friendly configuration GUI, it provides all the necessary tools and functionalities for managing any
+hardware parameters. The settings can be conveniently stored into or loaded from a configuration file, or a sequence
+of operations can be recorded to script files and then loaded to be re-executed. From a single board to multiple boards
+and multi-board synchronized systems, data acquisition is managed through a dedicated toolbar and upon different
+start/stop criteria. Live monitoring of the acquisition statistics can be enabled.
+Waveforms are lived plotted in a dedicated section emulating an 8-channel digital oscilloscope, which also provides
+cursors to make on-screen measurements, as well as marker lines to indicate the trigger position and the trigger
+threshold level. Traces can be individually enabled/disabled, and a zooming control in both vertical and horizontal
+directions is possible. Basic processing like FFT and samples histogram is provided runtime. The collected waveform
+data can be saved to ASCII or binary files for offline analysis.
+
+Fig. 12.4: CAEN WaveDump2
+
+Related to Digitizer 1.0, WaveDump2 is based on the CAEN FELib and Dig1 libraries (see Sec. 11.2). The software can
+run on 64-bit Windows® and Linux® operating systems. Regardless of the platform, the CAEN FELib is automatically
+installed along with the software, while the Dig1 library must be manually installed by the user.
+The installation packages, the required libraries and the software User Manual [RD8] can be downloaded on CAEN
+website (login required).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+58
+
+CAEN
+
+Electronic Instrumentation
+
+12.5 CoMPASS
+THIS SOFTWARE DOES NOT WORK WITH WAVEFORM RECORDING FIRMWARE
+
+CoMPASS (CAEN Muti-PArameter Spectroscopy Software) is the new software from CAEN able to implement a Multiparametric DAQ for Physics Applications, where the detectors can be connected directly to the digitizer inputs and the
+software acquires energy, timing, and PSD spectra.
+CoMPASS software has been designed as a user-friendly interface to manage the acquisition with all the CAEN DPP
+algorithms. CoMPASS can manage multiple boards, even in synchronized mode, and the event correlation between
+different channels (hardware and/or software), apply energy and PSD cuts, calculate and show the statistics (trigger
+rates, data throughput, etc...), save the output data files (raw data, lists, waveforms, spectra) and use the saved files to
+run off-line with different processing parameters.
+CoMPASS Software supports CAEN first generation digitizers x720, x724, x725, x730, x740D, x751 digitizer families
+running the DPP-PSD, DPP-PHA and DPP-QDC firmware, the x780, x781 and x782 MCA family, the DT5790 Pulse
+Processor and the second generation digitizer x2740, x2745 and x2730 running the DPP-PSD and DPP-PHA firmware.
+
+Fig. 12.5: CoMPASS software tool
+
+CoMPASS relies on the CAENDigitizer library (see Sec. 11.2). The software is compatible with both Windows® and
+Linux® platforms, operating as a standalone application on each available version. The installation packages, the
+required libraries and the software User Manual [RD9] can be downloaded from CAEN website (login required).
+
+59
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+12.6 DPP-ZLEplus and DPP-DAW Control Software
+THIS SOFTWARE DOES NOT WORK WITH WAVEFORM RECORDING FIRMWARE
+
+These two C software applications are provided for the DPP-ZLEplus and DPP-DAW firmware respectively. Each one
+allows the User configuring the parameters of the relevant DPP algorithm and control the data acquisition. The User
+can also take the included C source code as an example to access the underlying library functions and develop
+customized readout software. The package includes the source files, the Visual Studio project, and a Makefile for Linux
+users.
+The software runs on Windows® and Linux® platforms.
+The software relies on the CAENDigitizer and CAENComm libraries (see Sec. 11.2).
+
+
+
+Note: Windows® and Linux® versions of the software are stand-alone, the user needs to install only the driver for the
+communication link, while the software locally installs the DLLs of the required libraries.
+
+Refer to the software documentation for installation instructions and a detailed description [RD11][RD12].
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+60
+
+CAEN
+
+Electronic Instrumentation
+
+13 HW Installation
+To power on the board, perform the following steps:
+1. connect the 12V DC power supply to the digitizer through the DC input rear connector;
+2. power on the digitizer through the ON/OFF rear switch.
+
+ONLY QUALIFIED PERSONNEL SHOULD PERFORM INSTALLATION
+OPERATIONS
+
+DO NOT INSTALL THE EQUIPMENT IN A SETUP WHERE IT IS DIFFICULT TO
+ACCESS THE BACK PANEL FOR DISCONNECTING THE DEVICE
+
+IT IS RECOMMENDED THAT THE SWITCH OR CIRCUIT-BREAKER IS NEAR THE
+EQUIPMENT
+
+THE SAFETY OF ANY SYSTEM THAT INCORPORATES THE DEVICE IS UNDER
+THE REPONSIBILITY OF THE ASSEMBLER OF THE SYSTEM
+
+13.1 Power-on Status
+At power-on, the module is in the following status:
+•
+
+the Output Buffer is cleared;
+
+•
+
+registers are set to their default configuration.
+
+After the power-on, only the NIM and PLL LOCK LEDs must stay ON (see Fig. 13.1).
+
+61
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+Fig. 13.1: Front panel LEDs status at power-on
+
+EXCEPT FOR THE 725S/730S VERSIONS, AFTER POWER-ON, CAEN RECOMMENDS PERFORMING THE CHANNEL
+CALIBRATION AS DESCRIBED ON PAGE 30 TO ACHIEVE THE BEST DEVICE PERFORMANCES
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+62
+
+CAEN
+
+Electronic Instrumentation
+
+14 Firmware and Upgrades
+The board hosts one FPGA on the mainboard and two FPGAs per mezzanine (i.e. one FPGA per 4 channels). The
+channel FPGAs firmware is identical. A unique file is provided that will update all the FPGAs at the same time.
+ROC FPGA MAINBOARD FPGA (Readout Controller + VME interface):
+FPGA Altera Cyclone EP1C20.
+AMC FPGA MEZZANINE FPGA (ADC readout/Memory Controller):
+FPGA Altera Cyclone EP4CE30
+or
+FPGA INTEL/ALTERA ARRIA V GX
+(725S and 730S versions only)
+The firmware is stored onto the onboard FLASH memory. Two copies of the firmware are stored in two different pages
+of the FLASH, referred to as Standard (STD) and Backup (BKP). In the case of waveform recording firmware, the board is
+factory equipped with the same firmware version on both pages.
+At power-on, a microcontroller reads the FLASH memory and programs the module automatically loading the first
+working firmware copy, that is the STD one in normal operating.
+It is possible to upgrade the board firmware via USB or Optical Link by writing the FLASH with the CAEN Toolbox
+software (see Chap. 12).
+IT IS STRONGLY SUGGESTED TO OPERATE THE DIGITIZER UPON THE STD COPY OF THE FIRMWARE. UPGRADES ARE
+RECOMMENDED ONLY ON THE STD PAGE OF THE FLASH. THE BKP COPY IS TO BE INTENDED ONLY FOR RECOVERY
+USAGE. IF BOTH PAGES RESULT CORRUPTED, THE USER WILL NO LONGER BE ABLE TO UPLOAD THE FIRMWARE
+VIA USB OR OPTICAL LINK AGAIN AND THE BOARD NEEDS TO BE SENT TO CAEN IN REPAIR!
+
+14.1 Firmware Upgrade
+Firmware updates are available for download on the CAEN website (www.caen.it) at the digitizer page (login required).
+Different firmware updates are available for the 725/730 digitizer families:
+•
+
+The waveform recording firmware;
+
+•
+
+The DPP firmware implementing different algorithms for Physics Applications:
+-
+
+DPP-PSD firmware for the Pulse Shape Discrimination
+
+-
+
+DPP-PHA firmware for the Pulse Height Analysis
+
+-
+
+DPP-ZLEplus firmware with Zero Length Encoding
+
+-
+
+DPP-DAW firmware with Dynamic Acquisition Window
+
+The waveform recording is a free firmware and updates are free downloadable.
+The DPP firmware is a pay firmware: the trial version can be freely downloaded and is fully functional for a 30-minute
+per power cycle operation. The user must then purchase a license and store the provided unlock code onto the
+digitizer to run the firmware and its updates without time limitation. The license is managed by the CAEN Toolbox tool
+[RD1].
+
+63
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+14.1.1 Firmware Files Description
+The programming file is a CFA file (CAEN Firmware Archive). It is an archiving file format that aggregates all the
+programming files of the same firmware type which are compatible with the same digitizer family.
+The name of the CFA file follows a general convention:
+•
+
+<DIGITIZER>_rev_X.Y_W.Z.CFA for the waveform recording firmware
+
+•
+
+<DIGITIZER>_<DPP_ALGORITHM>_rev_X.Y_W.Z.CFA for the DPP firmware
+
+where:
+<DIGITIZER> means all the boards that can be updated by the CFA file:
+- x730 (includes x730, x730B, x730C, x730D module versions)
+- x730S (includes x730S, x730SB, x730SC, x730SD module versions)
+- x725 (includes x725, x725B, x725C, x725D module versions)
+- x725S (includes x725S, x725SB, x725SC, x725SD module versions)
+
+
+
+Note: The “x” prefix stands for DT5 in the case of desktop format, N6 for NIM format, and V1/VX1 for VME64/VME64x
+format);
+<DPP_ALGORITHM> is the DPP firmware type (options are DPP-PSD, DPP-PHA, DPP-ZLEplus, DPP-DAW)
+X.Y is the major/minor revision number of the ROC FPGA
+W.Z is the major/minor revision number of the AMC FPGA
+To discriminate between the waveform recording firmware and the DPP ones by the firmware version, the reference is
+the major revision number of the AMC FPGA (W):
+W < 128 means a waveform recording firmware
+W ≥ 128 means a DPP firmware, and it is a fixed number specific for each DPP and digitizer family.
+For the 730 and 725 digitizer families:
+W = 136 means DPP-PSD firmware
+W = 139 means DPP-PHA firmware
+W = 140 means DPP-ZLEplus firmware
+W = 141 means DPP-DAW firmware
+
+14.1.2 Troubleshooting
+In case of upgrade failure (e.g. STD FLASH page is corrupted), the user can try to reboot the board: after a power cycle,
+the system programs the board automatically from the alternative FLASH page (e.g. BKP FLASH page), if this is not
+corrupted as well (see Sec. 13.1). The user can so perform a further upgrade attempt on the STD page to restore the
+firmware copy.
+The reboot from the FLASH pages is managed by CAEN Toolbox only through the USB link (Fig. 14.1).
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+64
+
+CAEN
+
+Electronic Instrumentation
+
+Fig. 14.1: Reboot USB device in CAEN Toolbox
+
+
+
+Note: old versions of the digitizer motherboard have slightly different FLASH management. To obtain information about
+the FLASH type of the digitizer, the user can download the BoardInfoFile (text file) through the “Get information file”
+tab in CAEN Toolbox software (see. Chap. 12) and check the value of the FLASH_TYPE parameter: FLASH_TYPE=0
+indicates an older version. Alternatively, the user can use CAENComm software or the “Manual Controller” available in
+CAEN Toolbox to directly access register 0xF050 and check the status of bit[7]. If so, it means that, at power on, the
+microcontroller loads exactly the firmware copy from the FLASH page.
+When a failure occurs during the upgrade of the STD page of the FLASH, which compromises the communication with
+the DT5730/725, the user can perform the following recovering procedure as the first attempt:
+- force the board to reboot loading the copy of the firmware stored on the BKP page of the FLASH. For this
+purpose, make sure to connect by USB link, enable the “Use Backup Image” option in CAEN Toolbox software
+and then click on the “Reboot USB device” button.
+- Use CAEN Toolbox to read the firmware revision (in this case the one of the BKP copy). If this succeeds, it is
+possible to communicate again with the board;
+- Disable the “Use Backup Image” option in CAEN Toolbox and upgrade the new firmware on the standard page.
+Use CAEN Toolbox to load the proper firmware file on the STD page, then power-cycle in order to get the board
+operative again. Reboot the device using CAEN Toolbox.
+If neither of the procedures here described succeeds, it is recommended to send the board back to CAEN in repair (see
+Chap. 18).
+The reboot from the FLASH pages is managed by CAEN Toolbox only through the USB link.
+
+65
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+15 Instructions for Cleaning
+The equipment may be cleaned with isopropyl alcohol or deionized water and air dried. Clean the exterior of
+the product only.
+Do not apply cleaner directly to the items or allow liquids to enter or spill on the product.
+
+15.1 Cleaning the Touchscreen
+To clean the touchscreen (if present), wipe the screen with a towelette designed for cleaning monitors or with a clean
+cloth moistened with water.
+Do not use sprays or aerosols directly on the screen; the liquid may seep into the housing and damage a component.
+Never use solvents or flammable liquids on the screen.
+
+15.2 Cleaning the air vents
+It is recommended to occasionally clean the air vents (if present) on all vented sides of the board. Lint, dust, and other
+foreign matter can block the vents and limit the airflow. Be sure to unplug the board before cleaning the air vents and
+follow the general cleaning safety precautions.
+
+15.3 General cleaning safety precautions
+CAEN recommends cleaning the device using the following precautions:
+• Never use solvents or flammable solutions to clean the board.
+• Never immerse any parts in water or cleaning solutions; apply any liquids to a clean cloth and then use the cloth
+on the component.
+• Always unplug the board when cleaning with liquids or damp cloths.
+• Always unplug the board before cleaning the air vents.
+• Wear safety glasses equipped with side shields when cleaning the board.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+66
+
+CAEN
+
+Electronic Instrumentation
+
+16 Device Decommissioning
+After its intended service, it is recommended to perform the following actions:
+Detach all the signal/input/output cable
+Wrap the device in its protective packaging
+Insert the device in its packaging (if present)
+
+THE DEVICE SHALL BE STORED ONLY AT THE ENVIRONMENT
+CONDITIONS
+SPECIFIED
+IN
+THE
+MANUAL,
+OTHERWISE
+PERFORMANCES AND SAFETY WILL NOT BE GUARANTEED
+
+67
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+CAEN
+
+Electronic Instrumentation
+
+17 Disposal
+The disposal of the equipment must be managed in accordance with Directive 2012/19 / EU on waste electrical and
+electronic equipment (WEEE).
+
+The crossed bin symbol indicates that the device shall not be disposed with regular residual waste.
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+68
+
+CAEN
+
+Electronic Instrumentation
+
+18 Technical Support
+To contact CAEN specialists for requests on the software, hardware, and board return and repair, it is necessary a
+MyCAEN+ account on www.caen.it:
+https://www.caen.it/support-services/getting-started-with-mycaen-portal/
+
+All the instructions for use the Support platform are in the document:
+
+A paper copy of the document is delivered with CAEN boards.
+The document is downloadable for free in PDF digital format at:
+https://www.caen.it/safety-information-product-support
+
+69
+
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+User Manual DT5730/DT5725
+8-Channel 14-bit 500/250 MS/s Waveform Digitizer
+
+CAEN
+Tools for Discovery
+
+n
+
+Electronic Instrumentation
+
+CAEN GmbH
+Brunnenweg 9
+64331 Weiterstadt
+Germany
+Phone +49 212 254 40 77
+Fax +49 212 254 40 79
+info@caen-de.com
+www.caen-de.com
+CAEN Technologies, Inc.
+1 Edgewater Street - Suite 101
+Staten Island, NY 10305
+USA
+Phone: +1 (718) 981-0401
+Fax: +1 (718) 556-9185
+info@caentechnologies.com
+www.caentechnologies.com
+CAEN S.p.A.
+Via Vetraia 11
+55049 - Viareggio
+Italy
+Phone +39 0584 388 398
+Fax +39 0584 388 959
+info@caen.it
+www.caen.it
+
+CAENspa INDIA Private Limited
+B205, BLDG42, B Wing,
+Azad Nagar Sangam CHS,
+Mhada Layout, Azad Nagar, Andheri (W)
+Mumbai, Mumbai City,
+Maharashtra, India, 400053
+info@caen-india.in
+www.caen-india.in
+
+UM3148 - DT5730/DT5725 - User Manual rev. 10 - February 3rd, 2025 00108/12:DT5730.MUTX/10
+Copyright © CAEN SpA. All rights reserved. Information in this publication supersedes all earlier versions. Specifications subject to change without notice.
+
+Electronic Instrumentation
+UM3148 – DT5730/DT5725 User Manual rev. 10
+
+70
+
+

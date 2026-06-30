@@ -1,0 +1,59 @@
+\chapter{Production Physics}
+
+\section{Beryllium-target neutron production at NPI}
+
+For the present NCAL campaign, the relevant source environment is the proton-driven neutron production line operated at the U-120M cyclotron at NPI \v{R}e\v{z}. The source literature available in this workspace shows that two related, but physically distinct, beryllium-based configurations are used there and should not be conflated. In the thick-target configuration, \SI{35}{MeV} protons are fully stopped in an \SI{8}{mm} beryllium target and produce a continuous fast-neutron spectrum extending up to about \SI{33}{MeV} \citep{Majerle2023PBeGenerator}. In the collimated-beam configuration, protons interact with a \SI{2.5}{mm} beryllium foil, lose only part of their energy in the beryllium, and are then stopped downstream in a carbon slab; in that case the forward spectrum retains a quasi-monoenergetic character \citep{Ansorge2025CollimatedBeams}.
+
+This distinction matters for any discussion of the accompanying gamma field. A statement such as ``gamma spectrum for \SI{35}{MeV} protons on thick Be'' is incomplete unless the surrounding station geometry is also specified. The gamma background depends not only on the primary proton--beryllium interaction, but also on which additional beamline elements are struck by the proton beam and which materials are present close to the source.
+
+The neutron-production papers also show that some structures in the forward spectrum arise from different \(^{9}\mathrm{Be}(p,n)\) channels feeding the ground and low-lying excited states of \(^{9}\mathrm{B}\) \citep{Ansorge2025CollimatedBeams,Majerle2023PBeGenerator}. These structures are neutron-spectrum features. They should not be reinterpreted as evidence for prominent prompt gamma lines from \(^{9}\mathrm{B}^{*}\) de-excitation.
+
+\section{Dominant neutron-production channels}
+
+The reviewed NPI source papers support a compact interpretation of the forward neutron spectrum at proton energies around \SI{35}{MeV}. Thin-target measurements cited in these works show two high-energy components associated with the \(^{9}\mathrm{Be}(p,n)\) charge-exchange reaction, corresponding to population of the ground state of \(^{9}\mathrm{B}\) and of its first two excited states at \SI{2345}{keV} and \SI{2751}{keV}, superimposed on a broader continuum from compound-nucleus reactions \citep{Majerle2023PBeGenerator,Ansorge2025CollimatedBeams}. In the thick-target configuration, the measured forward spectrum is then interpreted as the superposition of such partial spectra as the incident protons slow down in the beryllium. This produces the characteristic step-like structure observed near \SIrange{30}{32}{MeV} \citep{Majerle2023PBeGenerator}.
+
+\begin{table}[htbp]
+\centering
+\caption{Source-supported neutron-production channels relevant for the forward spectrum from \SI{35}{MeV} protons on a thick beryllium target.}
+\begin{tabular}{p{3.8cm}p{3.1cm}p{5.7cm}}
+\toprule
+Channel & Spectral manifestation & Comment \\
+\midrule
+\(^{9}\mathrm{Be}(p,n){}^{9}\mathrm{B}_{\mathrm{g.s.}}\) & Highest-energy component, extending to about \SI{33}{MeV} & Forms the upper part of the high-energy peak structure in the forward spectrum \citep{Majerle2023PBeGenerator}. \\
+\(^{9}\mathrm{Be}(p,n){}^{9}\mathrm{B}^{*}\) to the first two excited states at \SIlist{2345;2751}{keV} & Second component about \SI{2.5}{MeV} lower than the highest peak & Together with the ground-state channel it produces the step-like structure near \SIrange{30}{32}{MeV}. The literature cited by Majerle et al. indicates an approximate 6:4 area ratio between the upper and lower high-energy components \citep{Majerle2023PBeGenerator}. \\
+Compound-nucleus contribution & Broad continuum underlying the peaks and extending to lower neutron energies & Described explicitly in the NPI beam papers as the continuum component of the spectrum \citep{Majerle2023PBeGenerator,Ansorge2025CollimatedBeams}. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The same thick-target study also shows that very close to the source the measured spectrum is modified by scattering in the target-station construction materials and by the finite extent of the production region. For that specific NPI configuration, Monte Carlo simulations indicate that this effect becomes negligible by about \SI{50}{cm} from the beryllium slab, after which inverse-square scaling is used for the flux normalization \citep{Majerle2023PBeGenerator}. For scan distances of order \SIrange{2.5}{7.5}{m}, this supports the use of \(1/r^{2}\) as a first-order geometric scaling law, provided the same source-station configuration is maintained.
+
+\section{Expected gamma contributions}
+
+Only a limited set of gamma contributions can be stated with confidence from the presently available beamline literature. Since the gamma field depends on the exact source-station geometry, beam centering, and the distribution of carbon- and hydrogen-containing materials near the target, a detailed line-by-line intensity model is not introduced here. Instead, only source terms directly supported by the reviewed NPI references are summarized.
+
+The best established prompt contribution is the \SI{4.439}{MeV} line from excited \(^{12}\mathrm{C}\). In the collimated-beam study, the prompt gamma timing peak is attributed to proton-beam interaction with the carbon stopping slab and the subsequent de-excitation of \(^{12}\mathrm{C}\), explicitly identifying the \SI{4439}{keV} transition \citep{Ansorge2025CollimatedBeams}. In the thick-target neutron-generator study, prompt gamma peaks are likewise associated with proton-beam interaction with a carbon beam collimator located upstream of the beryllium target \citep{Majerle2023PBeGenerator}. A prompt carbon line near \SI{4.44}{MeV} is therefore a realistic expectation whenever carbon components in the source station intercept part of the proton beam.
+
+The same collimated-beam study also discusses the \SI{2224}{keV} gamma from the \(^{1}\mathrm{H}(n,\gamma)\) reaction \citep{Ansorge2025CollimatedBeams}. This line is relevant for the local radiation environment and detector response, but it should be interpreted as a secondary environmental gamma from neutron capture in hydrogenous material rather than as a primary prompt component of proton--beryllium production.
+
+The available references do not justify fixed yield fractions for individual gamma lines, and they do not provide sufficient support for a detailed source decomposition involving additional discrete lines or a dominant continuum component for the present geometry. Those features should therefore be introduced only after dedicated gamma spectroscopy or transport calculations for the finalized setup.
+
+\begin{table}[htbp]
+\centering
+\caption{Working expectations for gamma contributions relevant to beryllium-target operation at NPI \v{R}e\v{z}.}
+\begin{tabular}{p{3.3cm}p{3.3cm}p{6.0cm}}
+\toprule
+Source region & Signature & Comment \\
+\midrule
+Carbon beamline components & Prompt line near \SI{4.439}{MeV} & Supported when the proton beam intercepts carbon elements such as the beam collimator or carbon stopping slab \citep{Ansorge2025CollimatedBeams,Majerle2023PBeGenerator}. \\
+Hydrogenous material near the source or detector & Secondary line at \SI{2.224}{MeV} & Associated with \(^{1}\mathrm{H}(n,\gamma){}^{2}\mathrm{H}\); relevant for environmental background and calibration-related response \citep{Ansorge2025CollimatedBeams}. \\
+Other prompt components & Geometry dependent & Additional lines or continuum components should not be quantified without a run-specific measurement or transport simulation. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Implications for the NCAL analysis}
+
+For the present NCAL document, the safest working assumption is therefore a limited one: the prompt-gamma field should be expected to contain at least a strong timing component associated with fast source gammas, and a \SI{4.439}{MeV} carbon line is physically plausible whenever carbon beamline components are irradiated. Beyond that, the detailed line content and relative intensities should be considered geometry-dependent and not fixed a priori. In particular, if the actual run conditions differ from the \SI{35}{MeV} reference papers in proton energy, beam centering, source hardware, shielding composition, or aperture arrangement, then the gamma spectrum must be re-evaluated for the exact run geometry rather than copied from a generic source table.
+
+Accordingly, the present document treats the gamma spectrum only at the level justified by currently available evidence. Any quantitative spectral decomposition should be based on either a dedicated gamma measurement with an energy-calibrated detector or a transport calculation using the finalized source-station geometry and realistic material composition. Until such a study is completed, the table above should be regarded as a compact working expectation rather than a final spectral model.

@@ -1,0 +1,23 @@
+\chapter{Commissioning and First Validation Workflow}
+
+\section{Purpose of the next work package}
+
+Once stable communication with the DT5725S has been established, the next work package is no longer device discovery but controlled validation. The practical objective is to produce a small set of well-documented reference runs that can be compared later against detector changes, threshold adjustments, firmware changes, or analysis updates. In other words, the transition from ``the board can be opened'' to ``the readout chain is scientifically usable'' requires a reproducible workflow rather than an isolated successful test.
+
+For the present campaign, this next step is especially important because the DAQ chain is expected to support later detector-comparison work and eventual neutron-beam measurements. A reference validation dataset should therefore be treated as an intermediate deliverable in its own right. It anchors later decisions on channel mapping, operating thresholds, pulse polarity, firmware choice, and file-format handling.
+
+\section{Recommended validation sequence}
+
+The initial validation sequence should remain deliberately simple. First, a short pedestal or no-source run should be recorded to document the electronic baseline, pickup environment, and spontaneous trigger behavior. Second, a single detector channel should be connected and validated under the same DAQ settings used during board discovery, so that waveform stability and trigger-rate response can be checked without the ambiguity introduced by multi-channel operation. Third, only after this single-channel behavior is stable should threshold adjustments or additional detector channels be introduced.
+
+For the current DT5725S configuration with DPP-PSD firmware and \textit{CoMPASS}, the minimum acceptance test for a reference run is straightforward: the board must be rediscovered after a fresh start, a selected channel must produce a stable rate and visible pulses, and the saved data file must be consistent with the configuration used during acquisition. If any of these conditions fails, the run should be classified as a commissioning test rather than as a physics-quality reference run.
+
+Where detector conditions permit it, a very small threshold scan is already useful at this stage. Even a coarse set of operating points can reveal whether the observed rate is dominated by electronic noise, low-amplitude background, or clearly resolved detector pulses. This is more informative than relying on a single visually satisfactory setting, and it provides a first quantitative handle on the stability margin of the chosen operating point.
+
+\section{Run record and promotion criteria}
+
+Each accepted validation run should preserve more than the raw event file alone. At minimum, the run record should include the saved \textit{CoMPASS} configuration, the board serial number, the firmware identifiers reported by the CAEN libraries, the driver version or package used on the acquisition PC, the active channel list, the detector connected to each channel, the applied threshold and polarity settings, and a short operator note stating the source or pulser condition. This information is lightweight to archive, but it is essential if later discrepancies between runs are to be interpreted correctly.
+
+Promotion from validation mode to routine data taking should require three conditions. First, board communication must remain stable across repeated restarts of both the software and the device. Second, the observed count rate and displayed pulses must remain consistent over a run long enough to exclude a transient startup effect. Third, the complete acquisition state must be reproducible by another operator using only the stored configuration and laboratory notes. If these conditions are met, subsequent measurements can be interpreted as detector studies rather than as continued infrastructure debugging.
+
+This work package also defines the point at which a future branch in the DAQ strategy becomes meaningful. If the reference runs show that the DPP-PSD configuration already provides the observables needed for detector discrimination and timing studies, then the present firmware can be retained for the next stage. If, however, the later analysis requires full trace-level treatment of baselines, charge integration windows, or pulse-shape development, then the justified next step is a planned transition to the x725S waveform-recording firmware together with a waveform-oriented acquisition program.
