@@ -5,7 +5,8 @@
 - This repository is the Mac-side mirror of the Prague Cyclotron Experiment 2 DOGMA/NCAL workspace formerly organized on Dell.
 - The Dell source path was `/home/dachi/Documents/NCAL_FSD/Prague_Cyclotron_Exp_2/`.
 - The heavy compute/data target is `padiwa` with result storage under `/data6/Dogma_analysis_by_Dachi/Results/`.
-- Do not move full DOGMA processing back to the Mac unless explicitly requested.
+- Create and edit code locally on the Mac, but run DOGMA analysis code only on `padiwa`.
+- Do not run DOGMA Python runners, C++ analyzers, compilers, notebooks, or data-processing commands locally on the Mac unless the user explicitly overrides this rule for a non-DOGMA task.
 
 ## Layout
 
@@ -27,8 +28,9 @@
 
 ## Execution Model
 
-- Edit locally, perform cheap local checks where possible, then sync/run heavy jobs on `padiwa`.
-- On Linux environments used for this analysis, activate `conda_env` before Python commands.
+- Edit locally, inspect code locally, and commit/sync through GitHub.
+- Execute DOGMA analysis commands only on `padiwa`, using the real `/data6` filesystem.
+- On `padiwa`/Linux environments used for this analysis, activate `conda_env` before Python commands when that environment is available/required.
 - Current cleaned-data entrypoints are:
   - `step01_run_dogma_raw_data_refiner.py`
   - `step02_run_cleaned_all_channel_rates.py`

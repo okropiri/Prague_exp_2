@@ -23,11 +23,12 @@ This is the Mac-side mirror of the DOGMA/NCAL Prague Cyclotron Experiment 2 proj
 ## Working Model
 
 - Edit code and documentation on the Mac workspace.
-- Keep full processing on `padiwa`, using the real `/data6` filesystem.
+- Run DOGMA analysis code only on `padiwa`, using the real `/data6` filesystem.
+- Do not run DOGMA Python runners, C++ analyzers, compilers, notebooks, or data-processing commands locally on the Mac unless this rule is explicitly overridden for a non-DOGMA task.
 - Write DOGMA result sets first to `/data6/Dogma_analysis_by_Dachi/Results/<run_dir>/...`.
 - Mirror back only small artifacts by default: PNG, PDF, small text summaries/tables, and small ROOT files.
 - Keep raw input data read-only unless explicitly changing the data management plan.
-- Activate `conda_env` before running Python on Linux-side machines that provide that environment.
+- Activate `conda_env` before running DOGMA Python on Linux-side machines that provide that environment.
 
 ## GitHub Sync Plan
 

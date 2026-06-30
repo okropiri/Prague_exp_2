@@ -6,7 +6,8 @@ This note summarizes the current DOGMA/NCAL analysis workflow after mirroring th
 
 - Mac workspace: edit code, documentation, LaTeX, and small reference artifacts.
 - GitHub mirror: `https://github.com/okropiri/Prague_exp_2.git` tracks code, notes, LaTeX source, figures, setup screenshots, and small selected outputs.
-- Heavy execution target: `padiwa`.
+- DOGMA execution target: `padiwa`.
+- The Mac workspace is for editing, review, git operations, and documentation; DOGMA Python runners, C++ analyzers, compilers, notebooks, and data-processing commands should not be run locally on the Mac.
 - Raw data and full generated outputs live under `/data6`, especially:
   - raw inputs: `/data6/Data/*.dld.dat`
   - refined pulse tables: `/data6/Data/Refined_Data/`
