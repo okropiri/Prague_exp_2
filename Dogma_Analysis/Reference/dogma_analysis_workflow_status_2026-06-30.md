@@ -90,6 +90,23 @@ The deduced RF period is stable at about `38.8495-38.85 ns` across completed run
 
 The old overnight batch report says this run failed at `step04_rf_period`. The current results tree still shows no `*_cleaned_rf_period_summary.txt` or `*_cleaned_hits_summary.txt` for this run.
 
+### Step-04 Diagnostic On 2026-06-30
+
+Diagnostic commands were run only on `padiwa`.
+
+- Direct `ssh padiwa` works from the Mac; `/data6/Dogma_analysis_by_Dachi/Results` is accessible.
+- No DOGMA processing jobs were running during the check.
+- `padiwa` had ample space for the result target: `/data6` had about `9.5T` free; `/tmp` had about `16G` free.
+- The failed `NCAL_20us_Pos_4m_0000` result directory contained step-02/step-03 products only: `Abs_rates/`, `Ch0_ref_Rates/`, `Trigger_ref_ToT/`, `Ch0_ref_TOT/`, and `TOT_distrib/`.
+- There were no step-04 leftovers for this run: no `Folded_RF/`, no `Folded_RF_3x/`, no `RF_period_scan/`, and no `*_cleaned_rf_period_summary.txt`.
+- A padiwa-only subset diagnostic was made from the first `20000` cleaned pulse-table windows under `/tmp` and processed with the current `step04_run_cleaned_all_channel_rf_period.py`.
+- The subset step-04 diagnostic succeeded, including the C++ analyzer, RF-period scan, plotting, ROOT output, and odd-ch0 diagnostics.
+- The subset diagnostic found `deduced_period_ns=38.8465`, `selected_fraction=0.595852`, `sigma_ns=4.371178`, and `score_pulses_stored=23479` for that small subset.
+- Temporary diagnostic files under `/tmp/dogma_diag_4m0000_397860` were removed after the check.
+- The active padiwa `step04_dogma_cleaned_all_channel_rf_period.cpp` has timestamp `2026-06-15 01:05`, after the incomplete `4m_0000` outputs from `2026-06-12`.
+
+Interpretation: the current padiwa step-04 code path can process real `NCAL_20us_Pos_4m_0000` data on a subset. The most likely next action is a padiwa-only full step-04 rerun for `NCAL_20us_Pos_4m_0000` using the current code, followed by final `CleanedHits` writing if step 04 succeeds.
+
 ## Interpretation
 
 The project is past raw exploration and into a cleaned-data production workflow. Most real NCAL position/tuning runs have been processed through the full chain, including RF-period deduction and final RF-annotated ROOT export. The immediate workflow gap is to rerun or debug step 04 for `NCAL_20us_Pos_4m_0000`, then write its final `CleanedHits` output if step 04 succeeds.
