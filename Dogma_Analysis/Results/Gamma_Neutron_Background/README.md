@@ -2,6 +2,10 @@
 
 This directory contains a first-pass sideband estimate from existing Folded_RF_3x phase-vs-ToT sparse histograms.
 
+Last refreshed: 2026-07-01 from padiwa `/data6` outputs.
+
+Included runs: 14 completed NCAL position-scan runs, including the recovered `NCAL_20us_Pos_4m_0000` run.
+
 Channel: Ch02
 
 Regions used:

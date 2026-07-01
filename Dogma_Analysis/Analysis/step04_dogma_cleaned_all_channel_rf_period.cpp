@@ -24,6 +24,7 @@ namespace {
 
 constexpr int kChannelCount = 32;
 constexpr double kTwoPi = 6.28318530717958647692;
+constexpr std::size_t kCycleResidualStatsLimit = 500000;
 constexpr std::size_t kCycleResidualPointLimit = 500000;
 
 struct Config {
@@ -65,6 +66,8 @@ struct Config {
     double segmentPhaseJumpNs = 3.0;
     double segmentGapFactor = 100.0;
     double segmentMinGapSeconds = 1.0;
+    bool singleRfSegment = false;
+    bool skipCycleResidualDiagnostics = false;
 };
 
 struct PulseRow {
@@ -770,6 +773,22 @@ std::vector<PhaseSegment> build_phase_segments(const Config& config,
     return segments;
 }
 
+PhaseSegment build_single_phase_segment(const std::vector<ScoredPulse>& scorePulses,
+                                        const CandidateMetrics& best) {
+    PhaseSegment segment;
+    segment.segmentId = 0;
+    segment.startPulseIndex = 0;
+    segment.endPulseIndex = scorePulses.size();
+    segment.phaseOriginNs = best.phaseOriginNs;
+    segment.scorePulses = static_cast<std::uint64_t>(scorePulses.size());
+    segment.reason = "single_segment";
+    if (!scorePulses.empty()) {
+        segment.startGlobalTimeSeconds = scorePulses.front().globalTimeSeconds;
+        segment.endGlobalTimeSeconds = scorePulses.back().globalTimeSeconds;
+    }
+    return segment;
+}
+
 const PhaseSegment* find_phase_segment_for_time(const std::vector<PhaseSegment>& segments,
                                                 double globalTimeSeconds) {
     if (segments.empty() || !std::isfinite(globalTimeSeconds)) {
@@ -1023,6 +1042,10 @@ Config parse_args(int argc, char** argv) {
             config.segmentGapFactor = std::stod(argv[++index]);
         } else if (arg == "--segment-min-gap-seconds" && index + 1 < argc) {
             config.segmentMinGapSeconds = std::stod(argv[++index]);
+        } else if (arg == "--single-rf-segment") {
+            config.singleRfSegment = true;
+        } else if (arg == "--skip-cycle-residual-diagnostics") {
+            config.skipCycleResidualDiagnostics = true;
         } else if (arg == "--help") {
             std::cout
                 << "Usage: dogma_cleaned_all_channel_rf_period --input <cleaned_pulses.tsv> --output-root <Results_root>\n"
@@ -1037,7 +1060,8 @@ Config parse_args(int argc, char** argv) {
                 << "  [--ch0-valid-rise-min-ns -410] [--ch0-valid-rise-max-ns -395]\n"
                 << "  [--ch0-valid-tot-min-ns 16.5] [--ch0-valid-tot-max-ns 19.5]\n"
                 << "  [--segment-block-score-pulses 20000] [--segment-persistent-blocks 2]\n"
-                << "  [--segment-phase-jump-ns 3.0] [--segment-gap-factor 100] [--segment-min-gap-seconds 1.0]\n";
+                << "  [--segment-phase-jump-ns 3.0] [--segment-gap-factor 100] [--segment-min-gap-seconds 1.0]\n"
+                << "  [--single-rf-segment] [--skip-cycle-residual-diagnostics]\n";
             std::exit(0);
         } else {
             throw std::runtime_error("Unknown or incomplete argument: " + arg);
@@ -1339,7 +1363,14 @@ std::vector<CycleResidualStats> build_cycle_residuals(const Config& config,
     };
 
     std::map<std::int64_t, Accumulator> accumulators;
-    for (const ScoredPulse& pulse : scorePulses) {
+    // Long runs can touch millions of RF cycles. Keep this diagnostic bounded so
+    // it cannot dominate the memory footprint after the RF solution is found.
+    const std::size_t sourceStride = std::max<std::size_t>(
+        1,
+        (scorePulses.size() + kCycleResidualStatsLimit - 1) / kCycleResidualStatsLimit
+    );
+    for (std::size_t pulseIndex = 0; pulseIndex < scorePulses.size(); pulseIndex += sourceStride) {
+        const ScoredPulse& pulse = scorePulses[pulseIndex];
         const double timeNs = static_cast<double>(pulse.timeNs);
         const double phaseNs = positive_mod(timeNs - best.phaseOriginNs, best.periodNs);
         const double residualNs = wrap_centered(phaseNs, best.periodNs);
@@ -1975,6 +2006,8 @@ void write_summary(const fs::path& outputPath,
     output << "rf_segment_phase_jump_ns=" << format_double(config.segmentPhaseJumpNs) << '\n';
     output << "rf_segment_gap_factor=" << format_double(config.segmentGapFactor) << '\n';
     output << "rf_segment_min_gap_seconds=" << format_double(config.segmentMinGapSeconds) << '\n';
+    output << "single_rf_segment=" << (config.singleRfSegment ? "true" : "false") << '\n';
+    output << "skip_cycle_residual_diagnostics=" << (config.skipCycleResidualDiagnostics ? "true" : "false") << '\n';
     output << "peak_center_ns=" << format_double(best.peakCenterNs) << '\n';
     output << "peak_height=" << best.peakHeight << '\n';
     output << "selected_pulses=" << best.selectedPulses << '\n';
@@ -2074,10 +2107,18 @@ int main(int argc, char** argv) {
         const CandidateMetrics best = best_valid_candidate(scanRows);
         const Histogram1D bestPhaseProfile = build_best_phase_profile(config, scorePulses, best);
         Histogram2D bestPhaseTot = make_best_phase_tot_histogram(config, best);
-        const std::vector<CycleResidualStats> cycleResiduals = build_cycle_residuals(config, scorePulses, best);
-        const std::vector<CycleResidualPoint> cycleResidualPoints = build_cycle_residual_points(config, scorePulses, best);
-        const std::vector<PhaseBlock> phaseBlocks = build_phase_blocks(config, scorePulses, best.periodNs);
-        const std::vector<PhaseSegment> phaseSegments = build_phase_segments(config, scorePulses, phaseBlocks, best);
+        const std::vector<CycleResidualStats> cycleResiduals = config.skipCycleResidualDiagnostics
+            ? std::vector<CycleResidualStats>{}
+            : build_cycle_residuals(config, scorePulses, best);
+        const std::vector<CycleResidualPoint> cycleResidualPoints = config.skipCycleResidualDiagnostics
+            ? std::vector<CycleResidualPoint>{}
+            : build_cycle_residual_points(config, scorePulses, best);
+        const std::vector<PhaseBlock> phaseBlocks = config.singleRfSegment
+            ? std::vector<PhaseBlock>{}
+            : build_phase_blocks(config, scorePulses, best.periodNs);
+        const std::vector<PhaseSegment> phaseSegments = config.singleRfSegment
+            ? std::vector<PhaseSegment>{build_single_phase_segment(scorePulses, best)}
+            : build_phase_segments(config, scorePulses, phaseBlocks, best);
 
         const int foldedBins = std::max(16, static_cast<int>(std::llround(best.periodNs / config.phaseBinWidthNs)));
         const int folded3xBins = 3 * foldedBins;

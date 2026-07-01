@@ -412,7 +412,7 @@ def draw_overlay(histogram: SparseHistogram, result: RunResult, diagnostic: dict
 def write_summary_table(results: list[RunResult], output_path: Path) -> None:
     fieldnames = [field for field in RunResult.__dataclass_fields__]
     with output_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, delimiter="\t")
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, delimiter="\t", lineterminator="\n")
         writer.writeheader()
         for result in results:
             row = {field: getattr(result, field) for field in fieldnames}
@@ -438,7 +438,7 @@ def write_position_summary_table(results: list[RunResult], output_path: Path) ->
     ]
     positions = sorted({result.position_m for result in results})
     with output_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, delimiter="\t")
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, delimiter="\t", lineterminator="\n")
         writer.writeheader()
         for position_m in positions:
             group = [result for result in results if result.position_m == position_m]

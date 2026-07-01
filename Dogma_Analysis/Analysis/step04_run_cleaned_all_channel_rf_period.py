@@ -70,6 +70,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--peak-window-ns", type=float, default=8.0)
     parser.add_argument("--min-selected-pulses", type=int, default=1000)
     parser.add_argument("--score-stride", type=int, default=1)
+    parser.add_argument("--single-rf-segment", action="store_true")
+    parser.add_argument("--skip-cycle-residual-diagnostics", action="store_true")
     parser.add_argument("--ch0-valid-rise-min-ns", type=float, default=-410.0)
     parser.add_argument("--ch0-valid-rise-max-ns", type=float, default=-395.0)
     parser.add_argument("--ch0-valid-tot-min-ns", type=float, default=16.5)
@@ -98,7 +100,7 @@ def main() -> None:
     run_command([sys.executable, "-m", "py_compile", str(writer_path)])
     run_command([sys.executable, "-m", "py_compile", str(scan_writer_path)])
 
-    run_command([
+    analyzer_command = [
         str(analyzer_executable),
         "--input",
         str(input_path),
@@ -158,7 +160,12 @@ def main() -> None:
         str(args.ch0_valid_tot_min_ns),
         "--ch0-valid-tot-max-ns",
         str(args.ch0_valid_tot_max_ns),
-    ])
+    ]
+    if args.single_rf_segment:
+        analyzer_command.append("--single-rf-segment")
+    if args.skip_cycle_residual_diagnostics:
+        analyzer_command.append("--skip-cycle-residual-diagnostics")
+    run_command(analyzer_command)
 
     run_dir = output_root / run_key
     ch0ref_file = run_dir / "Ch0_ref_Rates" / f"{run_key}_Ch0_ref_Rates_scan_matrix.tsv"

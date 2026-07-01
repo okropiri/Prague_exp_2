@@ -53,8 +53,8 @@ Checked on 2026-06-30 from the Mac with direct `ssh padiwa`.
 - `/data6/Data` contains `26` top-level `.dld.dat` files. Several calibration/source files in that list are zero-byte placeholders.
 - `/data6/Data/Refined_Data` contains `16` refined directories, including real NCAL runs, mock data, the old first test, and one subset directory.
 - `/data6/Dogma_analysis_by_Dachi/Results` contains a complete mock-data chain and the main NCAL run outputs.
-- Real NCAL runs with final RF-annotated `CleanedHits` summaries: `13`.
-- One real run is incomplete at the cleaned production-chain level: `NCAL_20us_Pos_4m_0000` has step-02/step-03 outputs but no step-04 RF-period summary and no final cleaned-hit ROOT summary.
+- Real NCAL runs with final RF-annotated `CleanedHits` summaries: `14`.
+- `NCAL_20us_Pos_4m_0000` was recovered on 2026-06-30 after bounding the memory-heavy step-04 diagnostic path.
 
 ## Completed Real Runs
 
@@ -70,25 +70,26 @@ These runs have step-02, step-03, step-04, and final RF-annotated `CleanedHits` 
 | `NCAL_20us_Pos_2.8m_0006` | 38.85 | 27.24949 | 54764560 | 3 |
 | `NCAL_20us_Pos_3.4m_0000` | 38.85 | 30.562578 | 453246926 | 23 |
 | `NCAL_20us_Pos_3.4m_0001` | 38.85 | 30.600537 | 18145014 | 1 |
+| `NCAL_20us_Pos_4m_0000` | 38.8545 | 36.55429 | 466856858 | 24 |
 | `NCAL_20us_Pos_4m_0001` | 38.85 | 36.753742 | 95861910 | 5 |
 | `NCAL_20us_Pos_5m_0000` | 38.8495 | 37.612242 | 375580494 | 19 |
 | `NCAL_20us_Pos_5m_0001` | 38.8495 | 37.584363 | 145525832 | 8 |
 | `NCAL_20us_Pos_5.8m_0000` | 38.8495 | 1.368496 | 401078638 | 21 |
 | `NCAL_20us_Pos_6.6m_0000` | 38.85 | 2.267314 | 255908347 | 13 |
 
-The deduced RF period is stable at about `38.8495-38.85 ns` across completed runs. Phase origin changes with run/position, as expected for the chosen folding origin.
+The deduced RF period is stable at about `38.8495-38.8545 ns` across completed runs. Phase origin changes with run/position, as expected for the chosen folding origin.
 
-## Incomplete Run
+## Recovered Run
 
-`NCAL_20us_Pos_4m_0000` has:
+`NCAL_20us_Pos_4m_0000` now has:
 
 - refined pulse table: yes
 - step-02 cleaned rates: yes
 - step-03 time-vs-ToT: yes
-- step-04 RF-period products: missing
-- final RF-annotated `CleanedHits` ROOT summary: missing
+- step-04 RF-period products: yes
+- final RF-annotated `CleanedHits` ROOT summary: yes
 
-The old overnight batch report says this run failed at `step04_rf_period`. The current results tree still shows no `*_cleaned_rf_period_summary.txt` or `*_cleaned_hits_summary.txt` for this run.
+The old overnight batch report says this run failed at `step04_rf_period`. A direct full rerun on 2026-06-30 also reached the RF analyzer but was killed after the post-scan diagnostic path grew to nearly all available RAM. The successful recovery used `--score-stride 4`, `--single-rf-segment`, and `--skip-cycle-residual-diagnostics` for step 04, then wrote final `CleanedHits` with the recovered RF summary.
 
 ### Step-04 Diagnostic On 2026-06-30
 
@@ -107,8 +108,34 @@ Diagnostic commands were run only on `padiwa`.
 
 Interpretation: the current padiwa step-04 code path can process real `NCAL_20us_Pos_4m_0000` data on a subset. The most likely next action is a padiwa-only full step-04 rerun for `NCAL_20us_Pos_4m_0000` using the current code, followed by final `CleanedHits` writing if step 04 succeeds.
 
+### Recovery On 2026-06-30
+
+- Full step-04 recovery succeeded on `padiwa` using a bounded diagnostic path:
+  - `--score-stride 4`
+  - `--single-rf-segment`
+  - `--skip-cycle-residual-diagnostics`
+- Step-04 RF summary:
+  - `deduced_period_ns=38.8545`
+  - `phase_origin_ns=36.55429`
+  - `score_pulses_before_stride=77767392`
+  - `score_pulses_stored=19441848`
+  - `selected_pulses=11522836`
+  - `selected_fraction=0.592682`
+  - `sigma_ns=4.390381`
+  - `rf_segment_count=1`
+- The step-04 C++ analyzer completed in about `45 min` with maximum resident set size about `528 MB`.
+- The normal padiwa system Python lacked `matplotlib`/`uproot`; the step-04 writer scripts were run with `/home/padiwa/dogsoft/.venv/bin/python`.
+- Final `CleanedHits` export succeeded:
+  - `root_tree_entries=466856858`
+  - `root_tree_file_count=24`
+  - `root_tree_rf_period_ns=38.8545`
+  - `root_tree_rf_phase_origin_ns=36.55429`
+  - `root_tree_rf_segment_count=1`
+  - manifest: `/data6/Dogma_analysis_by_Dachi/Results/NCAL_20us_Pos_4m_0000/NCAL_20us_Pos_4m_0000_cleaned_hits_parts.txt`
+  - runtime: about `1 h 13 min`
+
 ## Interpretation
 
-The project is past raw exploration and into a cleaned-data production workflow. Most real NCAL position/tuning runs have been processed through the full chain, including RF-period deduction and final RF-annotated ROOT export. The immediate workflow gap is to rerun or debug step 04 for `NCAL_20us_Pos_4m_0000`, then write its final `CleanedHits` output if step 04 succeeds.
+The project is past raw exploration and into a cleaned-data production workflow. All listed real NCAL position/tuning runs have now been processed through the full chain, including RF-period deduction and final RF-annotated ROOT export. The main technical lesson from the `4m_0000` recovery is that long runs can make optional RF residual/segmentation diagnostics much larger than the physics outputs; use the bounded diagnostic flags when recovering similarly pathological runs.
 
 The local Mac/GitHub mirror is suitable for code/documentation work and small artifacts, but the authoritative large data/output state is still padiwa `/data6`.

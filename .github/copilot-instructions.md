@@ -30,7 +30,8 @@
 
 - Edit locally, inspect code locally, and commit/sync through GitHub.
 - Execute DOGMA analysis commands only on `padiwa`, using the real `/data6` filesystem.
-- On `padiwa`/Linux environments used for this analysis, activate `conda_env` before Python commands when that environment is available/required.
+- The MacBook Pro workspace does not require `conda_env`; use it for editing, git operations, documentation, and lightweight inspection only.
+- Activate `conda_env` before DOGMA Python commands when working from the Dell laptop/Linux-side workflow where that environment exists.
 - Current cleaned-data entrypoints are:
   - `step01_run_dogma_raw_data_refiner.py`
   - `step02_run_cleaned_all_channel_rates.py`
