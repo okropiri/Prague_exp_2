@@ -1,0 +1,15 @@
+run_key	position_m	width_reference_used	gamma_neutron_phase_separation_ns	neutron_raw_phase_q68_half_width_ns	model_neutron_phase_half_width_ns	model_intercept_ns	model_slope_ns_per_m	model_source
+NCAL_20us_Pos_2.8m_0001	2.8	False	10.35111513061685	11.12189901446552	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_2.8m_0002	2.8	False	10.350615130616848	11.738561787099735	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_2.8m_0003	2.8	False	10.350615130616848	11.825163396307905	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_2.8m_0004	2.8	False	10.35111513061685	11.076885100199673	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_2.8m_0005	2.8	False	10.35111513061685	11.2017980199443	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_2.8m_0006	2.8	False	10.351115130616847	11.611417940495224	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_3.4m_0000	3.4	False	4.244211230034747	14.340659336214324	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_3.4m_0001	3.4	False	4.244211230034747	14.339157453525884	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_4m_0000	4.0	False	1.8581926705473535	11.703282914953476	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_4m_0001	4.0	False	1.8626926705473537	11.81488631987575	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_5m_0000	5.0	True	12.041365838184198	11.294072724927716	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_5m_0001	5.0	True	12.041365838184198	11.391150836338346	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_5.8m_0000	5.8	True	18.665595627706324	9.771390135898661	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths
+NCAL_20us_Pos_6.6m_0000	6.6	True	10.524057093596863	3.7486404089778467	10.53273143041319	10.53273143041319	0.0	constant_median_separated_runs_nonmonotonic_widths

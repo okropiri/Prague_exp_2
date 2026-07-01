@@ -30,6 +30,7 @@ conda activate conda_env
 - `step04_run_cleaned_all_channel_rf_period.py`: step-04 runner.
   - For very long/pathological runs, `--score-stride`, `--single-rf-segment`, and `--skip-cycle-residual-diagnostics` can recover the RF summary and full-statistics folded outputs while keeping optional diagnostic memory bounded.
 - `step05_estimate_gamma_neutron_background.py`: first-pass channel-2 phase-vs-ToT sideband estimator for prompt-like ROI, broad neutron-candidate band, and local background control regions.
+- `step06_quantify_gamma_neutron_components.py`: TOF-guided prompt-gamma, background-control, and neutron-candidate quantification step. It measures per-run centroids, widths, local/background-control regions, and first-pass background-subtracted rates while explicitly flagging gamma/neutron overlap cases.
 
 ## Utility Files Kept Nearby
 
