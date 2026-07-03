@@ -47,6 +47,13 @@ class PhaseStats:
 
 
 @dataclass(frozen=True)
+class PhaseCore:
+    center_ns: float
+    half_width_ns: float
+    peak_delta_ns: float
+
+
+@dataclass(frozen=True)
 class LinearStats:
     mean_ns: float
     sigma_ns: float
@@ -78,6 +85,8 @@ class RunMeasurement:
     neutron_30mev_delay_mod_ns: float
     neutron_center_30mev_ns: float
     gamma_neutron_phase_separation_ns: float
+    neutron_observed_center_ns: float
+    neutron_observed_delay_ns: float
     neutron_raw_phase_sigma_ns: float
     neutron_raw_phase_q68_half_width_ns: float
     neutron_raw_phase_q90_half_width_ns: float
@@ -96,12 +105,16 @@ class ComponentResult:
     gamma_tot_mean_ns: float
     gamma_tot_sigma_ns: float
     neutron_center_30mev_ns: float
+    neutron_observed_center_ns: float
+    neutron_selection_center_ns: float
+    neutron_selection_delay_ns: float
     neutron_exclusion_half_width_ns: float
     neutron_phase_roi_half_width_ns: float
     neutron_tot_roi_min_ns: float
     neutron_tot_roi_max_ns: float
     neutron_raw_phase_q68_half_width_ns: float
     neutron_width_source: str
+    neutron_selection_definition: str
     neutron_direct_extraction_valid: bool
     gamma_neutron_phase_separation_ns: float
     gamma_neutron_overlap_ns: float
@@ -176,14 +189,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--neutron-width-core-threshold-fraction", type=float, default=0.50)
     parser.add_argument("--neutron-exclusion-min-half-width-ns", type=float, default=7.5)
     parser.add_argument("--neutron-exclusion-max-half-width-ns", type=float, default=16.0)
-    parser.add_argument("--neutron-roi-min-half-width-ns", type=float, default=2.0)
-    parser.add_argument("--neutron-roi-max-half-width-ns", type=float, default=6.0)
+    parser.add_argument("--fast-neutron-tof-window-ns", type=float, default=5.0)
+    parser.add_argument("--fast-neutron-background-margin-ns", type=float, default=2.5)
+    parser.add_argument("--neutron-roi-min-half-width-ns", type=float, default=1.0)
+    parser.add_argument("--neutron-roi-max-half-width-ns", type=float, default=2.5)
     parser.add_argument("--neutron-roi-gamma-margin-ns", type=float, default=1.0)
     parser.add_argument("--neutron-tot-quantile-low", type=float, default=0.16)
     parser.add_argument("--neutron-tot-quantile-high", type=float, default=0.84)
     parser.add_argument("--neutron-tot-min-width-ns", type=float, default=4.0)
     parser.add_argument("--template-min-separation-ns", type=float, default=8.0)
     parser.add_argument("--display-tot-max-ns", type=float, default=55.0)
+    parser.add_argument("--phase-display", choices=("gamma-relative", "raw"), default="gamma-relative")
     parser.add_argument("--z-scale", choices=("linear", "log"), default="linear")
     parser.add_argument("--linear-z-quantile", type=float, default=0.995)
     return parser.parse_args()
@@ -261,7 +277,7 @@ def weighted_phase_stats(
     )
 
 
-def estimate_phase_core_half_width(
+def estimate_phase_core(
     phase_centers_ns: np.ndarray,
     weights: np.ndarray,
     center_ns: float,
@@ -269,7 +285,7 @@ def estimate_phase_core_half_width(
     gamma_center_ns: float,
     gamma_exclusion_half_width_ns: float,
     args: argparse.Namespace,
-) -> float:
+) -> PhaseCore:
     deltas = signed_delta_ns(phase_centers_ns, center_ns, period_ns)
     gamma_deltas = circular_delta_ns(phase_centers_ns, gamma_center_ns, period_ns)
     candidate_mask = (
@@ -278,18 +294,19 @@ def estimate_phase_core_half_width(
         & (weights > 0.0)
     )
     if not np.any(candidate_mask):
-        return args.neutron_roi_min_half_width_ns
+        return PhaseCore(center_ns, args.neutron_roi_min_half_width_ns, 0.0)
 
     candidate_weights = weights[candidate_mask]
     baseline = float(np.quantile(candidate_weights, args.neutron_width_baseline_quantile))
     excess = np.where(candidate_mask, np.maximum(0.0, weights - baseline), 0.0)
     if float(np.max(excess)) <= 0.0:
-        return args.neutron_roi_min_half_width_ns
+        return PhaseCore(center_ns, args.neutron_roi_min_half_width_ns, 0.0)
 
     order = np.argsort(deltas[candidate_mask])
     ordered_deltas = deltas[candidate_mask][order]
     ordered_excess = excess[candidate_mask][order]
     peak_index = int(np.argmax(ordered_excess))
+    peak_delta_ns = float(ordered_deltas[peak_index])
     threshold = args.neutron_width_core_threshold_fraction * float(ordered_excess[peak_index])
 
     left_index = peak_index
@@ -300,7 +317,8 @@ def estimate_phase_core_half_width(
         right_index += 1
 
     half_width = max(abs(float(ordered_deltas[left_index])), abs(float(ordered_deltas[right_index])))
-    return float(np.clip(half_width, args.neutron_roi_min_half_width_ns, args.neutron_roi_max_half_width_ns))
+    half_width = float(np.clip(half_width, args.neutron_roi_min_half_width_ns, args.neutron_roi_max_half_width_ns))
+    return PhaseCore(float((center_ns + peak_delta_ns) % period_ns), half_width, peak_delta_ns)
 
 
 def read_key_value_file(path: Path) -> dict[str, str]:
@@ -344,6 +362,41 @@ def phase_mask_3x(histogram: SparseHistogram, center_ns: float, half_width_ns: f
 
 def count_bins(y_mask: np.ndarray, x_mask: np.ndarray) -> int:
     return int(np.count_nonzero(y_mask) * np.count_nonzero(x_mask))
+
+
+def gamma_relative_display_counts(
+    histogram: SparseHistogram,
+    gamma_center_ns: float,
+    period_ns: float,
+    fold_factor: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    x_bins = histogram.counts.shape[1]
+    if x_bins % fold_factor != 0:
+        return histogram.counts, np.arange(x_bins, dtype=np.int64)
+    period_bins = x_bins // fold_factor
+    gamma_bin = int(np.round(gamma_center_ns / histogram.x_bin_width_ns - 0.5)) % period_bins
+    center_bin = period_bins // 2
+    one_period_order = (np.arange(period_bins, dtype=np.int64) + gamma_bin - center_bin) % period_bins
+    full_order = np.concatenate([fold_index * period_bins + one_period_order for fold_index in range(fold_factor)])
+    return histogram.counts[:, full_order], full_order
+
+
+def relative_phase_ranges(center_delta_ns: float, half_width_ns: float, period_ns: float, fold_factor: int) -> list[tuple[float, float]]:
+    lower = -0.5 * period_ns
+    upper = 0.5 * period_ns
+    start = center_delta_ns - half_width_ns
+    end = center_delta_ns + half_width_ns
+    if start < lower:
+        base_ranges = [(lower, end), (start + period_ns, upper)]
+    elif end > upper:
+        base_ranges = [(start, upper), (lower, end - period_ns)]
+    else:
+        base_ranges = [(start, end)]
+    ranges: list[tuple[float, float]] = []
+    for fold_index in range(fold_factor):
+        offset = fold_index * period_ns
+        ranges.extend((offset + start_ns, offset + end_ns) for start_ns, end_ns in base_ranges)
+    return ranges
 
 
 def measure_run(histogram: SparseHistogram, args: argparse.Namespace) -> RunMeasurement:
@@ -405,7 +458,7 @@ def measure_run(histogram: SparseHistogram, args: argparse.Namespace) -> RunMeas
         period_ns,
         args.neutron_fit_half_window_ns,
     )
-    neutron_core_half_width = estimate_phase_core_half_width(
+    neutron_core = estimate_phase_core(
         phase_centers_ns,
         signal_projection_1x,
         neutron_center_ns,
@@ -414,6 +467,7 @@ def measure_run(histogram: SparseHistogram, args: argparse.Namespace) -> RunMeas
         gamma_exclusion,
         args,
     )
+    neutron_observed_delay_ns = float(circular_delta_ns(np.asarray([neutron_core.center_ns]), gamma_phase.center_ns, period_ns)[0])
 
     return RunMeasurement(
         run_key=run_key,
@@ -434,10 +488,12 @@ def measure_run(histogram: SparseHistogram, args: argparse.Namespace) -> RunMeas
         neutron_30mev_delay_mod_ns=delay_mod_ns,
         neutron_center_30mev_ns=neutron_center_ns,
         gamma_neutron_phase_separation_ns=separation_ns,
+        neutron_observed_center_ns=neutron_core.center_ns,
+        neutron_observed_delay_ns=neutron_observed_delay_ns,
         neutron_raw_phase_sigma_ns=neutron_phase.sigma_ns,
         neutron_raw_phase_q68_half_width_ns=neutron_phase.q68_half_width_ns,
         neutron_raw_phase_q90_half_width_ns=neutron_phase.q90_half_width_ns,
-        neutron_core_phase_half_width_ns=neutron_core_half_width,
+        neutron_core_phase_half_width_ns=neutron_core.half_width_ns,
     )
 
 
@@ -480,15 +536,21 @@ def analyze_components(
     signal_tot_mask = mask_between(histogram.y_centers_ns, args.signal_tot_min_ns, args.signal_tot_max_ns)
     gamma_tot_mask = mask_between(histogram.y_centers_ns, args.gamma_tot_min_ns, args.gamma_tot_max_ns)
     gamma_phase_mask = phase_mask_3x(histogram, measurement.gamma_center_ns, measurement.gamma_phase_roi_half_width_ns, period_ns)
-    max_nonoverlap_width = measurement.gamma_neutron_phase_separation_ns - measurement.gamma_phase_roi_half_width_ns - args.neutron_roi_gamma_margin_ns
+    neutron_selection_center_ns = measurement.neutron_observed_center_ns if np.isfinite(measurement.neutron_observed_center_ns) else measurement.neutron_center_30mev_ns
+    neutron_selection_delay_ns = float(circular_delta_ns(np.asarray([neutron_selection_center_ns]), measurement.gamma_center_ns, period_ns)[0])
+    max_nonoverlap_width = neutron_selection_delay_ns - measurement.gamma_phase_roi_half_width_ns - args.neutron_roi_gamma_margin_ns
     direct_neutron_valid = (
         max_nonoverlap_width >= args.neutron_roi_min_half_width_ns
-        and measurement.gamma_neutron_phase_separation_ns >= args.template_min_separation_ns
+        and neutron_selection_delay_ns >= args.template_min_separation_ns
     )
     if direct_neutron_valid:
-        neutron_roi_width_ns = min(measurement.neutron_core_phase_half_width_ns, max_nonoverlap_width)
+        neutron_roi_width_ns = min(
+            measurement.neutron_core_phase_half_width_ns,
+            0.5 * args.fast_neutron_tof_window_ns,
+            max_nonoverlap_width,
+        )
         neutron_roi_width_ns = float(np.clip(neutron_roi_width_ns, args.neutron_roi_min_half_width_ns, args.neutron_roi_max_half_width_ns))
-        neutron_phase_mask = phase_mask_3x(histogram, measurement.neutron_center_30mev_ns, neutron_roi_width_ns, period_ns)
+        neutron_phase_mask = phase_mask_3x(histogram, neutron_selection_center_ns, neutron_roi_width_ns, period_ns)
     else:
         neutron_roi_width_ns = float("nan")
         neutron_phase_mask = np.zeros_like(gamma_phase_mask, dtype=bool)
@@ -496,7 +558,15 @@ def analyze_components(
     gamma_exclusion = max(args.background_min_gamma_exclusion_ns, measurement.gamma_phase_roi_half_width_ns * args.background_exclusion_scale)
     neutron_exclusion = max(args.background_min_neutron_exclusion_ns, neutron_width_ns * args.background_exclusion_scale)
     gamma_exclusion_mask = phase_mask_3x(histogram, measurement.gamma_center_ns, gamma_exclusion, period_ns)
-    neutron_exclusion_mask = phase_mask_3x(histogram, measurement.neutron_center_30mev_ns, neutron_exclusion, period_ns)
+    if direct_neutron_valid:
+        neutron_background_exclusion = neutron_roi_width_ns + args.fast_neutron_background_margin_ns
+        nominal_background_exclusion = 0.5 * args.fast_neutron_tof_window_ns
+    else:
+        neutron_background_exclusion = neutron_exclusion
+        nominal_background_exclusion = neutron_exclusion
+    neutron_exclusion_mask = phase_mask_3x(histogram, measurement.neutron_center_30mev_ns, nominal_background_exclusion, period_ns)
+    if np.isfinite(neutron_selection_center_ns):
+        neutron_exclusion_mask |= phase_mask_3x(histogram, neutron_selection_center_ns, neutron_background_exclusion, period_ns)
     background_phase_mask = ~(gamma_exclusion_mask | neutron_exclusion_mask)
 
     local_background_counts = count_in_mask(histogram.counts, signal_tot_mask, background_phase_mask)
@@ -567,12 +637,16 @@ def analyze_components(
         gamma_tot_mean_ns=measurement.gamma_tot_mean_ns,
         gamma_tot_sigma_ns=measurement.gamma_tot_sigma_ns,
         neutron_center_30mev_ns=measurement.neutron_center_30mev_ns,
+        neutron_observed_center_ns=measurement.neutron_observed_center_ns,
+        neutron_selection_center_ns=neutron_selection_center_ns,
+        neutron_selection_delay_ns=neutron_selection_delay_ns,
         neutron_exclusion_half_width_ns=neutron_width_ns,
         neutron_phase_roi_half_width_ns=neutron_roi_width_ns,
         neutron_tot_roi_min_ns=neutron_tot_min_ns,
         neutron_tot_roi_max_ns=neutron_tot_max_ns,
         neutron_raw_phase_q68_half_width_ns=measurement.neutron_raw_phase_q68_half_width_ns,
         neutron_width_source=width_source,
+        neutron_selection_definition=f"observed_fast_core_with_tof_window_{args.fast_neutron_tof_window_ns:g}_ns_and_tot_quantiles_{args.neutron_tot_quantile_low:g}_{args.neutron_tot_quantile_high:g}",
         neutron_direct_extraction_valid=direct_neutron_valid,
         gamma_neutron_phase_separation_ns=measurement.gamma_neutron_phase_separation_ns,
         gamma_neutron_overlap_ns=overlap_ns,
@@ -683,8 +757,21 @@ def draw_roi_overlay(
     output_path: Path,
     args: argparse.Namespace,
 ) -> None:
+    fold_factor = int(histogram.metadata.get("fold_factor", "3"))
+    if args.phase_display == "gamma-relative":
+        plot_counts, display_order = gamma_relative_display_counts(histogram, measurement.gamma_center_ns, measurement.period_ns, fold_factor)
+        x_min_ns = -0.5 * measurement.period_ns
+        x_max_ns = (fold_factor - 0.5) * measurement.period_ns
+        x_label = "RF phase relative to prompt gamma, repeated over three periods (ns)"
+    else:
+        plot_counts = histogram.counts
+        display_order = np.arange(histogram.counts.shape[1], dtype=np.int64)
+        x_min_ns = float(histogram.x_centers_ns[0] - 0.5 * histogram.x_bin_width_ns)
+        x_max_ns = float(histogram.x_centers_ns[-1] + 0.5 * histogram.x_bin_width_ns)
+        x_label = "RF phase, three periods (ns)"
+
     display_tot_mask = histogram.y_centers_ns <= args.display_tot_max_ns
-    display_counts = histogram.counts[display_tot_mask, :]
+    display_counts = plot_counts[display_tot_mask, :]
     positive_counts = display_counts[display_counts > 0.0]
     vmax = float(np.quantile(positive_counts, args.linear_z_quantile)) if positive_counts.size else 1.0
     masked_counts = np.ma.masked_less_equal(display_counts, 0.0)
@@ -692,12 +779,7 @@ def draw_roi_overlay(
     image_kwargs = {
         "aspect": "auto",
         "origin": "lower",
-        "extent": (
-            float(histogram.x_centers_ns[0] - 0.5 * histogram.x_bin_width_ns),
-            float(histogram.x_centers_ns[-1] + 0.5 * histogram.x_bin_width_ns),
-            0.0,
-            args.display_tot_max_ns,
-        ),
+        "extent": (x_min_ns, x_max_ns, 0.0, args.display_tot_max_ns),
         "interpolation": "nearest",
         "cmap": "magma",
     }
@@ -718,69 +800,79 @@ def draw_roi_overlay(
         colorbar_label = f"counts/bin, linear scale, clipped at q{args.linear_z_quantile:.3f}"
     figure.colorbar(image, ax=axis, label=colorbar_label)
 
-    fold_factor = int(histogram.metadata.get("fold_factor", "3"))
-    for start_ns, end_ns in periodic_ranges(measurement.gamma_center_ns, component.gamma_phase_roi_half_width_ns, measurement.period_ns, fold_factor):
-        axis.add_patch(
-            patches.Rectangle(
-                (start_ns, args.gamma_tot_min_ns),
-                end_ns - start_ns,
-                args.gamma_tot_max_ns - args.gamma_tot_min_ns,
-                edgecolor="#00e5ff",
-                facecolor="none",
-                linewidth=1.4,
-            )
-        )
-    if component.neutron_direct_extraction_valid and np.isfinite(component.neutron_phase_roi_half_width_ns):
-        for start_ns, end_ns in periodic_ranges(measurement.neutron_center_30mev_ns, component.neutron_phase_roi_half_width_ns, measurement.period_ns, fold_factor):
+    def draw_phase_box(center_ns: float, half_width_ns: float, y_min_ns: float, y_max_ns: float, edge_color: str, line_style: str = "-") -> None:
+        if args.phase_display == "gamma-relative":
+            center_delta_ns = float(signed_delta_ns(np.asarray([center_ns]), measurement.gamma_center_ns, measurement.period_ns)[0])
+            ranges = relative_phase_ranges(center_delta_ns, half_width_ns, measurement.period_ns, fold_factor)
+        else:
+            ranges = periodic_ranges(center_ns, half_width_ns, measurement.period_ns, fold_factor)
+        for start_ns, end_ns in ranges:
             axis.add_patch(
                 patches.Rectangle(
-                    (start_ns, component.neutron_tot_roi_min_ns),
+                    (start_ns, y_min_ns),
                     end_ns - start_ns,
-                    component.neutron_tot_roi_max_ns - component.neutron_tot_roi_min_ns,
-                    edgecolor="#ffb000",
+                    y_max_ns - y_min_ns,
+                    edgecolor=edge_color,
                     facecolor="none",
                     linewidth=1.4,
+                    linestyle=line_style,
                 )
             )
+
+    def draw_phase_line(center_ns: float, color: str, line_style: str = "--", alpha: float = 0.9) -> None:
+        if args.phase_display == "gamma-relative":
+            center_delta_ns = float(signed_delta_ns(np.asarray([center_ns]), measurement.gamma_center_ns, measurement.period_ns)[0])
+            positions = [fold_index * measurement.period_ns + center_delta_ns for fold_index in range(fold_factor)]
+        else:
+            positions = [fold_index * measurement.period_ns + center_ns for fold_index in range(fold_factor)]
+        for position_ns in positions:
+            axis.axvline(position_ns, color=color, linestyle=line_style, linewidth=1.2, alpha=alpha)
+
+    draw_phase_box(
+        measurement.gamma_center_ns,
+        component.gamma_phase_roi_half_width_ns,
+        args.gamma_tot_min_ns,
+        args.gamma_tot_max_ns,
+        "#00e5ff",
+    )
+    draw_phase_line(measurement.neutron_center_30mev_ns, "#ffb000", line_style=":", alpha=0.85)
+    if component.neutron_direct_extraction_valid and np.isfinite(component.neutron_phase_roi_half_width_ns):
+        draw_phase_box(
+            component.neutron_selection_center_ns,
+            component.neutron_phase_roi_half_width_ns,
+            component.neutron_tot_roi_min_ns,
+            component.neutron_tot_roi_max_ns,
+            "#ffb000",
+        )
     else:
-        for fold_index in range(fold_factor):
-            axis.axvline(
-                fold_index * measurement.period_ns + measurement.neutron_center_30mev_ns,
-                color="#ffb000",
-                linestyle="--",
-                linewidth=1.2,
-                alpha=0.9,
-            )
+        draw_phase_line(measurement.neutron_center_30mev_ns, "#ffb000", line_style="--", alpha=0.9)
 
     background_phase_mask = masks["background_phase_mask"]
-    period_bins = max(1, round(measurement.period_ns / histogram.x_bin_width_ns))
-    background_one_period = background_phase_mask[:period_bins]
-    for index, selected in enumerate(background_one_period):
-        if not selected:
+    display_bin_width_ns = (x_max_ns - x_min_ns) / max(1, plot_counts.shape[1])
+    for index, original_index in enumerate(display_order):
+        if not background_phase_mask[original_index]:
             continue
-        phase_start = index * histogram.x_bin_width_ns
-        phase_end = phase_start + histogram.x_bin_width_ns
-        for fold_index in range(fold_factor):
-            axis.add_patch(
-                patches.Rectangle(
-                    (fold_index * measurement.period_ns + phase_start, args.signal_tot_min_ns),
-                    phase_end - phase_start,
-                    args.signal_tot_max_ns - args.signal_tot_min_ns,
-                    edgecolor="none",
-                    facecolor="#5ec2ff",
-                    alpha=0.08,
-                )
+        phase_start = x_min_ns + index * display_bin_width_ns
+        axis.add_patch(
+            patches.Rectangle(
+                (phase_start, args.signal_tot_min_ns),
+                display_bin_width_ns,
+                args.signal_tot_max_ns - args.signal_tot_min_ns,
+                edgecolor="none",
+                facecolor="#5ec2ff",
+                alpha=0.08,
             )
+        )
 
-    axis.set_xlim(0.0, float(histogram.metadata["x_max_ns"]))
+    axis.set_xlim(x_min_ns, x_max_ns)
     axis.set_ylim(0.0, args.display_tot_max_ns)
-    axis.set_xlabel("RF phase, three periods (ns)")
+    axis.set_xlabel(x_label)
     axis.set_ylabel("ToT (ns)")
     axis.set_title(f"{measurement.run_key} | Ch{args.channel:02d} step06 ROIs | {component.component_status}")
     axis.text(
         0.01,
         0.98,
-        "cyan: prompt gamma ROI\norange: neutron core ROI when valid; dashed line when hidden/overlap\nblue shade: local background sideband",
+        "cyan: prompt gamma ROI\norange box: observed fast-neutron TOF/ToT slice\norange dotted: nominal 30 MeV TOF guide\nblue shade: local background sideband",
         transform=axis.transAxes,
         ha="left",
         va="top",
@@ -874,23 +966,27 @@ Channel: Ch{args.channel:02d}
 
 Purpose:
 - detect the compact prompt-gamma centroid and width independently for each run;
-- predict the neutron-candidate phase from the prompt gamma plus the gamma-neutron TOF delay for a {args.neutron_energy_mev:g} MeV reference neutron;
-- derive a position-dependent neutron-candidate phase width from separated reference positions when possible;
-- define background sidebands by excluding both the gamma ROI and the expected neutron-candidate ROI;
-- report raw counts, background estimates, net counts, and rates for gamma and neutron-candidate ROIs.
+- draw the nominal neutron-candidate phase expected from the prompt gamma plus the gamma-neutron TOF delay for a {args.neutron_energy_mev:g} MeV reference neutron;
+- identify a compact observed fast-neutron core near that TOF guide when it is sufficiently separated from the prompt gamma;
+- define background sidebands by excluding prompt-gamma and neutron-candidate phase regions;
+- report raw counts, background estimates, net counts, and rates for prompt gamma and for a constrained fast-neutron TOF/ToT slice.
 
 Important interpretation notes:
 - The 3.4 m runs are treated as background-control candidates because the neutron-candidate band is expected to overlap or hide near the prompt-gamma region, not because neutrons are absent.
-- The neutron-candidate ROI is not a final neutron identification. It is a TOF-guided candidate region for later template or mixture fitting.
+- The broad neutron-candidate distribution is not fully contained by the direct-counting ROI and may be wider than one RF period after folding. The direct neutron number reported here is only a fast-neutron TOF slice, not the total neutron yield.
+- The orange dotted line is the nominal {args.neutron_energy_mev:g} MeV neutron TOF guide. The orange box, when present, is centered on the observed fast-neutron core near that guide.
+- The orange box is constrained both in TOF/RF phase and in ToT. Its ToT interval is an energy-deposition proxy and must be applied consistently to simulation or control-detector comparisons before converting rates into flux or efficiency.
 - Neutron-candidate width is allowed to vary with detector distance. Current width model source: `{width_source}`.
+- Overlay plots use gamma-relative RF phase by default, so the prompt gamma ROI is centered rather than split at an RF-period boundary.
 - Overlay plots use linear Z by default. The color scale is clipped at quantile {args.linear_z_quantile:.3f} to make the gamma and neutron-candidate regions auditable without logarithmic visual inflation of sparse tails.
-- Broad neutron widths are used only as exclusion bands for background protection. Direct neutron counts use a compact neutron-core phase-ToT ROI when separation is sufficient.
+- Broad neutron widths are used only as exclusion bands for background protection. Direct neutron counts use a compact observed fast-neutron phase-ToT ROI when separation is sufficient.
 - Runs flagged as `gamma_neutron_roi_overlap` have no direct neutron rate reported; the expected neutron phase is drawn only as a dashed guide line.
 - Runs flagged as `close_to_gamma_tail` report a conservative neutron-core rate, but they should still be treated as template-fit candidates rather than final yields.
 
 Default regions:
 - Gamma ToT band: [{args.gamma_tot_min_ns}, {args.gamma_tot_max_ns}) ns.
 - Signal/neutron-candidate ToT band: [{args.signal_tot_min_ns}, {args.signal_tot_max_ns}) ns.
+- Fast-neutron TOF window: {args.fast_neutron_tof_window_ns} ns full width.
 - Neutron core ToT interval: measured from the valid neutron-core phase ROI using quantiles [{args.neutron_tot_quantile_low}, {args.neutron_tot_quantile_high}], with minimum width {args.neutron_tot_min_width_ns} ns.
 - Background-control positions: {', '.join(f'{position:g} m' for position in args.background_control_positions)}.
 - Neutron-width reference positions: {', '.join(f'{position:g} m' for position in args.neutron_width_reference_positions)}.
