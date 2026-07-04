@@ -15,7 +15,6 @@ import numpy as np
 from step05_estimate_gamma_neutron_background import find_sparse_files, mask_between, parse_run_key, read_channel_histogram
 from step07_phase_rate_slice_diagnostics import (
     SliceProfile,
-    draw_gamma_reference,
     draw_profiles,
     find_intervals,
     parse_position_m,
@@ -53,6 +52,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir")
     parser.add_argument("--channel", type=int, default=2)
     parser.add_argument("--run-glob", default="NCAL_20us_Pos_5m_*")
+    parser.add_argument("--broad-gamma-tot-min-ns", type=float, default=10.0)
+    parser.add_argument("--broad-gamma-tot-max-ns", type=float, default=18.0)
     parser.add_argument("--half-widths-ns", type=float, nargs="*", default=[1.0, 1.25, 1.5])
     parser.add_argument("--tot-slice-edges-ns", type=float, nargs="*", default=[8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 22.0, 26.0, 30.0])
     parser.add_argument("--gamma-exclusion-half-width-ns", type=float, default=4.0)
@@ -122,6 +123,115 @@ def build_slice_profile(histogram, run_key, position_m, duration_seconds, period
     )
 
 
+def build_phase_profile(histogram, duration_seconds, period_ns, gamma_center_ns, tot_min_ns, tot_max_ns):
+    period_bins = max(1, round(period_ns / histogram.x_bin_width_ns))
+    tot_mask = mask_between(histogram.y_centers_ns, tot_min_ns, tot_max_ns)
+    projection_3x = histogram.counts[tot_mask, :].sum(axis=0)
+    projection_1x = np.zeros(period_bins, dtype=np.float64)
+    for index, count in enumerate(projection_3x):
+        projection_1x[index % period_bins] += count
+    phase_centers_ns = (np.arange(period_bins, dtype=np.float64) + 0.5) * histogram.x_bin_width_ns
+    relative_phase_ns = signed_delta_ns(phase_centers_ns, gamma_center_ns, period_ns)
+    order = np.argsort(relative_phase_ns)
+    return relative_phase_ns[order], projection_1x[order], projection_1x[order] / duration_seconds
+
+
+def draw_gamma_cut_comparison(
+    histogram,
+    run_key: str,
+    position_m: float,
+    duration_seconds: float,
+    broad_gamma_center_ns: float,
+    cut_gamma_center_ns: float,
+    period_ns: float,
+    broad_tot_min_ns: float,
+    broad_tot_max_ns: float,
+    cut_tot_min_ns: float,
+    cut_tot_max_ns: float,
+    output_path: Path,
+    profile_path: Path,
+    args: argparse.Namespace,
+) -> None:
+    broad_ref_relative_ns = float(signed_delta_ns(np.asarray([broad_gamma_center_ns]), cut_gamma_center_ns, period_ns)[0])
+    broad_phase_ns, broad_counts, broad_rate = build_phase_profile(
+        histogram, duration_seconds, period_ns, cut_gamma_center_ns, broad_tot_min_ns, broad_tot_max_ns
+    )
+    cut_phase_ns, cut_counts, cut_rate = build_phase_profile(
+        histogram, duration_seconds, period_ns, cut_gamma_center_ns, cut_tot_min_ns, cut_tot_max_ns
+    )
+
+    with profile_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "run_key",
+                "phase_relative_ns",
+                "broad_gamma_counts",
+                "broad_gamma_rate_hz",
+                "cut_gamma_counts",
+                "cut_gamma_rate_hz",
+            ],
+            delimiter="\t",
+            lineterminator="\n",
+        )
+        writer.writeheader()
+        for phase_ns, broad_c, broad_r, cut_c, cut_r in zip(broad_phase_ns, broad_counts, broad_rate, cut_counts, cut_rate):
+            writer.writerow(
+                {
+                    "run_key": run_key,
+                    "phase_relative_ns": phase_ns,
+                    "broad_gamma_counts": broad_c,
+                    "broad_gamma_rate_hz": broad_r,
+                    "cut_gamma_counts": cut_c,
+                    "cut_gamma_rate_hz": cut_r,
+                }
+            )
+
+    display_tot_mask = histogram.y_centers_ns <= args.gamma_display_tot_max_ns
+    display_counts = histogram.counts[display_tot_mask, :]
+    vmax = float(np.quantile(display_counts[display_counts > 0.0], 0.995)) if np.any(display_counts > 0.0) else 1.0
+
+    figure, axes = plt.subplots(1, 2, figsize=(13.0, 4.8), constrained_layout=True)
+    image = axes[0].imshow(
+        np.ma.masked_less_equal(display_counts, 0.0),
+        aspect="auto",
+        origin="lower",
+        extent=(
+            float(histogram.x_centers_ns[0] - 0.5 * histogram.x_bin_width_ns),
+            float(histogram.x_centers_ns[-1] + 0.5 * histogram.x_bin_width_ns),
+            0.0,
+            args.gamma_display_tot_max_ns,
+        ),
+        interpolation="nearest",
+        cmap="magma",
+        vmin=0.0,
+        vmax=max(1.0, vmax),
+    )
+    figure.colorbar(image, ax=axes[0], label="counts/bin, linear scale, clipped at q0.995")
+    axes[0].axhspan(broad_tot_min_ns, broad_tot_max_ns, color="#2563eb", alpha=0.10)
+    axes[0].axhspan(cut_tot_min_ns, cut_tot_max_ns, color="#f59e0b", alpha=0.20)
+    for fold_index in range(int(histogram.metadata.get("fold_factor", "3"))):
+        axes[0].axvline(fold_index * period_ns + broad_gamma_center_ns, color="#2563eb", linestyle="--", linewidth=1.1)
+        axes[0].axvline(fold_index * period_ns + cut_gamma_center_ns, color="#00e5ff", linestyle="--", linewidth=1.2)
+    axes[0].set_xlabel("RF phase, three periods (ns)")
+    axes[0].set_ylabel("ToT (ns)")
+    axes[0].set_title(f"{run_key} | broad vs centered cut on 2D")
+
+    axes[1].plot(broad_phase_ns, broad_rate, color="#0891b2", linewidth=1.2, label="broad gamma band rate")
+    axes[1].plot(cut_phase_ns, cut_rate, color="#dc2626", linewidth=1.2, label="centered cut gamma rate")
+    axes[1].axvline(broad_ref_relative_ns, color="#2563eb", linestyle="--", linewidth=1.1, label="broad-band reference")
+    axes[1].axvline(0.0, color="#00e5ff", linestyle="--", linewidth=1.2, label="cut-band reference")
+    axes[1].set_xlabel("RF phase relative to selected gamma reference (ns)")
+    axes[1].set_ylabel("rate per phase bin (Hz)")
+    axes[1].set_title(f"{run_key} | cut vs no-cut comparison")
+    axes[1].grid(True, linewidth=0.3, alpha=0.5)
+    axes[1].legend(fontsize=8)
+
+    figure.suptitle(f"Prompt-gamma cut comparison | detector face {position_m:g} m")
+    figure.savefig(output_path, dpi=180)
+    plt.close(figure)
+
+
 def write_results(results: list[GammaWindowResult], output_path: Path) -> None:
     with output_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=[field.name for field in GammaWindowResult.__dataclass_fields__.values()], delimiter="\t", lineterminator="\n")
@@ -158,12 +268,14 @@ This directory tests the 5 m prompt-gamma reference against centered fixed-width
 
 Method:
 - use the fitted gamma ToT peak position `mu_gamma` from step08;
-- define gamma ToT gates as `[mu_gamma - half_width, mu_gamma + half_width]`;
+- compare the original broad gamma band [{args.broad_gamma_tot_min_ns}, {args.broad_gamma_tot_max_ns}] ns against centered cut gates `[mu_gamma - half_width, mu_gamma + half_width]`;
 - scan half widths: {', '.join(f'{width:g} ns' for width in args.half_widths_ns)};
 - rebuild the prompt-gamma phase reference and the 1D phase-rate slice diagnostics for each width.
 
 Interpretation:
 - the spread in `phase_center_ns` across the width scan is a direct measure of gamma-reference sensitivity to the ToT gate choice;
+- the `*_gamma_reference.png` plots show both references explicitly: broad-band reference and centered-cut reference;
+- if those two lines overlap, the broad and cut selections pick the same prompt-gamma phase bin;
 - this is a systematic-selection study, not a statistical fit error.
 """
     (output_dir / "README.md").write_text(text, encoding="utf-8")
@@ -201,6 +313,7 @@ def main() -> None:
         position_m = parse_position_m(run_key)
         duration_seconds = run_duration_seconds(histogram, run_key)
         mu_gamma = peak_summary[run_key]["peak_mu_ns"]
+        broad_gamma_center_ns, _, _, _ = detect_gamma_center_for_window(histogram, args.broad_gamma_tot_min_ns, args.broad_gamma_tot_max_ns)
         phase_centers_by_width: dict[float, float] = {}
 
         for half_width_ns in args.half_widths_ns:
@@ -212,15 +325,18 @@ def main() -> None:
             args.gamma_tot_max_ns = gamma_tot_max_ns
 
             width_tag = f"hw{half_width_ns:.2f}".replace(".", "p")
-            draw_gamma_reference(
+            draw_gamma_cut_comparison(
                 histogram,
-                f"{run_key} | {width_tag}",
+                run_key,
                 position_m,
                 duration_seconds,
+                broad_gamma_center_ns,
                 gamma_center_ns,
-                sorted_relative_phase_ns,
-                sorted_counts,
                 period_ns,
+                args.broad_gamma_tot_min_ns,
+                args.broad_gamma_tot_max_ns,
+                gamma_tot_min_ns,
+                gamma_tot_max_ns,
                 output_dir / f"{run_key}_ch{args.channel:02d}_{width_tag}_gamma_reference.png",
                 output_dir / f"{run_key}_ch{args.channel:02d}_{width_tag}_gamma_reference_profile.tsv",
                 args,
