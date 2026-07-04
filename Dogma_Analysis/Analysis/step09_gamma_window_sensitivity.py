@@ -95,6 +95,7 @@ def detect_gamma_center_for_window(histogram, gamma_tot_min_ns: float, gamma_tot
 
 def build_slice_profile(histogram, run_key, position_m, duration_seconds, period_ns, gamma_center_ns, sorted_relative_phase_ns, tot_min_ns, tot_max_ns, args) -> SliceProfile:
     period_bins = max(1, round(period_ns / histogram.x_bin_width_ns))
+    phase_bin_width_ns = period_ns / period_bins
     tot_mask = mask_between(histogram.y_centers_ns, tot_min_ns, tot_max_ns)
     projection_3x = histogram.counts[tot_mask, :].sum(axis=0)
     projection_1x = np.zeros(period_bins, dtype=np.float64)
@@ -104,7 +105,7 @@ def build_slice_profile(histogram, run_key, position_m, duration_seconds, period
     relative_phase_ns = signed_delta_ns(phase_centers_ns, gamma_center_ns, period_ns)
     order = np.argsort(relative_phase_ns)
     sorted_counts = projection_1x[order]
-    sorted_rate = sorted_counts / duration_seconds
+    sorted_rate = sorted_counts / duration_seconds / phase_bin_width_ns
     baseline_candidates = sorted_counts[np.abs(sorted_relative_phase_ns) > args.gamma_exclusion_half_width_ns]
     baseline_counts = float(np.quantile(baseline_candidates if baseline_candidates.size else sorted_counts, args.baseline_quantile))
     z_score = (sorted_counts - baseline_counts) / np.sqrt(np.maximum(baseline_counts, 1.0))
@@ -117,7 +118,7 @@ def build_slice_profile(histogram, run_key, position_m, duration_seconds, period
         gamma_relative_phase_ns=sorted_relative_phase_ns,
         rate_hz=sorted_rate,
         counts=sorted_counts,
-        baseline_rate_hz=baseline_counts / duration_seconds,
+        baseline_rate_hz=baseline_counts / duration_seconds / phase_bin_width_ns,
         baseline_counts_per_bin=baseline_counts,
         z_score=z_score,
     )
@@ -125,6 +126,7 @@ def build_slice_profile(histogram, run_key, position_m, duration_seconds, period
 
 def build_phase_profile(histogram, duration_seconds, period_ns, gamma_center_ns, tot_min_ns, tot_max_ns):
     period_bins = max(1, round(period_ns / histogram.x_bin_width_ns))
+    phase_bin_width_ns = period_ns / period_bins
     tot_mask = mask_between(histogram.y_centers_ns, tot_min_ns, tot_max_ns)
     projection_3x = histogram.counts[tot_mask, :].sum(axis=0)
     projection_1x = np.zeros(period_bins, dtype=np.float64)
@@ -133,7 +135,7 @@ def build_phase_profile(histogram, duration_seconds, period_ns, gamma_center_ns,
     phase_centers_ns = (np.arange(period_bins, dtype=np.float64) + 0.5) * histogram.x_bin_width_ns
     relative_phase_ns = signed_delta_ns(phase_centers_ns, gamma_center_ns, period_ns)
     order = np.argsort(relative_phase_ns)
-    return relative_phase_ns[order], projection_1x[order], projection_1x[order] / duration_seconds
+    return relative_phase_ns[order], projection_1x[order], projection_1x[order] / duration_seconds / phase_bin_width_ns
 
 
 def draw_gamma_cut_comparison(
@@ -167,9 +169,9 @@ def draw_gamma_cut_comparison(
                 "run_key",
                 "phase_relative_ns",
                 "broad_gamma_counts",
-                "broad_gamma_rate_hz",
+                "broad_gamma_rate_density_hz_per_ns",
                 "cut_gamma_counts",
-                "cut_gamma_rate_hz",
+                "cut_gamma_rate_density_hz_per_ns",
             ],
             delimiter="\t",
             lineterminator="\n",
@@ -181,9 +183,9 @@ def draw_gamma_cut_comparison(
                     "run_key": run_key,
                     "phase_relative_ns": phase_ns,
                     "broad_gamma_counts": broad_c,
-                    "broad_gamma_rate_hz": broad_r,
+                    "broad_gamma_rate_density_hz_per_ns": broad_r,
                     "cut_gamma_counts": cut_c,
-                    "cut_gamma_rate_hz": cut_r,
+                    "cut_gamma_rate_density_hz_per_ns": cut_r,
                 }
             )
 
@@ -222,7 +224,7 @@ def draw_gamma_cut_comparison(
     axes[1].axvline(broad_ref_relative_ns, color="#2563eb", linestyle="--", linewidth=1.1, label="broad-band reference")
     axes[1].axvline(0.0, color="#00e5ff", linestyle="--", linewidth=1.2, label="cut-band reference")
     axes[1].set_xlabel("RF phase relative to selected gamma reference (ns)")
-    axes[1].set_ylabel("rate per phase bin (Hz)")
+    axes[1].set_ylabel("Hz/ns")
     axes[1].set_title(f"{run_key} | cut vs no-cut comparison")
     axes[1].grid(True, linewidth=0.3, alpha=0.5)
     axes[1].legend(fontsize=8)
@@ -238,6 +240,32 @@ def write_results(results: list[GammaWindowResult], output_path: Path) -> None:
         writer.writeheader()
         for result in results:
             writer.writerow({field: getattr(result, field) for field in GammaWindowResult.__dataclass_fields__})
+
+
+def draw_profiles_density(run_key: str, position_m: float, profiles: list[SliceProfile], output_path: Path, gamma_exclusion_half_width_ns: float) -> None:
+    figure, axes = plt.subplots(2, 1, figsize=(11.0, 8.0), sharex=True, constrained_layout=True)
+    colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(profiles)))
+    for color, profile in zip(colors, profiles):
+        label = f"{profile.tot_min_ns:g}-{profile.tot_max_ns:g} ns"
+        axes[0].plot(profile.gamma_relative_phase_ns, profile.rate_hz, color=color, linewidth=1.2, label=label)
+        axes[0].hlines(profile.baseline_rate_hz, profile.gamma_relative_phase_ns[0], profile.gamma_relative_phase_ns[-1], color=color, linewidth=0.8, linestyle="--", alpha=0.6)
+        axes[1].plot(profile.gamma_relative_phase_ns, profile.z_score, color=color, linewidth=1.2, label=label)
+
+    axes[0].axvspan(-gamma_exclusion_half_width_ns, gamma_exclusion_half_width_ns, color="#00bcd4", alpha=0.08)
+    axes[1].axvspan(-gamma_exclusion_half_width_ns, gamma_exclusion_half_width_ns, color="#00bcd4", alpha=0.08)
+    axes[1].axhline(5.0, color="#d97706", linestyle="--", linewidth=1.0, label="z = 5")
+
+    axes[0].set_ylabel("Hz/ns")
+    axes[0].set_title(f"{run_key} | detector face {position_m:g} m | Ch02 phase-rate slices")
+    axes[0].grid(True, linewidth=0.3, alpha=0.5)
+    axes[0].legend(fontsize=8, ncol=2)
+
+    axes[1].set_xlabel("RF phase relative to prompt gamma (ns)")
+    axes[1].set_ylabel("excess significance z")
+    axes[1].grid(True, linewidth=0.3, alpha=0.5)
+
+    figure.savefig(output_path, dpi=180)
+    plt.close(figure)
 
 
 def draw_phase_center_summary(results: list[GammaWindowResult], output_path: Path) -> None:
@@ -359,7 +387,7 @@ def main() -> None:
                 run_profiles.append(profile)
                 profiles.append(profile)
                 intervals.extend(find_intervals(profile, args))
-            draw_profiles(run_key, position_m, run_profiles, output_dir / f"{run_key}_ch{args.channel:02d}_{width_tag}_phase_rate_slices.png", args.gamma_exclusion_half_width_ns)
+            draw_profiles_density(run_key, position_m, run_profiles, output_dir / f"{run_key}_ch{args.channel:02d}_{width_tag}_phase_rate_slices.png", args.gamma_exclusion_half_width_ns)
 
             results.append(
                 GammaWindowResult(
