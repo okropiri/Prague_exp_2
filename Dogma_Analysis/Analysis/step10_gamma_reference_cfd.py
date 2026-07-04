@@ -148,6 +148,23 @@ def draw_comparison(
     axes[1].set_title(f"{run_key} | max vs CFD50 reference")
     axes[1].grid(True, linewidth=0.3, alpha=0.5)
     axes[1].legend(fontsize=8)
+    annotation = (
+        f"broad max: {broad_max_ref_relative:+.3f} ns\n"
+        f"broad CFD50: {broad_cfd50_ref_relative:+.3f} ns\n"
+        f"cut max: {0.0:+.3f} ns\n"
+        f"cut CFD50: {cut_cfd50_ref_relative:+.3f} ns"
+    )
+    axes[0].text(
+        0.02,
+        0.98,
+        annotation,
+        transform=axes[0].transAxes,
+        ha="left",
+        va="top",
+        fontsize=8,
+        color="white",
+        bbox={"facecolor": "black", "alpha": 0.50, "edgecolor": "none", "pad": 4},
+    )
 
     figure.suptitle(f"Prompt-gamma reference comparison | detector face {position_m:g} m")
     figure.savefig(output_path, dpi=180)
