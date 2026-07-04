@@ -33,6 +33,7 @@ conda activate conda_env
 - `step06_quantify_gamma_neutron_components.py`: TOF-guided prompt-gamma, background-control, and neutron-candidate quantification step. It measures per-run centroids, widths, local/background-control regions, and first-pass background-subtracted rates while explicitly flagging gamma/neutron overlap cases.
 - `step07_phase_rate_slice_diagnostics.py`: gamma-relative one-period phase-rate diagnostics by ToT slice, used to inspect delayed excess structure in 1D before committing to 2D population cuts.
 - `step08_fit_gamma_tot_peak.py`: narrow Ch02 gamma-ToT peak fitter using a Gaussian plus constant background in a fixed ROI to extract peak position and its statistical fit uncertainty.
+- `step09_gamma_window_sensitivity.py`: 5 m-only sensitivity scan for gamma-window definition. It centers fixed-width gamma ToT gates on the fitted peak from step08, rebuilds the gamma phase reference and 1D phase-rate diagnostics, and reports how much the reference shifts under window variations.
 
 ## Utility Files Kept Nearby
 
