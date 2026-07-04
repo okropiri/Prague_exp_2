@@ -31,6 +31,8 @@ conda activate conda_env
   - For very long/pathological runs, `--score-stride`, `--single-rf-segment`, and `--skip-cycle-residual-diagnostics` can recover the RF summary and full-statistics folded outputs while keeping optional diagnostic memory bounded.
 - `step05_estimate_gamma_neutron_background.py`: first-pass channel-2 phase-vs-ToT sideband estimator for prompt-like ROI, broad neutron-candidate band, and local background control regions.
 - `step06_quantify_gamma_neutron_components.py`: TOF-guided prompt-gamma, background-control, and neutron-candidate quantification step. It measures per-run centroids, widths, local/background-control regions, and first-pass background-subtracted rates while explicitly flagging gamma/neutron overlap cases.
+- `step07_phase_rate_slice_diagnostics.py`: gamma-relative one-period phase-rate diagnostics by ToT slice, used to inspect delayed excess structure in 1D before committing to 2D population cuts.
+- `step08_fit_gamma_tot_peak.py`: narrow Ch02 gamma-ToT peak fitter using a Gaussian plus constant background in a fixed ROI to extract peak position and its statistical fit uncertainty.
 
 ## Utility Files Kept Nearby
 
