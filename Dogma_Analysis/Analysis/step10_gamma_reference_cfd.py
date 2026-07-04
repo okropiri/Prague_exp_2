@@ -37,7 +37,7 @@ class ReferenceResult:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Compare max-bin and left-edge constant-fraction gamma references for the 5m gamma-window scans."
+        description="Compare max-bin and left-edge constant-fraction gamma references for gamma-window scans."
     )
     parser.add_argument("--results-root", default="/data6/Dogma_analysis_by_Dachi/Results")
     parser.add_argument(
@@ -187,7 +187,9 @@ def write_results(results: list[ReferenceResult], output_path: Path) -> None:
 def write_readme(output_dir: Path, args: argparse.Namespace) -> None:
     text = f"""# Step10 Gamma Reference CFD Comparison
 
-This directory compares three prompt-gamma reference definitions on the 5 m runs:
+This directory compares prompt-gamma reference definitions for the processed runs in the supplied gamma-window scan input.
+
+References compared:
 - broad-band maximum,
 - broad-band left-edge constant-fraction crossing at {args.fraction:.2f} of the net peak height,
 - centered-cut maximum,
