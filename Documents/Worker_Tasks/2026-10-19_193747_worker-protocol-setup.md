@@ -33,7 +33,8 @@
 
 ## Commits
 
-- (filled in after commit)
+- `9e6e1c7` — Establish MiMo worker protocol and task log (Done by: MiMo-V2.6-Pro-RL on Juwels Booster (BLABLADOR))
+- (this entry's SHA-recording follow-up commit is the one containing this line)
 
 ## Validation
 
