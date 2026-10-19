@@ -44,3 +44,42 @@
 - Do not commit `.conda/`, `data6/`, Python caches, LaTeX build products, or generated bulk result trees.
 - GitHub should synchronize code, notes, LaTeX sources, reference docs, and small selected artifacts.
 - Full raw data and full generated result sets stay on `padiwa`/`/data6` unless the user explicitly asks for a different storage plan.
+
+## Worker Protocol (MiMo code worker)
+
+This section defines the multi-model collaboration protocol established on 2026-10-19. It applies to all work in this repository.
+
+### Roles
+
+- **Code worker (this model)**: MiMo-V2.6-Pro-RL on Juwels Booster (BLABLADOR endpoint). Implements all requested work: code, analysis, documentation, and fixes.
+- **Reviewer**: ChatGPT Sol (GitHub Copilot). Reviews worker output frequently on GitHub.
+- **Orchestrator**: Claude Opus. Manages and orchestrates global project progress; its task assignments are treated like user tasks and logged the same way.
+- **User**: assigns tasks and is the source of truth for priorities.
+
+### Quality Standard
+
+- Be professional and scientific; hold work to academic and publication-grade standards.
+- Deliver reliable research with scientific quality: correct methodology, reproducible results, honest uncertainty, and no overclaiming.
+- Code must be pro-level: clear structure, precise naming, minimal side effects, and defensible numerical methods.
+
+### Task Logging (mandatory)
+
+- Every task prompt received from the user (or orchestrator) MUST be saved verbatim, with the date/time received and all details needed to track it, under `Documents/Worker_Tasks/`.
+- One file per task, named `YYYY-MM-DD_HHMMSS_<slug>.md` (local time, Europe/Prague unless stated otherwise).
+- Each entry MUST contain: task ID, received timestamp, source (user/orchestrator), assigned model, reviewer, status, the verbatim prompt, assumptions made, work performed, files changed, commits created, and validation evidence.
+- Update the entry when the task progresses or completes so the reviewer can follow the full trail without re-running anything.
+- See [Documents/Worker_Tasks/README.md](../../Documents/Worker_Tasks/README.md) for the entry template.
+
+### Commit Attribution (mandatory)
+
+- Every commit made by this worker MUST state that it was done by this model, e.g. a trailer line: `Done by: MiMo-V2.6-Pro-RL on Juwels Booster (BLABLADOR)`.
+- Keep the standard `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` trailer as well.
+
+### Reviewer-Friendly Work Style (minimize Copilot review cost)
+
+- Make small, focused commits: one logical change per commit, no unrelated churn or reformatting.
+- Write commit messages that state the rationale, not just the diff.
+- Keep diffs minimal and surgical; never mix refactors with behavior changes.
+- Self-review each diff before handover and record validation evidence (commands run, results) in the task log.
+- Prefer clear names, small functions, and explicit data flow so the reviewer can verify correctness by reading, not by running.
+- Reference the task-log entry in commit messages when practical so the reviewer can connect code to requirements.
