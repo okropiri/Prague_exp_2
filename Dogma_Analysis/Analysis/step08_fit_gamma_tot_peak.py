@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 import csv
@@ -51,7 +52,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--display-tot-max-ns", type=float, default=25.0)
     parser.add_argument("--max-iterations", type=int, default=30)
     parser.add_argument("--tolerance", type=float, default=1.0e-6)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def parse_position_m(run_key: str) -> float:

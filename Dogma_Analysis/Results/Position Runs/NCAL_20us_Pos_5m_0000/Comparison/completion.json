@@ -1,0 +1,15 @@
+{
+  "status": "PASS_STEPS01_TO10",
+  "phase": "full",
+  "shared_upstream": true,
+  "step00_reused": true,
+  "tot_display_ns": [
+    0,
+    60
+  ],
+  "detector_alignment": false,
+  "periods_ns": {
+    "ch0": 38.8500713060152,
+    "ch2": 38.84950000000001
+  }
+}

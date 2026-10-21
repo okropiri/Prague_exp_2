@@ -33,6 +33,7 @@ struct Config {
     std::optional<int> processedTdcOrdinal;
     std::optional<int> triggerTdcOrdinal;
     double triggerResetThresholdSeconds = 1.0;
+    bool rejectTriggerRestarts = false;
     double maxAcceptedHitTimeNs = 50000.0;
     double totMinNs = 1.0;
     double totMaxNs = 5000.0;
@@ -350,6 +351,8 @@ Config parse_args(int argc, char** argv) {
             config.maxAcceptedHitTimeNs = std::stod(argv[++index]);
         } else if (arg == "--trigger-reset-threshold-seconds" && index + 1 < argc) {
             config.triggerResetThresholdSeconds = std::stod(argv[++index]);
+        } else if (arg == "--reject-trigger-restarts") {
+            config.rejectTriggerRestarts = true;
         } else {
             throw std::runtime_error("Unknown or incomplete argument: " + arg);
         }
@@ -949,6 +952,9 @@ int main(int argc, char** argv) {
                 if (should_track_tdc(config.triggerTdcOrdinal, currentTdcOrdinal)) {
                     double adjustedTriggerSeconds = *trigger + triggerTimeOffsetSeconds;
                     if (haveLastTrigger && *trigger + config.triggerResetThresholdSeconds < lastRawTriggerSeconds) {
+                        if (config.rejectTriggerRestarts) {
+                            throw std::runtime_error("Trigger timestamp restart: possible duplicated recording; refusing to stitch input");
+                        }
                         globalStats.duplicateRestartDetected = true;
                         globalStats.duplicateRestartPreviousTriggerSeconds = lastRawTriggerSeconds;
                         globalStats.duplicateRestartNewTriggerSeconds = *trigger;

@@ -1,0 +1,302 @@
+{
+  "common": {
+    "run_key": "NCAL_20us_Pos_5m_0000",
+    "board": "TDC_001049",
+    "ordinal": 1,
+    "ch0_valid_rise_min_ns": -410,
+    "ch0_valid_rise_max_ns": -395,
+    "ch0_valid_tot_min_ns": 16.5,
+    "ch0_valid_tot_max_ns": 19.5,
+    "reference_order": "first passing hit in file order",
+    "cleaning_tot_ns": [
+      1,
+      5000
+    ],
+    "max_accepted_hit_time_ns": 50000,
+    "ch0ref_axis_ns": [
+      -6000,
+      6000
+    ],
+    "trigger_axis_ns": [
+      -6000,
+      6000
+    ],
+    "time_map_bins": 2400,
+    "step02_ch0ref_bins": 12000,
+    "absolute_display_bin_seconds": 0.1,
+    "tot_storage_ns": [
+      0,
+      128
+    ],
+    "tot_bins": 1280,
+    "tot_display_ns": [
+      0,
+      60
+    ],
+    "phase_bin_width_target_ns": 0.25,
+    "phase_binning": "ceil(T/0.25), 3P uses three times that bin count",
+    "detailed_channels": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "include_all_ch0_hits": true,
+    "phase_origin_ns": 0,
+    "detector_phase_alignment": false,
+    "assumed_prescaler": 1024,
+    "coarse_quantum_ns": 5,
+    "assumed_trigger_window_ns": 10000,
+    "duty_factor_correction": false,
+    "zebra_timewalk_correction": false
+  },
+  "phase": "full",
+  "source": [
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/analysis_provenance.py",
+      "bytes": 2211,
+      "mtime_ns": 1792416249121927562,
+      "sha256": "df00efe4d71b7f63d314c2898c213fee421f56ee51fdf959b3ae820ee2512574"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/phi_star_artifact_diagnostic.py",
+      "bytes": 9205,
+      "mtime_ns": 1792416249149927660,
+      "sha256": "dcb201e78f571312ca6392db75ce050471430b2b786c813611d6e8b09028d9c1"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/plot_phase_tot_zoom.py",
+      "bytes": 2555,
+      "mtime_ns": 1792416249176927755,
+      "sha256": "b6df85143a148c13d96745ff7230d4ec4be577afbcec4f93e8b7c77ac559088a"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/rf_phase_walk_correction_diagnostic.py",
+      "bytes": 11513,
+      "mtime_ns": 1792416249203927850,
+      "sha256": "56c6ac7009aacd304caf277263bc4297b648339b2aca9a16455c4f48aa083aea"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/run_all_cleaned_analysis_chain.py",
+      "bytes": 14085,
+      "mtime_ns": 1792416249231927948,
+      "sha256": "ceb510cf8e91a5e269412e2731c5a7f142f5f8758058d00eaccb7e6e9d9e7208"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/run_cleaned_pulser_diagnostics.py",
+      "bytes": 25077,
+      "mtime_ns": 1792416249260928050,
+      "sha256": "4b533a39ee77fa16656ea8bba9af4e5b28ac81c731c52337d81420793c4adb8b"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/run_matched_five_m.py",
+      "bytes": 23189,
+      "mtime_ns": 1792416775718054136,
+      "sha256": "1bb635461654052c45b17e1c678c9f075dcb6205e76084565e5a244dc9e508b0"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/run_trigger_timestamp_envelope.py",
+      "bytes": 18155,
+      "mtime_ns": 1792416249319928257,
+      "sha256": "c5cf083413a43dbf40dd58f4977e8777a9b39b845b99f1080df2403e5feaab50"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/run_zebra_ch0_clock.py",
+      "bytes": 59774,
+      "mtime_ns": 1792416249351928370,
+      "sha256": "7f96dc5d0b98c5a89aaf46a3923a6b15a4a5edc7ecb4d9265dc7e3843f7ca26a"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step01_run_dogma_raw_data_refiner.py",
+      "bytes": 10402,
+      "mtime_ns": 1792416249377928461,
+      "sha256": "6af38adcf87e6dbf32a368ec79b535a07f333c126ba4a2bb7d30da37cba081ad"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step01_write_cleaned_root_tree.py",
+      "bytes": 26861,
+      "mtime_ns": 1792416249412928584,
+      "sha256": "b71a7d7ace4c26aca14727b7a81d88949a2ab9136d067f6bb448bcc23de985c1"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step02_run_cleaned_all_channel_rates.py",
+      "bytes": 13837,
+      "mtime_ns": 1792416249441928686,
+      "sha256": "83c3e9e7bdaaf62916f7772e1b43916a070c1a2ffe76324b7e7fa8c08b946547"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step02_write_cleaned_all_channel_rates_outputs.py",
+      "bytes": 11482,
+      "mtime_ns": 1792416249470928788,
+      "sha256": "51be05fb8d35b49cd2a5910bc50d1a1c81cd60aa60d8e0625a10bbc8df4bd8e3"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step03_run_cleaned_all_channel_time_tot.py",
+      "bytes": 5047,
+      "mtime_ns": 1792416249507928918,
+      "sha256": "3ba741868fde419cc88c87f7c9cd8eec1aa3e87272bc1ca8e0907ce2a6e1990b"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step03_write_cleaned_all_channel_time_tot_outputs.py",
+      "bytes": 20927,
+      "mtime_ns": 1792416249540929034,
+      "sha256": "fc08033ebc2437cf4238c68ff2964f86e8edb4423267f30212b480ed1c17e61b"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step04_alt_trigger_referenced_rf_modulation.py",
+      "bytes": 10922,
+      "mtime_ns": 1792416249567929129,
+      "sha256": "7f290c1171ff72fbf873f35081483123c8f68454ced85e9b9134c37078ba9568"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step04_run_cleaned_all_channel_rf_period.py",
+      "bytes": 11020,
+      "mtime_ns": 1792416249595929227,
+      "sha256": "3effa6d255699018a1b1771b231dfbfbd0ba76657c241bb1eddb7186a2320f06"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step04_write_cleaned_all_channel_rf_period_outputs.py",
+      "bytes": 22563,
+      "mtime_ns": 1792416249623929326,
+      "sha256": "7dfdae9a1d08283232479735689749653710657e81bf600a0be0303b901b0fd2"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step04_write_rf_period_scan_outputs.py",
+      "bytes": 30148,
+      "mtime_ns": 1792416249652929428,
+      "sha256": "1d5a802e4eb1b4c48253b0bda9dee48627f9c86c626f76d23f964d96469511c2"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step05_estimate_gamma_neutron_background.py",
+      "bytes": 27452,
+      "mtime_ns": 1792416249678929519,
+      "sha256": "dadf880e4a8431f4ab38597b31d490bca517f47f31681fd5e8e228057a2f1145"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step06_quantify_gamma_neutron_components.py",
+      "bytes": 53911,
+      "mtime_ns": 1792416382043665544,
+      "sha256": "67388c22012eefad8ba388ddf8d4bc8f7c1356023ee45f156454e198c1106b50"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step07_phase_rate_slice_diagnostics.py",
+      "bytes": 22424,
+      "mtime_ns": 1792416249745929755,
+      "sha256": "7aabd0fb985fe942af537e174143b11ef6bea5700bfa78c91b09a9a2e854d321"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step08_fit_gamma_tot_peak.py",
+      "bytes": 14006,
+      "mtime_ns": 1792416249774929856,
+      "sha256": "444ed781a51fa01bd079623b6ed25ea22485fad6abeaf0af48eecdbe2d1f5405"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step09_gamma_window_sensitivity.py",
+      "bytes": 74280,
+      "mtime_ns": 1792416249810929983,
+      "sha256": "b17ab7041ee9649ee1b45dc4ed18fa4b5461dfd7fe0ebac0807f5ffb3502dcf1"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step10_gamma_reference_cfd.py",
+      "bytes": 20442,
+      "mtime_ns": 1792416249839930085,
+      "sha256": "a69f14c2671461490b097b06833dfb59e4d50a22979dfb42af8b75e9aa55b2fd"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/verify_ch0_burst_fold.py",
+      "bytes": 23118,
+      "mtime_ns": 1792416382014665286,
+      "sha256": "a9b54430502820544cfa61af7bd636bc8bbef4bc4d04e5bd883744fb06ca257e"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/extract_native_trigger_timestamps.cpp",
+      "bytes": 6000,
+      "mtime_ns": 1792416249902930306,
+      "sha256": "209221c6e2fe2db5cb35121359a032d6466ecdb73d665bb873fa44ccf77907ea"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step01_dogma_raw_data_refiner.cpp",
+      "bytes": 54647,
+      "mtime_ns": 1792416249934930419,
+      "sha256": "50cc34393d47c760f308f86e07453cfbc7c2e9cca3f57126e6658785a41b1201"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step02_dogma_cleaned_all_channel_rates.cpp",
+      "bytes": 25222,
+      "mtime_ns": 1792416249962930517,
+      "sha256": "9705fe20eabfbbcefbd8efd90463ca04798642a8052ef676c3fdbce4bf0ca220"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step03_dogma_cleaned_all_channel_time_tot.cpp",
+      "bytes": 32758,
+      "mtime_ns": 1792416249998930644,
+      "sha256": "6deb0ab45c174f4ec2bf8183e23938ce43f84e46af4a89f4978acf62666739a2"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/step04_dogma_cleaned_all_channel_rf_period.cpp",
+      "bytes": 112374,
+      "mtime_ns": 1792416250045930808,
+      "sha256": "9d3d6e406d25c25a4c82abc9762004c8143f7eb313756931c6dde1c2946be800"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/analysis_source/zebra_ch0_clock.cpp",
+      "bytes": 27785,
+      "mtime_ns": 1792416250078930924,
+      "sha256": "3f0799654533db997c7b16223a118c0e16f8413d25fc2828d1447c8a472de478"
+    }
+  ],
+  "decoded": {
+    "path": "/data6/Dogma_analysis_by_Dachi/Results/NCAL_20us_Pos_5m_0000/Zebra_Period_Finder_20261015/step00_decode/full/NCAL_Test_Prescaler1024_TrigWindow_0x83e803e8_20us_Pos_5m_20260425_0000.dld.dat",
+    "bytes": 11616395551,
+    "mtime_ns": 1792027749343775498,
+    "sha256": "5ce19b459accb789024be5192a21998e6769aaba2d87d62d9052d0b0620af579"
+  },
+  "python": "/home/padiwa/dogsoft/.venv/bin/python",
+  "platform": "Linux-7.1.2-1-default-x86_64-with-glibc2.43",
+  "packages": {
+    "numpy": "2.4.4",
+    "matplotlib": "3.10.9",
+    "uproot": "5.7.4",
+    "pillow": "12.2.0"
+  },
+  "compiler": "g++ (SUSE Linux) 15.3.0",
+  "raw_tail_warning": "Final raw record lacks 292 bytes; all 10,521,678 complete events decoded.",
+  "step00_validation": "ASCII_VALIDATION PASSED\nTotal edge rows: 568714285\nBoard 0 TDC_001048: blocks=10521638 empty=10453816 edges=2557691\n  trigger span: 2050.818166700 s; first 902.178583090; last 2952.996749790\nBoard 1 TDC_001049: blocks=10516211 empty=0 edges=566156594\n  trigger span: 2050.818325830 s; first 902.178410820; last 2952.996736650\nboard channel rising_edges falling_edges rise_min_ns rise_max_ns\n0 0 34599 42567 -4668.173 4944.191\n0 1 28152 37329 -4667.060 4873.140\n0 2 24056 34398 -4667.255 4927.556\n0 3 27000 29105 -4670.015 4925.376\n0 4 24753 27734 -4670.051 4918.873\n0 5 24261 25614 -4668.559 4920.125\n0 6 29968 30629 -4669.311 4919.879\n0 7 29267 29884 -4671.317 4918.217\n0 8 33722 35081 -4671.708 4941.771\n0 9 30555 31057 -4669.925 4918.542\n0 10 32496 33180 -4669.915 4942.943\n0 11 34986 36166 -4670.216 4941.725\n0 12 39815 43673 -4670.091 4941.782\n0 13 36497 40445 -4668.903 4942.214\n0 14 41778 47838 -4672.592 4939.676\n0 15 242138 274342 -5000.191 4944.523\n0 16 50574 68487 -4836.044 4926.857\n0 17 36869 48332 -4649.795 4926.541\n0 18 38289 43087 -4648.931 4927.874\n0 19 35224 41132 -4649.315 4928.407\n0 20 31650 37017 -4647.964 4930.569\n0 21 29174 32959 -4647.051 4906.424\n0 22 24805 29256 -4648.411 4904.807\n0 23 22605 26367 -4648.938 4903.502\n0 24 24650 28404 -4643.974 4905.374\n0 25 26408 29801 -4644.537 4904.557\n0 26 25981 27944 -4644.362 4904.217\n0 27 23116 24549 -3841.245 4904.290\n0 28 27693 32027 -3857.103 4929.478\n0 29 28857 34937 -4642.345 4929.402\n0 30 24930 29176 -3843.763 4931.184\n0 31 27706 32600 -3837.926 4930.414\n1 0 10470219 10469616 -507.733 4944.768\n1 1 59233 83986 -5010.000 4944.402\n1 2 31931277 32512827 -5010.000 4949.225\n1 3 2169339 2182300 -5010.000 4944.977\n1 4 61822 88369 -4997.194 4943.818\n1 5 2722363 2734890 -5010.000 4944.987\n1 6 5492380 5515095 -5010.000 4947.243\n1 7 39423 66536 -4638.072 4919.548\n1 8 2555811 2570682 -5010.000 4946.455\n1 9 4185 4136 -514.227 4208.241\n1 10 56990 74204 -4917.409 4929.494\n1 11 4371700 4418633 -5010.000 4949.440\n1 12 2597342 2789697 -5010.000 4944.978\n1 13 1552 1539 -468.575 3320.872\n1 14 2205155 2201390 -5010.000 4944.985\n1 15 40743 59379 -4995.659 4925.284\n1 16 113722 189326 -4982.090 4944.308\n1 17 1740504 161166994 -5009.961 4944.808\n1 18 97723 163973 -4951.027 4944.712\n1 19 144315 204043 -5010.000 4942.870\n1 20 90898 162169 -5007.991 4938.778\n1 21 66866844 72736757 -5010.000 4949.932\n1 22 61709979 68130898 -5010.000 4948.834\n1 23 101737 164824 -5009.346 4944.854\n1 24 75421 147338 -5008.179 4938.384\n1 25 78816 149465 -4991.850 4936.843\n1 26 65899 134107 -4990.691 4938.796\n1 27 73590 132870 -4991.175 4936.816\n1 28 54829 104943 -4689.046 4930.721\n1 29 53339 97183 -4689.049 4929.319\n1 30 168307 302788 -5005.038 4944.044\n1 31 65660 114520 -4948.137 4932.025\n",
+  "source_control": {
+    "git_revision": "4a936335e05e41b7becc1de48c00eaa25ba229b5",
+    "tracked_worktree_diff_sha256": "c9d42978fb4ca4f94cc97ef9814c9c220d0c7ebd2efe1a9f471cac5ea572126b",
+    "dirty": true,
+    "note": "Actual executed Python/C++ contents are identified individually by source hashes in Run_settings.json; a Git revision alone does not identify this dirty worktree."
+  },
+  "verification_sources": [
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/verifiers/verify_step01.py",
+      "bytes": 9977,
+      "mtime_ns": 1792416251188934825,
+      "sha256": "6b43065f5e4a797a577f922ed83323ea6a0eaa92abb43f01133322efb8702fb0"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/verifiers/verify_step02.py",
+      "bytes": 10242,
+      "mtime_ns": 1792416251215934920,
+      "sha256": "3d9ffec05cd5e595337f381895aecf591db4e4b544e233d865e14212baa16c3f"
+    },
+    {
+      "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/verifiers/verify_step03.py",
+      "bytes": 16115,
+      "mtime_ns": 1792416251240935008,
+      "sha256": "abdb22a5d2889e8daa7c67c56fed93f9ddf37c0fe0702dbaa693df3e8dd50986"
+    }
+  ],
+  "raw": {
+    "path": "/data6/Data/NCAL_Test_Prescaler1024_TrigWindow_0x83e803e8_20us_Pos_5m_20260425_0000.dld",
+    "bytes": 3381436416,
+    "mtime_ns": 1777119933873751764,
+    "sha256": "f6d99216d9d452575286eead2859c08f7c4a7d8eda7177d5d57ed3ca02f20513"
+  }
+}

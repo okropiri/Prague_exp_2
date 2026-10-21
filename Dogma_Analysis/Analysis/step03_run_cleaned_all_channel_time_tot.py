@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 from pathlib import Path
@@ -31,11 +32,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tot-min-ns", type=float, default=0.0)
     parser.add_argument("--tot-max-ns", type=float, default=128.0)
     parser.add_argument("--tot-bins", type=int, default=1280)
+    parser.add_argument(
+        "--tot-distrib-display-max-ns", type=float,
+        help="Upper ToT limit for distribution plots only; full TSV/ROOT counts are retained.",
+    )
     parser.add_argument("--ch0-valid-rise-min-ns", type=float, default=-410.0)
     parser.add_argument("--ch0-valid-rise-max-ns", type=float, default=-395.0)
     parser.add_argument("--ch0-valid-tot-min-ns", type=float, default=16.5)
     parser.add_argument("--ch0-valid-tot-max-ns", type=float, default=19.5)
-    return parser.parse_args()
+    parser.add_argument("--tot-map-display-max-ns", type=float)
+    return record_arguments(parser.parse_args())
 
 
 def main() -> None:
@@ -98,7 +104,7 @@ def main() -> None:
     ch0ref_file = run_dir / "Ch0_ref_TOT" / f"{run_key}_Ch0_ref_TOT_sparse.tsv"
     tot_distrib_dir = run_dir / "TOT_distrib"
     tot_distrib_file = tot_distrib_dir / f"{run_key}_TOT_distrib.tsv"
-    run_command([
+    writer_command = [
         sys.executable,
         str(writer_path),
         "--trigger-ref-file",
@@ -109,7 +115,12 @@ def main() -> None:
         str(tot_distrib_file),
         "--tot-distrib-output-dir",
         str(tot_distrib_dir),
-    ])
+    ]
+    if args.tot_distrib_display_max_ns is not None:
+        writer_command.extend(["--tot-distrib-display-max-ns", str(args.tot_distrib_display_max_ns)])
+    if args.tot_map_display_max_ns is not None:
+        writer_command.extend(["--tot-map-display-max-ns", str(args.tot_map_display_max_ns)])
+    run_command(writer_command)
 
     odd_stats_path, odd_samples_path = write_odd_ch0_stats(input_path, run_dir, run_key, metadata, args)
     print(f"Odd ch0 stats: {odd_stats_path}")

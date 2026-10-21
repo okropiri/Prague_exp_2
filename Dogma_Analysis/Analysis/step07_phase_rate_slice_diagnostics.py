@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 import csv
@@ -53,6 +54,20 @@ class ExcessInterval:
     integrated_excess_rate_hz: float
 
 
+@dataclass(frozen=True)
+class AcceptedExposure:
+    run_key: str
+    covered_duration_seconds: float
+    accepted_window_count: int
+    total_window_count: int
+    validation_efficiency_window: float
+    rejected_window_fraction: float
+    assumed_trigger_window_width_ns: float
+    accepted_exposure_seconds: float
+    deduced_period_ns: float
+    accepted_rf_cycles: float
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
@@ -72,7 +87,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--baseline-quantile", type=float, default=0.20)
     parser.add_argument("--z-threshold", type=float, default=5.0)
     parser.add_argument("--min-contiguous-bins", type=int, default=3)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def parse_position_m(run_key: str) -> float:
@@ -101,6 +116,32 @@ def run_duration_seconds(histogram: SparseHistogram, run_key: str) -> float:
     return float(summary["covered_duration_seconds"])
 
 
+def accepted_exposure(histogram: SparseHistogram, run_key: str, assumed_trigger_window_width_ns: float) -> AcceptedExposure:
+    run_dir = histogram.path.parents[1]
+    rf_summary = read_key_value_file(run_dir / f"{run_key}_cleaned_rf_period_summary.txt")
+    rates_summary = read_key_value_file(run_dir / f"{run_key}_cleaned_rates_summary.txt")
+    covered_duration_seconds = float(rates_summary["covered_duration_seconds"])
+    accepted_window_count = int(rf_summary["valid_ch0_windows"])
+    total_window_count = int(rf_summary["windows_seen"])
+    validation_efficiency_window = accepted_window_count / total_window_count if total_window_count > 0 else float("nan")
+    rejected_window_fraction = 1.0 - validation_efficiency_window if total_window_count > 0 else float("nan")
+    accepted_exposure_seconds = accepted_window_count * assumed_trigger_window_width_ns * 1e-9
+    deduced_period_ns = float(rf_summary["deduced_period_ns"])
+    accepted_rf_cycles = accepted_window_count * (assumed_trigger_window_width_ns / deduced_period_ns)
+    return AcceptedExposure(
+        run_key=run_key,
+        covered_duration_seconds=covered_duration_seconds,
+        accepted_window_count=accepted_window_count,
+        total_window_count=total_window_count,
+        validation_efficiency_window=validation_efficiency_window,
+        rejected_window_fraction=rejected_window_fraction,
+        assumed_trigger_window_width_ns=assumed_trigger_window_width_ns,
+        accepted_exposure_seconds=accepted_exposure_seconds,
+        deduced_period_ns=deduced_period_ns,
+        accepted_rf_cycles=accepted_rf_cycles,
+    )
+
+
 def signed_delta_ns(values_ns: np.ndarray, center_ns: float, period_ns: float) -> np.ndarray:
     return (values_ns - center_ns + 0.5 * period_ns) % period_ns - 0.5 * period_ns
 
@@ -111,6 +152,8 @@ def detect_gamma_center(histogram: SparseHistogram, args: argparse.Namespace) ->
     phase_centers_ns = (np.arange(period_bins, dtype=np.float64) + 0.5) * histogram.x_bin_width_ns
     gamma_tot_mask = mask_between(histogram.y_centers_ns, args.gamma_tot_min_ns, args.gamma_tot_max_ns)
     projection_3x = histogram.counts[gamma_tot_mask, :].sum(axis=0)
+    if projection_3x.sum() <= 0:
+        raise ValueError(f"No reference entries in the gamma ToT window for {histogram.path}")
     projection_1x = fold_projection_to_one_period(projection_3x, period_bins)
     smoothed = circular_smooth(projection_1x, half_width_bins=2)
     gamma_center_ns = float(phase_centers_ns[int(np.argmax(smoothed))])

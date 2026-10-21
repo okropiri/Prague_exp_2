@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments, record_command
 
 import argparse
 from collections import Counter
@@ -46,6 +47,7 @@ def derive_run_key(input_path: Path, metadata: dict[str, str], explicit_run_key:
 
 
 def run_command(command: list[str]) -> None:
+    record_command(command)
     subprocess.run(command, check=True)
 
 
@@ -283,7 +285,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ch0-valid-rise-max-ns", type=float, default=-395.0)
     parser.add_argument("--ch0-valid-tot-min-ns", type=float, default=16.5)
     parser.add_argument("--ch0-valid-tot-max-ns", type=float, default=19.5)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def main() -> None:

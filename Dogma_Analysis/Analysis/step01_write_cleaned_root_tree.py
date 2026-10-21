@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 from dataclasses import dataclass
@@ -110,7 +111,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rf-summary-file")
     parser.add_argument("--rf-period-ns", type=float)
     parser.add_argument("--rf-phase-origin-ns", type=float)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def parse_metadata_line(line: str) -> tuple[str, str] | None:

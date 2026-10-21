@@ -35,30 +35,31 @@ struct Config {
     std::string foldedDirName = "Folded_RF";
     std::string folded3xDirName = "Folded_RF_3x";
     std::string scanDirName = "RF_period_scan";
-    double ch0RefMinNs = -6000.0;
-    double ch0RefMaxNs = 6000.0;
-    int ch0RefBins = 12000;
-    double triggerRefMinNs = -6000.0;
-    double triggerRefMaxNs = 6000.0;
-    int triggerRefBins = 2400;
+    double ch0RefMinNs = -6000.0;  // Zebra: -11000.0
+    double ch0RefMaxNs = 6000.0;  // Zebra: 2000.0
+    int ch0RefBins = 12000;  // Zebra: 2600
+    double triggerRefMinNs = -6000.0;  // Zebra: -11000.0
+    double triggerRefMaxNs = 6000.0;  // Zebra: 2000.0
+    int triggerRefBins = 2400;  // Zebra: 2600
     double totMinNs = 0.0;
-    double totMaxNs = 128.0;
-    int totBins = 1280;
+    double totMaxNs = 128.0;  // Zebra: 80.0
+    int totBins = 1280;  // Zebra: 800
     int scoreChannel = 2;
+    std::vector<int> histogramChannels = {};  // Prague: empty (score channel only); Zebra: {0, 1, 2, 3, 6}
     double scoreTotMinNs = 0.0;
-    double scoreTotMaxNs = 128.0;
-    double initialPeriodMinNs = 37.0;
-    double initialPeriodMaxNs = 41.0;
-    double initialStepNs = 0.05;
+    double scoreTotMaxNs = 128.0;  // Zebra: 80.0
+    double initialPeriodMinNs = 37.0;  // Zebra: 5.0
+    double initialPeriodMaxNs = 41.0;  // Zebra: 200.0
+    double initialStepNs = 0.05;  // Zebra: 0.25
     int refineRounds = 3;
     int refineHalfSpanSteps = 25;
     double refineFactor = 10.0;
     double phaseBinWidthNs = 0.25;
     double peakWindowNs = 8.0;
     std::uint64_t minSelectedPulses = 1000;
-    std::uint64_t scoreStride = 1;
-    double ch0ValidRiseMinNs = -410.0;
-    double ch0ValidRiseMaxNs = -395.0;
+    std::uint64_t scoreStride = 1;  // Zebra: 10
+    double ch0ValidRiseMinNs = -410.0;  // Zebra: -392.0
+    double ch0ValidRiseMaxNs = -395.0;  // Zebra: -374.0
     double ch0ValidTotMinNs = 16.5;
     double ch0ValidTotMaxNs = 19.5;
     std::uint64_t segmentBlockScorePulses = 20000;
@@ -66,8 +67,9 @@ struct Config {
     double segmentPhaseJumpNs = 3.0;
     double segmentGapFactor = 100.0;
     double segmentMinGapSeconds = 1.0;
-    bool singleRfSegment = false;
+    bool singleRfSegment = false;  // Zebra: true
     bool skipCycleResidualDiagnostics = false;
+    bool estimateOnly = false;
 };
 
 struct PulseRow {
@@ -1000,6 +1002,21 @@ Config parse_args(int argc, char** argv) {
             config.totBins = std::stoi(argv[++index]);
         } else if (arg == "--score-channel" && index + 1 < argc) {
             config.scoreChannel = std::stoi(argv[++index]);
+        } else if (arg == "--histogram-channels" && index + 1 < argc) {
+            config.histogramChannels.clear();
+            std::istringstream channels(argv[++index]);
+            std::string token;
+            while (std::getline(channels, token, ',')) {
+                std::size_t consumed = 0;
+                const int channel = std::stoi(token, &consumed);
+                if (consumed != token.size() || channel < 0 || channel >= kChannelCount) {
+                    throw std::runtime_error("histogram-channels must be comma-separated channels in [0,31]");
+                }
+                config.histogramChannels.push_back(channel);
+            }
+            if (config.histogramChannels.empty()) {
+                throw std::runtime_error("histogram-channels must not be empty");
+            }
         } else if (arg == "--score-tot-min-ns" && index + 1 < argc) {
             config.scoreTotMinNs = std::stod(argv[++index]);
         } else if (arg == "--score-tot-max-ns" && index + 1 < argc) {
@@ -1044,24 +1061,32 @@ Config parse_args(int argc, char** argv) {
             config.segmentMinGapSeconds = std::stod(argv[++index]);
         } else if (arg == "--single-rf-segment") {
             config.singleRfSegment = true;
+        } else if (arg == "--auto-rf-segments") {
+            config.singleRfSegment = false;
         } else if (arg == "--skip-cycle-residual-diagnostics") {
             config.skipCycleResidualDiagnostics = true;
+        } else if (arg == "--estimate-only") {
+            config.estimateOnly = true;
         } else if (arg == "--help") {
             std::cout
                 << "Usage: dogma_cleaned_all_channel_rf_period --input <cleaned_pulses.tsv> --output-root <Results_root>\n"
+                << "Prague defaults (Zebra two-generator values are commented in Config):\n"
                 << "  [--run-key <name>] [--ch0ref-dir-name Ch0_ref_Rates] [--folded-dir-name Folded_RF] [--folded3x-dir-name Folded_RF_3x] [--scan-dir-name RF_period_scan]\n"
                 << "  [--ch0ref-min-ns -6000] [--ch0ref-max-ns 6000] [--ch0ref-bins 12000]\n"
                 << "  [--trigger-ref-min-ns -6000] [--trigger-ref-max-ns 6000] [--trigger-ref-bins 2400]\n"
                 << "  [--tot-min-ns 0] [--tot-max-ns 128] [--tot-bins 1280]\n"
                 << "  [--score-channel 2] [--score-tot-min-ns 0] [--score-tot-max-ns 128]\n"
+                << "  [--histogram-channels <csv>] (default: score channel only; Zebra used 0,1,2,3,6)\n"
                 << "  [--initial-period-min-ns 37.0] [--initial-period-max-ns 41.0] [--initial-step-ns 0.05]\n"
-                << "  [--refine-rounds 3] [--refine-half-span-steps 5] [--refine-factor 10]\n"
+                << "  [--refine-rounds 3] [--refine-half-span-steps 25] [--refine-factor 10]\n"
                 << "  [--phase-bin-width-ns 0.25] [--peak-window-ns 8] [--min-selected-pulses 1000] [--score-stride 1]\n"
                 << "  [--ch0-valid-rise-min-ns -410] [--ch0-valid-rise-max-ns -395]\n"
                 << "  [--ch0-valid-tot-min-ns 16.5] [--ch0-valid-tot-max-ns 19.5]\n"
                 << "  [--segment-block-score-pulses 20000] [--segment-persistent-blocks 2]\n"
                 << "  [--segment-phase-jump-ns 3.0] [--segment-gap-factor 100] [--segment-min-gap-seconds 1.0]\n"
-                << "  [--single-rf-segment] [--skip-cycle-residual-diagnostics]\n";
+                << "  [--auto-rf-segments] (default, Prague alignment) [--single-rf-segment] (Zebra)\n"
+                << "  [--estimate-only] Save period/scan without final folding or alignment\n"
+                << "  [--skip-cycle-residual-diagnostics]\n";
             std::exit(0);
         } else {
             throw std::runtime_error("Unknown or incomplete argument: " + arg);
@@ -1091,6 +1116,9 @@ Config parse_args(int argc, char** argv) {
     }
     if (config.totBins <= 0) {
         throw std::runtime_error("tot-bins must be positive");
+    }
+    if (config.scoreChannel < 0 || config.scoreChannel >= kChannelCount) {
+        throw std::runtime_error("score-channel must be in [0,31]");
     }
     if (!(config.scoreTotMinNs < config.scoreTotMaxNs)) {
         throw std::runtime_error("score-tot-min-ns must be smaller than score-tot-max-ns");
@@ -1184,11 +1212,18 @@ std::uint64_t sparse_key(int xBinZeroBased, int yBinZeroBased, int yBins) {
          + static_cast<std::uint64_t>(yBinZeroBased);
 }
 
-void ensure_sparse_histogram_sizes(SparseHistogram& histograms, int xBins, int yBins, int storedChannel) {
+bool stores_histogram_channel(const Config& config, int channel) {
+    if (config.histogramChannels.empty()) {
+        return channel == config.scoreChannel;
+    }
+    return std::find(config.histogramChannels.begin(), config.histogramChannels.end(), channel) != config.histogramChannels.end();
+}
+
+void ensure_sparse_histogram_sizes(SparseHistogram& histograms, int xBins, int yBins, const Config& config) {
     const std::size_t size = static_cast<std::size_t>(xBins) * static_cast<std::size_t>(yBins);
     for (int channel = 0; channel < kChannelCount; ++channel) {
         auto& histogram = histograms[static_cast<std::size_t>(channel)];
-        if (channel == storedChannel) {
+        if (stores_histogram_channel(config, channel)) {
             histogram.assign(size, 0U);
         } else {
             histogram.clear();
@@ -1547,6 +1582,9 @@ void finalize_window_for_scan(const WindowState& window,
 
     const auto& scoreHits = window.hitsByChannel[static_cast<std::size_t>(config.scoreChannel)];
     for (const PulseHit& hit : scoreHits) {
+        if (config.scoreChannel == 0 && &hit == referenceHit) {
+            continue;
+        }
         if (!passes_score_tot_gate(config, hit.totNs)) {
             continue;
         }
@@ -1571,10 +1609,10 @@ void ensure_profile_sizes(ChannelProfiles& profiles, int bins) {
     }
 }
 
-void ensure_phase_tot_sizes(ChannelPhaseTotHistograms& histograms, int xBins, int yBins, int storedChannel) {
+void ensure_phase_tot_sizes(ChannelPhaseTotHistograms& histograms, int xBins, int yBins, const Config& config) {
     for (int channel = 0; channel < kChannelCount; ++channel) {
         auto& histogram = histograms[static_cast<std::size_t>(channel)];
-        if (channel == storedChannel) {
+        if (stores_histogram_channel(config, channel)) {
             histogram.assign(static_cast<std::size_t>(xBins) * static_cast<std::size_t>(yBins), 0);
         } else {
             histogram.clear();
@@ -1686,7 +1724,7 @@ void finalize_window_for_profiles(const WindowState& window,
 
         const double phaseNs = positive_mod(relativeNs - phaseOriginNs, best.periodNs);
         fill_profile(foldedProfiles, foldedTotals, channel, phaseNs, foldedBins, 0.0, best.periodNs);
-        if (channel == config.scoreChannel) {
+        if (stores_histogram_channel(config, channel)) {
             fill_phase_tot(foldedPhaseTotHistograms, channel, phaseNs, foldedBins, 0.0, best.periodNs, totNs, config.totBins, config.totMinNs, config.totMaxNs);
             fill_sparse_histogram(
                 foldedPhaseCh0TimeHistograms,
@@ -1718,7 +1756,7 @@ void finalize_window_for_profiles(const WindowState& window,
 
         const double phase3xNs = positive_mod(relativeNs - phaseOriginNs, period3xNs);
         fill_profile(folded3xProfiles, folded3xTotals, channel, phase3xNs, folded3xBins, 0.0, period3xNs);
-        if (channel == config.scoreChannel) {
+        if (stores_histogram_channel(config, channel)) {
             fill_phase_tot(folded3xPhaseTotHistograms, channel, phase3xNs, folded3xBins, 0.0, period3xNs, totNs, config.totBins, config.totMinNs, config.totMaxNs);
             fill_sparse_histogram(
                 folded3xPhaseCh0TimeHistograms,
@@ -1849,6 +1887,15 @@ void write_phase_tot_sparse(const fs::path& outputPath,
     output << "# peak_center_ns=" << format_double(best.peakCenterNs) << '\n';
     output << "# fold_factor=" << foldFactor << '\n';
     output << "# columns: channel x_bin y_bin count\n";
+    output << "# stored_channels=";
+    bool firstStoredChannel = true;
+    for (int channel = 0; channel < kChannelCount; ++channel) {
+        if (stores_histogram_channel(config, channel)) {
+            output << (firstStoredChannel ? "" : ",") << channel;
+            firstStoredChannel = false;
+        }
+    }
+    output << '\n';
 
     for (int channel = 0; channel < kChannelCount; ++channel) {
         const auto& storage = histograms[static_cast<std::size_t>(channel)];
@@ -2105,6 +2152,25 @@ int main(int argc, char** argv) {
 
         const std::vector<CandidateMetrics> scanRows = scan_candidates(config, scorePulses);
         const CandidateMetrics best = best_valid_candidate(scanRows);
+        if (config.estimateOnly) {
+            if (stats.invalidRows != 0) throw std::runtime_error("Invalid cleaned rows during period estimation");
+            const fs::path directory = fs::path(config.outputRoot) / config.runKey;
+            if (fs::exists(directory)) throw std::runtime_error("Refusing existing period-estimate output");
+            fs::create_directories(directory);
+            write_scan_file(directory / "period_scan.tsv", config, scanRows);
+            std::ofstream output(directory / "period_estimate.txt");
+            if (!output) throw std::runtime_error("Unable to write period estimate");
+            output << std::setprecision(17)
+                   << "deduced_period_ns=" << best.periodNs << '\n'
+                   << "search_phase_origin_ns=" << best.phaseOriginNs << '\n'
+                   << "search_sigma_ns=" << best.sigmaNs << '\n'
+                   << "search_merit=" << best.merit << '\n'
+                   << "score_pulses_stored=" << stats.scorePulsesStored << '\n'
+                   << "valid_ch0_windows=" << stats.validCh0Windows << '\n'
+                   << "windows_seen=" << stats.windowsSeen << '\n'
+                   << "phase_offset_applied_to_final_folding=false\n";
+            return 0;
+        }
         const Histogram1D bestPhaseProfile = build_best_phase_profile(config, scorePulses, best);
         Histogram2D bestPhaseTot = make_best_phase_tot_histogram(config, best);
         const std::vector<CycleResidualStats> cycleResiduals = config.skipCycleResidualDiagnostics
@@ -2134,12 +2200,12 @@ int main(int argc, char** argv) {
         ensure_profile_sizes(ch0RefProfiles, config.ch0RefBins);
         ensure_profile_sizes(foldedProfiles, foldedBins);
         ensure_profile_sizes(folded3xProfiles, folded3xBins);
-        ensure_phase_tot_sizes(foldedPhaseTotHistograms, foldedBins, config.totBins, config.scoreChannel);
-        ensure_phase_tot_sizes(folded3xPhaseTotHistograms, folded3xBins, config.totBins, config.scoreChannel);
-        ensure_sparse_histogram_sizes(foldedPhaseCh0TimeHistograms, foldedBins, config.ch0RefBins, config.scoreChannel);
-        ensure_sparse_histogram_sizes(foldedPhaseTriggerTimeHistograms, foldedBins, config.triggerRefBins, config.scoreChannel);
-        ensure_sparse_histogram_sizes(folded3xPhaseCh0TimeHistograms, folded3xBins, config.ch0RefBins, config.scoreChannel);
-        ensure_sparse_histogram_sizes(folded3xPhaseTriggerTimeHistograms, folded3xBins, config.triggerRefBins, config.scoreChannel);
+        ensure_phase_tot_sizes(foldedPhaseTotHistograms, foldedBins, config.totBins, config);
+        ensure_phase_tot_sizes(folded3xPhaseTotHistograms, folded3xBins, config.totBins, config);
+        ensure_sparse_histogram_sizes(foldedPhaseCh0TimeHistograms, foldedBins, config.ch0RefBins, config);
+        ensure_sparse_histogram_sizes(foldedPhaseTriggerTimeHistograms, foldedBins, config.triggerRefBins, config);
+        ensure_sparse_histogram_sizes(folded3xPhaseCh0TimeHistograms, folded3xBins, config.ch0RefBins, config);
+        ensure_sparse_histogram_sizes(folded3xPhaseTriggerTimeHistograms, folded3xBins, config.triggerRefBins, config);
         std::vector<std::uint64_t> ch0RefTotals(static_cast<std::size_t>(config.ch0RefBins), 0);
         std::vector<std::uint64_t> foldedTotals(static_cast<std::size_t>(foldedBins), 0);
         std::vector<std::uint64_t> folded3xTotals(static_cast<std::size_t>(folded3xBins), 0);

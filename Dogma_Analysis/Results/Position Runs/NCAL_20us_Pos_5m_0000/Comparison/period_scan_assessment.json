@@ -1,0 +1,36 @@
+{
+  "status": "PASS_INTERIOR_PERIOD_SCAN_AND_FULL_POPULATION",
+  "rounds": [
+    {
+      "round": 0,
+      "minimum_ns": 37.0,
+      "maximum_ns": 41.0,
+      "best_ns": 38.85,
+      "best_merit": 0.120306,
+      "interior_optimum": true
+    },
+    {
+      "round": 1,
+      "minimum_ns": 38.725,
+      "maximum_ns": 38.975,
+      "best_ns": 38.85,
+      "best_merit": 0.120306,
+      "interior_optimum": true
+    },
+    {
+      "round": 2,
+      "minimum_ns": 38.8375,
+      "maximum_ns": 38.8625,
+      "best_ns": 38.8495,
+      "best_merit": 0.120311,
+      "interior_optimum": true
+    }
+  ],
+  "periods_ns": {
+    "ch0": 38.8500713060152,
+    "ch2": 38.84950000000001
+  },
+  "ch2_minus_ch0_ns": -0.0005713060151890659,
+  "ch2_minus_ch0_ppm": -14.705404545845013,
+  "scale_note": "Nominal DAQ time units; no absolute clock-scale uncertainty or independent-estimator statistical significance is claimed."
+}

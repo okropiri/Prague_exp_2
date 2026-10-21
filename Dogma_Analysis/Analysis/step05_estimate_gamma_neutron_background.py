@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 import csv
@@ -78,7 +79,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gamma-phase-exclusion-half-width-ns", type=float, default=7.5)
     parser.add_argument("--empty-phase-quantile", type=float, default=0.20)
     parser.add_argument("--display-tot-max-ns", type=float, default=55.0)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def parse_metadata_line(line: str) -> tuple[str, str] | None:
@@ -134,6 +135,13 @@ def read_channel_histogram(path: Path, channel: int) -> SparseHistogram:
             y_bin = int(parts[2])
             count = int(parts[3])
             entries.append((x_bin, y_bin, count))
+
+    if not entries or sum(count for _, _, count in entries) <= 0:
+        stored_channels = metadata.get("stored_channels", "not recorded by this export")
+        raise ValueError(
+            f"No folded phase-ToT entries for channel {channel} in {path}; "
+            f"stored_channels={stored_channels}. Check the board, step04 --histogram-channels, and cuts."
+        )
 
     x_bins = int(metadata["x_bins"])
     y_bins = int(metadata["y_bins"])

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 from pathlib import Path
@@ -48,35 +49,50 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-key")
     parser.add_argument("--compiler", default="g++")
     parser.add_argument("--build-dir", default="/tmp")
-    parser.add_argument("--ch0ref-min-ns", type=float, default=-6000.0)
-    parser.add_argument("--ch0ref-max-ns", type=float, default=6000.0)
-    parser.add_argument("--ch0ref-bins", type=int, default=12000)
-    parser.add_argument("--trigger-ref-min-ns", type=float, default=-6000.0)
-    parser.add_argument("--trigger-ref-max-ns", type=float, default=6000.0)
-    parser.add_argument("--trigger-ref-bins", type=int, default=2400)
+    parser.add_argument("--ch0ref-min-ns", type=float, default=-6000.0)  # Zebra: -11000.0
+    parser.add_argument("--ch0ref-max-ns", type=float, default=6000.0)  # Zebra: 2000.0
+    parser.add_argument("--ch0ref-bins", type=int, default=12000)  # Zebra: 2600
+    parser.add_argument("--trigger-ref-min-ns", type=float, default=-6000.0)  # Zebra: -11000.0
+    parser.add_argument("--trigger-ref-max-ns", type=float, default=6000.0)  # Zebra: 2000.0
+    parser.add_argument("--trigger-ref-bins", type=int, default=2400)  # Zebra: 2600
     parser.add_argument("--tot-min-ns", type=float, default=0.0)
-    parser.add_argument("--tot-max-ns", type=float, default=128.0)
-    parser.add_argument("--tot-bins", type=int, default=1280)
+    parser.add_argument("--tot-max-ns", type=float, default=128.0)  # Zebra: 80.0
+    parser.add_argument("--tot-bins", type=int, default=1280)  # Zebra: 800
     parser.add_argument("--score-channel", type=int, default=2)
+    parser.add_argument(
+        "--histogram-channels", default=None,  # Prague: None (score channel only); Zebra: "0,1,2,3,6"
+        help="Comma-separated folded 2D channels; default stores the score channel only.",
+    )
     parser.add_argument("--score-tot-min-ns", type=float, default=0.0)
-    parser.add_argument("--score-tot-max-ns", type=float, default=128.0)
-    parser.add_argument("--initial-period-min-ns", type=float, default=37.0)
-    parser.add_argument("--initial-period-max-ns", type=float, default=41.0)
-    parser.add_argument("--initial-step-ns", type=float, default=0.05)
+    parser.add_argument("--score-tot-max-ns", type=float, default=128.0)  # Zebra: 80.0
+    parser.add_argument("--initial-period-min-ns", type=float, default=37.0)  # Zebra: 5.0
+    parser.add_argument("--initial-period-max-ns", type=float, default=41.0)  # Zebra: 200.0
+    parser.add_argument("--initial-step-ns", type=float, default=0.05)  # Zebra: 0.25
     parser.add_argument("--refine-rounds", type=int, default=3)
     parser.add_argument("--refine-half-span-steps", type=int, default=25)
     parser.add_argument("--refine-factor", type=float, default=10.0)
     parser.add_argument("--phase-bin-width-ns", type=float, default=0.25)
     parser.add_argument("--peak-window-ns", type=float, default=8.0)
     parser.add_argument("--min-selected-pulses", type=int, default=1000)
-    parser.add_argument("--score-stride", type=int, default=1)
-    parser.add_argument("--single-rf-segment", action="store_true")
+    parser.add_argument(
+        "--score-stride", type=int, default=1,  # Zebra: 10
+        help="Score every Nth eligible pulse; folded outputs still use all eligible pulses.",
+    )
+    segment_group = parser.add_mutually_exclusive_group()
+    segment_group.add_argument("--single-rf-segment", dest="single_rf_segment", action="store_true")
+    segment_group.add_argument(
+        "--auto-rf-segments", dest="single_rf_segment", action="store_false",
+        help="Prague automatic phase-segment alignment (default).",
+    )
+    parser.set_defaults(single_rf_segment=False)  # Zebra: True
     parser.add_argument("--skip-cycle-residual-diagnostics", action="store_true")
-    parser.add_argument("--ch0-valid-rise-min-ns", type=float, default=-410.0)
-    parser.add_argument("--ch0-valid-rise-max-ns", type=float, default=-395.0)
+    parser.add_argument("--estimate-only", action="store_true",
+                        help="Save ch2 period estimate and scan without detector-aligned folded outputs")
+    parser.add_argument("--ch0-valid-rise-min-ns", type=float, default=-410.0)  # Zebra: -392.0
+    parser.add_argument("--ch0-valid-rise-max-ns", type=float, default=-395.0)  # Zebra: -374.0
     parser.add_argument("--ch0-valid-tot-min-ns", type=float, default=16.5)
     parser.add_argument("--ch0-valid-tot-max-ns", type=float, default=19.5)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def main() -> None:
@@ -161,11 +177,19 @@ def main() -> None:
         "--ch0-valid-tot-max-ns",
         str(args.ch0_valid_tot_max_ns),
     ]
+    if args.histogram_channels is not None:
+        analyzer_command.extend(["--histogram-channels", args.histogram_channels])
     if args.single_rf_segment:
         analyzer_command.append("--single-rf-segment")
+    else:
+        analyzer_command.append("--auto-rf-segments")
     if args.skip_cycle_residual_diagnostics:
         analyzer_command.append("--skip-cycle-residual-diagnostics")
+    if args.estimate_only:
+        analyzer_command.append("--estimate-only")
     run_command(analyzer_command)
+    if args.estimate_only:
+        return
 
     run_dir = output_root / run_key
     ch0ref_file = run_dir / "Ch0_ref_Rates" / f"{run_key}_Ch0_ref_Rates_scan_matrix.tsv"

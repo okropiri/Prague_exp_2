@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 from collections import defaultdict
@@ -26,7 +27,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--trigger-ref-output-dir")
     parser.add_argument("--ch0ref-output-dir")
     parser.add_argument("--tot-distrib-output-dir")
-    return parser.parse_args()
+    parser.add_argument(
+        "--tot-distrib-display-max-ns", type=float,
+        help="Upper ToT limit for distribution plots only; full TSV/ROOT counts are retained.",
+    )
+    parser.add_argument("--tot-map-display-max-ns", type=float)
+    return record_arguments(parser.parse_args())
 
 
 def parse_metadata_line(line: str) -> tuple[str, str] | None:
@@ -249,6 +255,7 @@ def write_mode_outputs(
     hist_group: str,
     x_label: str,
     title_prefix: str,
+    display_max_ns: float | None = None,
 ) -> None:
     metadata, channel_entries, aggregate_entries, max_cell_count = read_sparse_histogram(sparse_path)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -261,6 +268,10 @@ def write_mode_outputs(
     tot_max = float(metadata["tot_max_ns"])
     tot_bins = int(metadata["tot_bins"])
     channel_count = int(metadata.get("channel_count", "32"))
+    if display_max_ns is not None:
+        if not np.isfinite(display_max_ns) or not tot_min < display_max_ns <= tot_max:
+            raise ValueError("ToT map display maximum must lie within the stored axis")
+        title_prefix += f" | display {tot_min:g}-{display_max_ns:g} ns; full ROOT retained"
 
     heatmap_cmap = build_heatmap_cmap()
     norm = build_norm(float(max_cell_count), logarithmic=True)
@@ -277,6 +288,8 @@ def write_mode_outputs(
         axis = axes.flat[channel]
         counts = build_dense(channel_entries.get(channel, []), x_bins, tot_bins)
         draw_heatmap(axis, counts, x_min, x_max, tot_min, tot_max, f"Ch{channel:02d}", norm, heatmap_cmap)
+        if display_max_ns is not None:
+            axis.set_ylim(tot_min, display_max_ns)
         if counts.sum() > 0 and image is None:
             image = axis.images[0]
         if channel // 8 == 3:
@@ -299,6 +312,8 @@ def write_mode_outputs(
         figure, axis = plt.subplots(figsize=(12, 6))
         panel_norm = build_norm(float(np.max(counts)), logarithmic=True)
         draw_heatmap(axis, counts, x_min, x_max, tot_min, tot_max, f"{title_prefix} | Ch{channel:02d}", panel_norm, heatmap_cmap)
+        if display_max_ns is not None:
+            axis.set_ylim(tot_min, display_max_ns)
         axis.set_xlabel(x_label)
         axis.set_ylabel("ToT (ns)")
         if axis.images:
@@ -338,7 +353,9 @@ def write_mode_outputs(
             )
 
 
-def write_tot_distribution_outputs(tot_distribution_path: Path, output_dir: Path) -> None:
+def write_tot_distribution_outputs(
+    tot_distribution_path: Path, output_dir: Path, display_max_ns: float | None = None,
+) -> None:
     metadata, counts_by_channel = read_tot_distribution(tot_distribution_path)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -353,10 +370,30 @@ def write_tot_distribution_outputs(tot_distribution_path: Path, output_dir: Path
     if bin_width <= 0.0:
         bin_width = (tot_max - tot_min) / tot_bins if tot_bins > 0 else 1.0
     tot_axis = tot_min + (np.arange(tot_bins, dtype=np.float64) + 0.5) * bin_width
+    if display_max_ns is not None:
+        if not np.isfinite(display_max_ns) or display_max_ns <= tot_min:
+            raise ValueError("ToT distribution display maximum must be finite and greater than its minimum")
+        displayed_bins = min(tot_bins, int(np.ceil((display_max_ns - tot_min) / bin_width)))
+    else:
+        displayed_bins = tot_bins
+    displayed_counts = counts_by_channel[:displayed_bins]
+    displayed_axis = tot_axis[:displayed_bins]
+    displayed_max = tot_min + displayed_bins * bin_width
+    displayed_total = displayed_counts.sum(axis=1)
 
     total = counts_by_channel.sum(axis=1)
     nonzero = nonzero_channel_indices(counts_by_channel)
-    source_label = f"all parsed pulses with ToT >= {tot_min:g} ns"
+    def source_label(values: np.ndarray) -> str:
+        label = f"all parsed pulses with ToT >= {tot_min:g} ns"
+        if display_max_ns is not None:
+            count = values.sum()
+            excluded = values[displayed_bins:].sum()
+            fraction = 100 * excluded / count if count else 0.0
+            label += (
+                f"\ndisplay {tot_min:g}-{display_max_ns:g} ns"
+                f" | outside displayed bins: {int(excluded):,} ({fraction:.6f}%)"
+            )
+        return label
     heatmap_cmap = build_heatmap_cmap()
 
     def save_combined_figure(suffix: str, *, logarithmic_total: bool) -> None:
@@ -369,8 +406,8 @@ def write_tot_distribution_outputs(tot_distribution_path: Path, output_dir: Path
             constrained_layout=True,
         )
 
-        line_values = np.where(total > 0.0, total, np.nan) if logarithmic_total else total
-        axes[0].plot(tot_axis, line_values, color="#ff7f0e", linewidth=0.9)
+        line_values = np.where(displayed_total > 0.0, displayed_total, np.nan) if logarithmic_total else displayed_total
+        axes[0].plot(displayed_axis, line_values, color="#ff7f0e", linewidth=0.9)
         axes[0].set_ylabel("counts")
         axes[0].set_title("Top: total counts summed over all channels")
         axes[0].grid(True, linewidth=0.3, alpha=0.4)
@@ -378,13 +415,13 @@ def write_tot_distribution_outputs(tot_distribution_path: Path, output_dir: Path
             axes[0].set_yscale("log")
 
         if nonzero.size > 0:
-            heatmap = counts_by_channel[:, nonzero].T
+            heatmap = displayed_counts[:, nonzero].T
             masked_heatmap = np.ma.masked_less_equal(heatmap, 0.0)
             image = axes[1].imshow(
                 masked_heatmap,
                 aspect="auto",
                 origin="lower",
-                extent=(tot_min, tot_max, -0.5, nonzero.size - 0.5),
+                extent=(tot_min, displayed_max, -0.5, nonzero.size - 0.5),
                 interpolation="nearest",
                 cmap=heatmap_cmap,
                 norm=build_norm(float(np.max(heatmap)), logarithmic=True),
@@ -397,13 +434,15 @@ def write_tot_distribution_outputs(tot_distribution_path: Path, output_dir: Path
 
         figure.suptitle(
             "Whole-run ToT distribution"
-            f" | {source_label}"
+            f" | {source_label(total)}"
             f" | {'log-y total counts' if logarithmic_total else 'linear total counts'}"
             " | log-z channel heatmap"
         )
         axes[1].set_title("Bottom: channel-resolved counts")
         axes[1].set_xlabel("ToT (ns)")
         axes[1].set_ylabel("Channel")
+        if display_max_ns is not None:
+            axes[1].set_xlim(tot_min, display_max_ns)
         figure.savefig(output_dir / f"combined_tot_distrib{suffix}.png", dpi=180)
         figure.savefig(output_dir / f"combined_tot_distrib{suffix}.pdf")
         plt.close(figure)
@@ -413,19 +452,21 @@ def write_tot_distribution_outputs(tot_distribution_path: Path, output_dir: Path
     save_combined_figure("_logy", logarithmic_total=True)
 
     for channel in nonzero:
-        channel_counts = counts_by_channel[:, channel]
+        channel_counts = displayed_counts[:, channel]
         for suffix, logarithmic_total in (("", False), ("_logy", True)):
             figure, axis = plt.subplots(figsize=(13, 5), constrained_layout=True)
             line_values = np.where(channel_counts > 0.0, channel_counts, np.nan) if logarithmic_total else channel_counts
-            axis.plot(tot_axis, line_values, color="#ff7f0e", linewidth=0.9)
+            axis.plot(displayed_axis, line_values, color="#ff7f0e", linewidth=0.9)
             axis.set_title(
                 "Whole-run ToT counts"
-                f" | {source_label}"
+                f" | {source_label(counts_by_channel[:, channel])}"
                 f" | {labels[channel]}"
                 f" | {'log-y' if logarithmic_total else 'linear'}"
             )
             axis.set_xlabel("ToT (ns)")
             axis.set_ylabel("counts")
+            if display_max_ns is not None:
+                axis.set_xlim(tot_min, display_max_ns)
             axis.grid(True, linewidth=0.3, alpha=0.4)
             if logarithmic_total:
                 axis.set_yscale("log")
@@ -469,6 +510,7 @@ def main() -> None:
         hist_group="TriggerRefToT",
         x_label="Rising time relative to trigger window (ns)",
         title_prefix="Trigger-referenced ToT vs rising time",
+        display_max_ns=args.tot_map_display_max_ns,
     )
     write_mode_outputs(
         ch0ref_path,
@@ -478,8 +520,9 @@ def main() -> None:
         hist_group="Ch0RefToT",
         x_label="Rising time relative to validated first ch0 reference hit (ns)",
         title_prefix="ch0-referenced ToT vs rising time",
+        display_max_ns=args.tot_map_display_max_ns,
     )
-    write_tot_distribution_outputs(tot_distrib_path, tot_distrib_output_dir)
+    write_tot_distribution_outputs(tot_distrib_path, tot_distrib_output_dir, args.tot_distrib_display_max_ns)
 
 
 if __name__ == "__main__":

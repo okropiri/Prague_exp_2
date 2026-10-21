@@ -20,6 +20,18 @@ This is the Mac-side mirror of the DOGMA/NCAL Prague Cyclotron Experiment 2 proj
 - `Documents/`: detector, electronics, articles, tables, and presentation references.
 - `BeamtimeScreens/` and `CAEN_DT5725S/`: setup screenshots and CAEN-specific support material.
 
+## Local Results
+
+All local analysis result copies belong under [Dogma_Analysis/Results/](Dogma_Analysis/Results/), grouped by run type:
+
+- [Position Runs](<Dogma_Analysis/Results/Position Runs/>): Prague position scans, comparison collections, and derived gamma/neutron diagnostics.
+  - The canonical [5 m matched RF-method analysis](<Dogma_Analysis/Results/Position Runs/NCAL_20us_Pos_5m_0000/README.md>) has numbered Steps01-10, shared upstream data, two unshifted Step04 alternatives, complete NCAL pulse TTrees, exact histogram-replay TTrees and per-step reports. Start with the [side-by-side 3P comparison](<Dogma_Analysis/Results/Position Runs/NCAL_20us_Pos_5m_0000/Comparison/NCAL_3P_ToT_comparison.png>). Previous canonical ROOT products and their copy information are preserved unchanged in the [archive](<Dogma_Analysis/Results/Position Runs/NCAL_20us_Pos_5m_0000/Archive/2026-10-19_Previous_5m_results/Folded_RF_3x/>).
+- [Pulser Runs](<Dogma_Analysis/Results/Pulser Runs/>): Prague external-trigger pulser calibration.
+- [Source Runs](<Dogma_Analysis/Results/Source Runs/>): Prague radioactive-source control.
+- [Zebra Runs](<Dogma_Analysis/Results/Zebra Runs/>): Zebra laboratory pulser tests.
+
+Keep acquisition names and the existing per-run step, board, and report directories inside these groups. Future local copies must use the corresponding group rather than create separate result roots. This organization is local only: remote production remains under `/data6/Dogma_analysis_by_Dachi/Results/<run_dir>/...`.
+
 ## Working Model
 
 - Edit code and documentation on the Mac workspace.

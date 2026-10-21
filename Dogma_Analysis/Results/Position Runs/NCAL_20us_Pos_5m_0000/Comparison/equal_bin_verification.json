@@ -1,0 +1,31 @@
+{
+  "status": "PASS_EQUAL_BIN_COMPLETE_NCAL_COMPARISON",
+  "source": {
+    "path": "/data6/Dogma_analysis_by_Dachi/Workflows/NCAL_20us_Pos_5m_0000/Matched_RF_20261019/comparison_source/compare_matched_rf.py",
+    "bytes": 8348,
+    "mtime_ns": 1792417533125726740,
+    "sha256": "0d1de0389873a7ce5df10eb0968456d1f34e4f077242d17199974a7ae17965d8"
+  },
+  "input_ncal_pulses": 31217712,
+  "phase_invalid_pulses": 58053,
+  "phase_valid_pulses": 31159659,
+  "phase_valid_at_or_above_display_tot": 77,
+  "periods_ns": {
+    "ch0": 38.8500713060152,
+    "ch2": 38.84950000000001
+  },
+  "phase_bin_width_ns": 0.25,
+  "tot_bin_width_ns": 0.1,
+  "tot_stored_ns": [
+    0,
+    128
+  ],
+  "tot_display_ns": [
+    0,
+    60
+  ],
+  "phase_zero": "same selected guarded ch0; no fitted detector offset",
+  "chi_square_claim": "None: the two histograms use the same hits and are statistically correlated.",
+  "range_note": "Common axes extend to the larger fitted period (or 3P); the shorter-period tail is structurally empty.",
+  "persisted_replay_bins_equal": true
+}

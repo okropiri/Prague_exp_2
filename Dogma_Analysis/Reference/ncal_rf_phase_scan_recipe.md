@@ -28,7 +28,7 @@ Recover the fine RF period and phase inside the natural `ch0`-referenced `10 us`
 ## Output Logic
 
 - Keep the main result set first on `padiwa:/data6/Dogma_analysis_by_Dachi/Analysis/<dir_name>/`.
-- Copy the same result set into the local workspace mirror under `Dogma_Analysis/Results/<dir_name>/`.
+- Copy the selected small result artifacts into the local workspace mirror under `Dogma_Analysis/Results/Position Runs/<dir_name>/`.
 - Mark raw-analysis result directories explicitly, for example `_ch0Ref_rawdata_rfPhaseScan`.
 
 ## Current Tooling

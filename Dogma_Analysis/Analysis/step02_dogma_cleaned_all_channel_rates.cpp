@@ -465,6 +465,28 @@ int main(int argc, char** argv) {
         }
 
         std::string line;
+        // File order groups channels, so the first row need not be the earliest hit.
+        while (std::getline(input, line)) {
+            PulseRow row;
+            if (line.empty() || starts_with(line, "#") || starts_with(line, "window_index") ||
+                !parse_pulse_row(line, row)) {
+                continue;
+            }
+            const std::int64_t absoluteNs = static_cast<std::int64_t>(std::llround(row.globalTriggerSeconds * 1e9 + row.riseNs));
+            if (!stats.hasFirstAbsoluteNs || absoluteNs < stats.firstAbsoluteNs) {
+                stats.hasFirstAbsoluteNs = true;
+                stats.firstAbsoluteNs = absoluteNs;
+                stats.lastAbsoluteNs = absoluteNs;
+            }
+        }
+        if (input.bad()) {
+            throw std::runtime_error("Unable to read pulse table while finding the run start");
+        }
+        input.clear();
+        input.seekg(0);
+        if (!input) {
+            throw std::runtime_error("Unable to rewind pulse table after finding the run start");
+        }
         while (std::getline(input, line)) {
             if (line.empty()) {
                 continue;
@@ -492,11 +514,6 @@ int main(int argc, char** argv) {
             stats.pulseCountByChannel[static_cast<std::size_t>(row.channel)] += 1;
 
             const std::int64_t absoluteNs = static_cast<std::int64_t>(std::llround(row.globalTriggerSeconds * 1e9 + row.riseNs));
-            if (!stats.hasFirstAbsoluteNs) {
-                stats.hasFirstAbsoluteNs = true;
-                stats.firstAbsoluteNs = absoluteNs;
-                stats.lastAbsoluteNs = absoluteNs;
-            }
             if (absoluteNs < stats.firstAbsoluteNs) {
                 stats.negativeAbsoluteTimeRows += 1;
                 continue;

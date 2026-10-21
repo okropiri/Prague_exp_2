@@ -10,14 +10,14 @@ How do we go from raw `ch0`-referenced `NCAL` times to one best trial period suc
 
 ## What Happens Before The Search
 
-1. Read the raw DOGMA file.
-2. Keep only the signal windows.
-3. In each signal window, take the earliest `ch0` rise as the local time zero.
-4. Pair each `NCAL` rise with its matching fall to get a `ToT`.
+1. Read the cleaned pulse table produced by step01 from the decoded DOGMA export.
+2. Group the validated pulses by signal window.
+3. In each signal window, take the first `ch0` pulse in file order that passes the configured rise-time and ToT guards as the local time zero.
+4. Use the rise/fall pairs and `ToT` already validated by step01.
 5. Compute the raw `ch0`-referenced `NCAL` time:
 
    $$
-   t_{\mathrm{rel}} = t_{\mathrm{NCAL\ rise}} - t_{\mathrm{earliest\ ch0}}
+   t_{\mathrm{rel}} = t_{\mathrm{NCAL\ rise}} - t_{\mathrm{guarded\ ch0}}
    $$
 
 6. Keep only pulses that pass the accepted time and `ToT` cuts.
@@ -26,24 +26,42 @@ How do we go from raw `ch0`-referenced `NCAL` times to one best trial period suc
 
 Important:
 
+- The reference channel and the RF scoring channel are separate roles. The NCAL
+  default scores channel 2 relative to guarded ch0; it does not directly measure
+  the spacing between ch0 pulses.
+- For an RF mock test, `--score-channel 0` scores additional ch0 pulses, excluding
+  the reference hit itself. Use `--histogram-channels 0,2,6` (or the confirmed
+  detector channels) to save their 2D products independently of scoring.
+- A single self-relative reference at zero provides no RF-period information.
 - The search may use a subsample for speed.
 - The final phase-vs-ToT plot is built later from all accepted stored pulses.
 
-## Current Search Knobs
+## Current Zebra Search Knobs
 
-These are the main search settings used by the current tool.
+Standalone Step04 defaults now target Zebra 0115. Original Prague defaults are
+commented in both the C++ configuration and Python runner. The real-data batch
+runner passes the Prague values explicitly; see the [analysis README](../Analysis/README.md)
+for standalone restoration flags.
 
-- `initialPeriodMinNs = 39.0`
-- `initialPeriodMaxNs = 41.0`
-- `initialStepNs = 0.05`
+- `initialPeriodMinNs = 5.0` (Prague default: `37.0`)
+- `initialPeriodMaxNs = 200.0` (Prague default: `41.0`)
+- `initialStepNs = 0.25` (Prague default: `0.05`)
 - `refineRounds = 3`
-- `refineHalfSpanSteps = 5`
+- `refineHalfSpanSteps = 25`
 - `refineFactor = 10.0`
 - `phaseBinWidthNs = 0.25`
 - `peakWindowNs = 8.0`
 - `minSelectedPulses = 1000`
 - recentering passes per trial period = `2`
-- `scoreStride = 1` by default
+- `scoreStride = 10` (Prague default: `1`; only the search is subsampled)
+- detailed folded channels: `0,1,2,3,6`
+- one global fitted phase origin; `--auto-rf-segments` restores Prague segmentation
+
+The widened range is an exploratory RF-like search, not knowledge of the unknown
+generator setting. It does not cover microsecond periods. Its coarse grid may
+miss a narrow optimum; a credible candidate needs a finer, full-statistics check.
+Flat scores, aliases or scan-edge maxima are not a valid period measurement.
+The phase origin is still fitted globally, so this is not unshifted modulo folding.
 
 For the first `3.4 m / 0000` run, the search used:
 

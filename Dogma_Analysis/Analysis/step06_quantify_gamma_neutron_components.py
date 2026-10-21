@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 import csv
@@ -202,7 +203,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--phase-display", choices=("gamma-relative", "raw"), default="gamma-relative")
     parser.add_argument("--z-scale", choices=("linear", "log"), default="linear")
     parser.add_argument("--linear-z-quantile", type=float, default=0.995)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def signed_delta_ns(values_ns: np.ndarray, center_ns: float, period_ns: float) -> np.ndarray:
@@ -427,6 +428,9 @@ def measure_run(histogram: SparseHistogram, args: argparse.Namespace) -> RunMeas
     if not np.isfinite(gamma_half_width):
         gamma_half_width = args.gamma_phase_min_half_width_ns
 
+    if not np.isfinite(gamma_phase.center_ns):
+        raise ValueError(f"No measured prompt reference in {histogram.path}; check the channel and gamma ToT window.")
+
     gamma_phase_mask = phase_mask_3x(histogram, gamma_phase.center_ns, gamma_half_width, period_ns)
     gamma_tot_projection = histogram.counts[:, gamma_phase_mask].sum(axis=1)
     gamma_tot_weights = np.where(gamma_tot_mask, gamma_tot_projection, 0.0)
@@ -591,8 +595,12 @@ def analyze_components(
         neutron_tot_projection = histogram.counts[:, neutron_phase_mask].sum(axis=1)
         neutron_tot_weights = np.where(signal_tot_mask, neutron_tot_projection, 0.0)
         neutron_tot = weighted_linear_stats(histogram.y_centers_ns, neutron_tot_weights)
-        neutron_tot_min_ns = max(args.signal_tot_min_ns, neutron_tot.q16_ns)
-        neutron_tot_max_ns = min(args.signal_tot_max_ns, neutron_tot.q84_ns)
+        selected_tot_ns = histogram.y_centers_ns[signal_tot_mask]
+        selected_tot_weights = neutron_tot_weights[signal_tot_mask]
+        neutron_tot_quantile_low_ns = weighted_quantile(selected_tot_ns, selected_tot_weights, args.neutron_tot_quantile_low)
+        neutron_tot_quantile_high_ns = weighted_quantile(selected_tot_ns, selected_tot_weights, args.neutron_tot_quantile_high)
+        neutron_tot_min_ns = max(args.signal_tot_min_ns, neutron_tot_quantile_low_ns)
+        neutron_tot_max_ns = min(args.signal_tot_max_ns, neutron_tot_quantile_high_ns)
         if not np.isfinite(neutron_tot_min_ns) or not np.isfinite(neutron_tot_max_ns) or neutron_tot_max_ns <= neutron_tot_min_ns:
             neutron_tot_min_ns = args.signal_tot_min_ns
             neutron_tot_max_ns = args.signal_tot_max_ns
@@ -1016,6 +1024,14 @@ def main() -> None:
     }
 
     intercept, slope, width_source = fit_neutron_width_model(measurements, args)
+    if width_source == "default_minimum":
+        print("WARNING: No separated neutron-width reference is available; the reported "
+              "width model uses the configured minimum, not a measured cross-position template.",
+              flush=True)
+    if not any(close_to_any(measurement.position_m, args.background_control_positions)
+               for measurement in measurements):
+        print("WARNING: No configured background-control position is present in this run selection; "
+              "do not interpret these results as a cross-position background validation.", flush=True)
 
     components: list[ComponentResult] = []
     controls: list[BackgroundControlResult] = []

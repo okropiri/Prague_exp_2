@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from analysis_provenance import record_arguments, record_command
 
 
 def strip_known_suffixes(text: str) -> str:
@@ -66,6 +67,7 @@ def derive_run_key(input_path: Path) -> str:
 
 
 def run_command(command: list[str]) -> None:
+    record_command(command)
     subprocess.run(command, check=True)
 
 
@@ -97,6 +99,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--signal-tdc-ordinal", type=int)
     parser.add_argument("--trigger-tdc-ordinal", type=int)
     parser.add_argument("--trigger-reset-threshold-seconds", type=float, default=1.0)
+    parser.add_argument("--reject-trigger-restarts", action="store_true")
     parser.add_argument("--max-accepted-hit-time-ns", type=float, default=50000.0)
     parser.add_argument("--tot-min-ns", type=float, default=1.0)
     parser.add_argument("--tot-max-ns", type=float, default=5000.0)
@@ -120,7 +123,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--root-tree-rf-summary-file")
     parser.add_argument("--root-tree-rf-period-ns", type=float)
     parser.add_argument("--root-tree-rf-phase-origin-ns", type=float)
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def build_cleaner_command(args: argparse.Namespace, binary_path: Path, run_key: str) -> list[str]:
@@ -151,6 +154,8 @@ def build_cleaner_command(args: argparse.Namespace, binary_path: Path, run_key: 
         command.extend(["--signal-tdc-ordinal", str(args.signal_tdc_ordinal)])
     if args.trigger_tdc_ordinal is not None:
         command.extend(["--trigger-tdc-ordinal", str(args.trigger_tdc_ordinal)])
+    if args.reject_trigger_restarts:
+        command.append("--reject-trigger-restarts")
     return command
 
 

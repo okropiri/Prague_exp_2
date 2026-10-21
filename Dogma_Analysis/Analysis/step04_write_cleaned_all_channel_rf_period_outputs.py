@@ -1,4 +1,5 @@
 from __future__ import annotations
+from analysis_provenance import record_arguments
 
 import argparse
 from collections import defaultdict
@@ -32,7 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ch0ref-output-dir")
     parser.add_argument("--folded-output-dir")
     parser.add_argument("--folded3x-output-dir")
-    return parser.parse_args()
+    return record_arguments(parser.parse_args())
 
 
 def parse_metadata_line(line: str) -> tuple[str, str] | None:
@@ -335,8 +336,11 @@ def write_sparse_2d_outputs(
     x_label: str,
     y_label: str,
     title_prefix: str,
+    display_y_max_ns: float | None = None,
 ) -> None:
     metadata, channel_entries, aggregate_entries, max_cell_count = read_sparse_histogram(sparse_path)
+    if not aggregate_entries:
+        raise ValueError(f"No folded 2D entries in {sparse_path}; refusing to generate empty plots.")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     run_key = metadata.get("run_key", sparse_path.stem)
@@ -347,6 +351,10 @@ def write_sparse_2d_outputs(
     y_max = float(metadata.get("y_max_ns", metadata.get("tot_max_ns", "1")))
     y_bins = int(metadata.get("y_bins", metadata.get("tot_bins", "1")))
     channel_count = int(metadata.get("channel_count", "32"))
+    if display_y_max_ns is not None:
+        if not np.isfinite(display_y_max_ns) or not y_min < display_y_max_ns <= y_max:
+            raise ValueError("Display maximum must lie within the stored y axis")
+        title_prefix += f" | display {y_min:g}-{display_y_max_ns:g} ns; full ROOT retained"
 
     heatmap_cmap = build_heatmap_cmap()
 
@@ -369,13 +377,18 @@ def write_sparse_2d_outputs(
             axis = axes.flat[channel]
             counts = build_dense(channel_entries.get(channel, []), x_bins, y_bins)
             draw_heatmap(axis, counts, x_min, x_max, y_min, y_max, f"Ch{channel:02d}", norm, heatmap_cmap)
+            if display_y_max_ns is not None:
+                axis.set_ylim(y_min, display_y_max_ns)
+            if counts.sum() == 0:
+                axis.text(0.5, 0.5, "No stored entries", transform=axis.transAxes, ha="center", va="center")
             if counts.sum() > 0 and image is None and axis.images:
                 image = axis.images[0]
             if channel // 8 == 3:
                 axis.set_xlabel(x_label)
             if channel % 8 == 0:
                 axis.set_ylabel(y_label)
-        combined_figure.suptitle(f"{title_prefix} | all channels | {scale_label}")
+        populated_channels = ",".join(str(channel) for channel in sorted(channel_entries))
+        combined_figure.suptitle(f"{title_prefix} | populated stored channels: {populated_channels} | {scale_label}")
         if image is not None:
             combined_figure.colorbar(image, ax=axes.ravel().tolist(), label="counts")
         combined_figure.savefig(output_dir / f"combined_{suffix}.png", dpi=180)
@@ -401,6 +414,8 @@ def write_sparse_2d_outputs(
             )
             axis.set_xlabel(x_label)
             axis.set_ylabel(y_label)
+            if display_y_max_ns is not None:
+                axis.set_ylim(y_min, display_y_max_ns)
             if axis.images:
                 figure.colorbar(axis.images[0], ax=axis, label="counts")
             figure.savefig(output_dir / f"ch{channel:02d}_{per_channel_filename_suffix}{'_linearZ' if scale_label == 'linear Z' else ''}.png", dpi=180)

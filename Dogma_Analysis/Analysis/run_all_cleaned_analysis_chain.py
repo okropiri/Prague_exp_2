@@ -251,6 +251,16 @@ def run_chain_for_file(
                 str(build_dir),
                 "--score-channel",
                 str(step04_score_channel),
+                "--histogram-channels",
+                ",".join(str(channel) for channel in sorted({step04_score_channel, 2})),
+                # Prague real-data settings are the step04 defaults; the Zebra two-generator
+                # values remain commented beside each default in step04_run_cleaned_all_channel_rf_period.py.
+                "--ch0ref-min-ns", "-6000", "--ch0ref-max-ns", "6000", "--ch0ref-bins", "12000",
+                "--trigger-ref-min-ns", "-6000", "--trigger-ref-max-ns", "6000", "--trigger-ref-bins", "2400",
+                "--tot-max-ns", "128", "--tot-bins", "1280", "--score-tot-max-ns", "128",
+                "--initial-period-min-ns", "37", "--initial-period-max-ns", "41", "--initial-step-ns", "0.05",
+                "--score-stride", "1", "--ch0-valid-rise-min-ns", "-410", "--ch0-valid-rise-max-ns", "-395",
+                "--auto-rf-segments",
             ],
             current_step,
         )
